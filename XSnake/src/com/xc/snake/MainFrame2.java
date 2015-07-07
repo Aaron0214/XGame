@@ -27,6 +27,7 @@ public class MainFrame2 implements ActionListener,KeyListener{
 	private boolean isright = false;
 	private boolean isup = true;
 	private boolean isdown = false;
+	private boolean isEnd = true;
 	
 	public MainFrame2(){
 		frame = new JFrame();
@@ -52,9 +53,6 @@ public class MainFrame2 implements ActionListener,KeyListener{
 		frame.add(toolbar);
 		frame.add(panel);
 		
-		Thread t = new Thread(new run_thread());
-		t.start();
-		
 		button.addActionListener(this);
 		frame.setFocusable(true);
 		frame.addKeyListener(this);
@@ -73,43 +71,50 @@ public class MainFrame2 implements ActionListener,KeyListener{
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource() == button){
-			System.out.println("2");
+			isEnd = false;
+			frame.requestFocus();
+			Thread t = new Thread(new run_thread());
+			t.start();
 		}
 		
 	}
 	
 	@Override
 	public void keyPressed(KeyEvent e) {
-		if(e.getKeyCode() == KeyEvent.VK_DOWN || e.getKeyCode() == KeyEvent.VK_S){
-			moveDown(panel.list);
-			isup = false;
-			isdown = true;
-			isleft = false;
-			isright = false;
-		}
-		
-		if(e.getKeyCode() == KeyEvent.VK_UP || e.getKeyCode() == KeyEvent.VK_W){
-			moveUp(panel.list);
-			isup = true;
-			isdown = false;
-			isleft = false;
-			isright = false;
-		}
-		
-		if(e.getKeyCode() == KeyEvent.VK_LEFT || e.getKeyCode() == KeyEvent.VK_A){
-			moveLeft(panel.list);
-			isup = false;
-			isdown = false;
-			isleft = true;
-			isright = false;
-		}
-		
-		if(e.getKeyCode() == KeyEvent.VK_RIGHT || e.getKeyCode() == KeyEvent.VK_D){
-			moveRight(panel.list);
-			isup = false;
-			isdown = false;
-			isleft = false;
-			isright = true;
+		if(!isEnd){
+			if(e.getKeyCode() == KeyEvent.VK_DOWN || e.getKeyCode() == KeyEvent.VK_S){
+				moveDown(panel.list);
+				isup = false;
+				isdown = true;
+				isleft = false;
+				isright = false;
+			}
+			
+			if(e.getKeyCode() == KeyEvent.VK_UP || e.getKeyCode() == KeyEvent.VK_W){
+				moveUp(panel.list);
+				isup = true;
+				isdown = false;
+				isleft = false;
+				isright = false;
+			}
+			
+			if(e.getKeyCode() == KeyEvent.VK_LEFT || e.getKeyCode() == KeyEvent.VK_A){
+				moveLeft(panel.list);
+				isup = false;
+				isdown = false;
+				isleft = true;
+				isright = false;
+			}
+			
+			if(e.getKeyCode() == KeyEvent.VK_RIGHT || e.getKeyCode() == KeyEvent.VK_D){
+				moveRight(panel.list);
+				isup = false;
+				isdown = false;
+				isleft = false;
+				isright = true;
+			}
+		}else{
+			JOptionPane.showMessageDialog(frame, "please press start");
 		}
 	}
 	@Override
@@ -123,10 +128,6 @@ public class MainFrame2 implements ActionListener,KeyListener{
 	
 	//向上移动
 	public void moveUp(List<SnakeBean> snakeBeanList){
-		List<SnakeBean> a = new ArrayList<SnakeBean>();
-		a.addAll(snakeBeanList);
-//		ifNoRoad(a,"up");
-//		ifNoRoad(snakeBeanList,"up");
 		//先倒序
 		if(isdown){
 			sort(snakeBeanList);
@@ -140,14 +141,14 @@ public class MainFrame2 implements ActionListener,KeyListener{
 		snakeBean.setEndPointY(snakeBeanList.get(size -1).getStartPointY());
 		snakeBeanList.add(snakeBean);
 		panel.repaint();
+		List<SnakeBean> a = new ArrayList<SnakeBean>();
+		a.addAll(snakeBeanList);
+		ifNoRoad(a);
+		ifEat(snakeBeanList,panel.x,panel.y);
 	}
 	
 	//向左移动
 	private void moveLeft(List<SnakeBean> snakeBeanList){
-		List<SnakeBean> a = new ArrayList<SnakeBean>();
-		a.addAll(snakeBeanList);
-//		ifNoRoad(a,"left");
-//		ifNoRoad(snakeBeanList,"left");
 		if(isright){
 			sort(snakeBeanList);
 		}
@@ -160,14 +161,15 @@ public class MainFrame2 implements ActionListener,KeyListener{
 		snakeBean.setEndPointY(snakeBeanList.get(size -1).getEndPointY());
 		snakeBeanList.add(snakeBean);
 		panel.repaint();
+		
+		List<SnakeBean> a = new ArrayList<SnakeBean>();
+		a.addAll(snakeBeanList);
+		ifNoRoad(a);
+		ifEat(snakeBeanList,panel.x,panel.y);
 	}
 	
 	//向下移动
 	private void moveDown(List<SnakeBean> snakeBeanList){
-		List<SnakeBean> a = new ArrayList<SnakeBean>();
-		a.addAll(snakeBeanList);
-//		ifNoRoad(a,"down");
-//		ifNoRoad(snakeBeanList,"down");
 		if(isup){
 			sort(snakeBeanList);
 		}
@@ -180,13 +182,14 @@ public class MainFrame2 implements ActionListener,KeyListener{
 		snakeBean.setEndPointY(snakeBeanList.get(size -1).getStartPointY());
 		snakeBeanList.add(snakeBean);
 		panel.repaint();
+		
+		List<SnakeBean> a = new ArrayList<SnakeBean>();
+		a.addAll(snakeBeanList);
+		ifNoRoad(a);
+		ifEat(snakeBeanList,panel.x,panel.y);
 	}
 	
 	private void moveRight(List<SnakeBean> snakeBeanList){
-		List<SnakeBean> a = new ArrayList<SnakeBean>();
-		a.addAll(snakeBeanList);
-//		ifNoRoad(a,"right");
-//		ifNoRoad(snakeBeanList,"right");
 		//先正序
 		if(isleft){
 			sort(snakeBeanList);
@@ -201,38 +204,67 @@ public class MainFrame2 implements ActionListener,KeyListener{
 		snakeBeanList.add(snakeBean);
 		panel.repaint();
 		
+		List<SnakeBean> a = new ArrayList<SnakeBean>();
+		a.addAll(snakeBeanList);
+		ifNoRoad(a);
+		ifEat(snakeBeanList,panel.x,panel.y);
 	}
 	
 	//判断是否碰到自己的身体
-	public void ifNoRoad(List<SnakeBean> snakeBeanList,String dire){
+	public void ifNoRoad(List<SnakeBean> snakeBeanList){
 		int size = snakeBeanList.size();
 		SnakeBean s = snakeBeanList.get(size - 1);
 		Integer x = s.getStartPointX();
 		Integer y = s.getStartPointY();
-//		Integer x = 0;
-//		Integer y = 0;
-//		if("left".equals(dire)){
-//			 x = s.getStartPointX() - 5;
-//			 y = s.getStartPointY();
-//		}else if("up".equals(dire)){
-//			 x = s.getStartPointX();
-//			 y = s.getStartPointY() - 5;
-//		}else if("down".equals(dire)){
-//			 x = s.getStartPointX();
-//			 y = s.getStartPointY() + 5;
-//		}else if("right".equals(dire)){
-//			 x = s.getStartPointX() + 5;
-//			 y = s.getStartPointY();
-//		}
 		int i = 0;
-		for(SnakeBean snakeBean : snakeBeanList){
-			if((x.equals(snakeBean.getStartPointX()) && y.equals(snakeBean.getStartPointY())) 
-					|| (x.equals(snakeBean.getEndPointX()) && y.equals(snakeBean.getEndPointY()))){
-				JOptionPane.showMessageDialog(frame, "Game over");
+		if(x + 15 > 500 || x - 5 < 0 || y - 5 < 0 || y + 5 > 450){
+			JOptionPane.showMessageDialog(frame, "Game over");
+			isEnd = true;
+		}else{
+			for(SnakeBean snakeBean : snakeBeanList){
+				if((x.equals(snakeBean.getStartPointX()) && y.equals(snakeBean.getStartPointY())) 
+						|| (x.equals(snakeBean.getEndPointX()) && y.equals(snakeBean.getEndPointY()))){
+					JOptionPane.showMessageDialog(frame, "Game over");
+					isEnd = true;
+				}
+				if(i == size - 2){
+					break;
+				}
+				i++;
 			}
-			if(i == size - 1){
-				break;
-			}
+		}
+	}
+	
+	public void ifEat(List<SnakeBean> snakeBeanList,Integer x,Integer y){
+		int size = snakeBeanList.size();
+		SnakeBean s = snakeBeanList.get(size -1);
+		Integer startPointX = 0;
+		Integer startPointY = 0;
+		if(isup){
+			startPointX = s.getStartPointX();
+			startPointY = s.getStartPointY() - 5;
+		}else if(isleft){
+			startPointX = s.getStartPointX() - 5;
+			startPointY = s.getStartPointY();
+		}else if(isdown){
+			startPointX = s.getStartPointX();
+			startPointY = s.getStartPointY() + 5; 
+		}else if(isright){
+			startPointX = s.getStartPointX() + 5;
+			startPointY = s.getStartPointY();
+		}
+		if(x.equals(startPointX) && y.equals(startPointY)){
+			SnakeBean snake = new SnakeBean();
+			snake.setStartPointX(x);
+			snake.setStartPointY(y);
+			snake.setEndPointX(x+5);
+			snake.setEndPointY(y+5);
+			snakeBeanList.add(snake);
+			x = 5 * (int) (Math.random() * 99);
+			y = 5 * (int) (Math.random() * 99);
+			panel.x = x;
+			panel.y = y;
+			System.out.println("x:"+ panel.x + ",y:" +panel.y);
 		}
 	}
 	
@@ -260,10 +292,8 @@ public class MainFrame2 implements ActionListener,KeyListener{
 
 		@Override
 		public void run() {
-			int indexX = 0;
-			int indexY = 0;
 			
-			while(indexX >= 0 && indexY >= 0){
+			while(!isEnd){
 				try {
 					if(isup){
 						moveUp(panel.list);
@@ -282,8 +312,6 @@ public class MainFrame2 implements ActionListener,KeyListener{
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
-				
-				
 			}
 		}
 	}
@@ -293,12 +321,15 @@ class GamePanel2 extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 	
+	int x = 50;
+	int y = 50;
 	List<SnakeBean> list = new ArrayList<SnakeBean>();
 	
 	public void paint(Graphics g){
 		g.setColor(Color.BLACK);
 		g.fillRect(0, 0, 500, 500);
 		g.setColor(Color.white);
+		g.fillRect(x,y,5,5);
 		if(null != list && list.size() > 0){
 			for(SnakeBean snakeBean : list){
 				g.fillRect(snakeBean.getStartPointX(),snakeBean.getStartPointY(), Math.abs(snakeBean.getStartPointX() - snakeBean.getEndPointX()), Math.abs(snakeBean.getStartPointY() - snakeBean.getEndPointY()));
@@ -307,6 +338,9 @@ class GamePanel2 extends JPanel {
 	}
 	
 	public void init(){
+		x = 5 * (int) (Math.random() * 99);
+		y = 5 * (int) (Math.random() * 99);
+		System.out.println("x:"+x+",y:"+y);
 		for(int i = 0;i<100/5;i++){
 			SnakeBean snakeBean = new SnakeBean();
 			snakeBean.setStartPointX(250);
