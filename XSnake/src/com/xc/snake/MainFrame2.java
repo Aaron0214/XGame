@@ -35,7 +35,7 @@ public class MainFrame2 implements ActionListener,KeyListener{
 		
 		//工具栏
 		button = new JButton();
-		button.setText("start");
+		button.setText("开始");
 		button.setContentAreaFilled(false);
 		button.setBorder(null);
 		button.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -71,10 +71,16 @@ public class MainFrame2 implements ActionListener,KeyListener{
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource() == button){
-			isEnd = false;
-			frame.requestFocus();
-			Thread t = new Thread(new run_thread());
-			t.start();
+			int num = JOptionPane.showConfirmDialog(frame, "确认开始?","提示", 0);
+			if(num == 0){
+				isEnd = false;
+				frame.requestFocus();
+				Thread t = new Thread(new run_thread());
+				t.start();
+			}else{
+				isEnd = true;
+				frame.requestFocus();
+			}
 		}
 		
 	}
@@ -114,7 +120,7 @@ public class MainFrame2 implements ActionListener,KeyListener{
 				isright = true;
 			}
 		}else{
-			JOptionPane.showMessageDialog(frame, "please press start");
+			JOptionPane.showMessageDialog(frame, "请先开始游戏！","提示",0);
 		}
 	}
 	@Override
@@ -218,14 +224,36 @@ public class MainFrame2 implements ActionListener,KeyListener{
 		Integer y = s.getStartPointY();
 		int i = 0;
 		if(x + 15 > 500 || x - 5 < 0 || y - 5 < 0 || y + 5 > 450){
-			JOptionPane.showMessageDialog(frame, "Game over");
+			JOptionPane.showMessageDialog(frame, "Game over","游戏结束",0);
 			isEnd = true;
+			int num = JOptionPane.showConfirmDialog(frame, "是否重新开始？","",0);
+			if(num == 0){
+				isEnd = false;
+				panel.init();
+				sort(panel.list);
+				panel.repaint();
+				Thread t = new Thread(new run_thread());
+				t.start();
+			}else{
+				isEnd = true;
+			}
 		}else{
 			for(SnakeBean snakeBean : snakeBeanList){
 				if((x.equals(snakeBean.getStartPointX()) && y.equals(snakeBean.getStartPointY())) 
 						|| (x.equals(snakeBean.getEndPointX()) && y.equals(snakeBean.getEndPointY()))){
-					JOptionPane.showMessageDialog(frame, "Game over");
+					JOptionPane.showMessageDialog(frame, "Game over","游戏结束",0);
 					isEnd = true;
+					int num = JOptionPane.showConfirmDialog(frame, "是否重新开始？","",0);
+					if(num == 0){
+						isEnd = false;
+						panel.init();
+						sort(panel.list);
+						panel.repaint();
+						Thread t = new Thread(new run_thread());
+						t.start();
+					}else{
+						isEnd = true;
+					}
 				}
 				if(i == size - 2){
 					break;
@@ -338,6 +366,7 @@ class GamePanel2 extends JPanel {
 	}
 	
 	public void init(){
+		list = new ArrayList<SnakeBean>();
 		x = 5 * (int) (Math.random() * 99);
 		y = 5 * (int) (Math.random() * 99);
 		System.out.println("x:"+x+",y:"+y);
