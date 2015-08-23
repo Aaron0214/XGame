@@ -1,20 +1,25 @@
 package com.xc.financial.mainapp;
 
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
+import javax.swing.plaf.basic.BasicTreeUI;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.DefaultTreeModel;
 
 public class MainFrame implements MouseListener{
 	
 	private JFrame frame;
-	private JTree tree;
+	private JTree jtree;
 	private JPanel jpanel,instoke;
 	
 	public MainFrame(){
@@ -22,31 +27,35 @@ public class MainFrame implements MouseListener{
 		frame.setLayout(null);
 		
 		
-		DefaultMutableTreeNode top = new DefaultMutableTreeNode("财务管理系统");
+		DefaultMutableTreeNode root = new DefaultMutableTreeNode("财务管理系统");
 		DefaultMutableTreeNode index = new DefaultMutableTreeNode("首页");
 		
 		DefaultMutableTreeNode jxc = new DefaultMutableTreeNode("进销存");
-		DefaultMutableTreeNode instore = new DefaultMutableTreeNode("收入管理");
-		DefaultMutableTreeNode outstore = new DefaultMutableTreeNode("消费管理");
-		DefaultMutableTreeNode maney = new DefaultMutableTreeNode("余额管理");
+		jxc.add(new DefaultMutableTreeNode("收入管理"));
+		jxc.add(new DefaultMutableTreeNode("消费管理"));
+		jxc.add(new DefaultMutableTreeNode("余额管理"));
 		
 		DefaultMutableTreeNode user = new DefaultMutableTreeNode("用户管理");
-		DefaultMutableTreeNode adduser = new DefaultMutableTreeNode("用户列表");
+		user.add(new DefaultMutableTreeNode("用户列表"));
+		root.add(index);
+		root.add(jxc);
+		root.add(user);
 		
-		jxc.add(instore);
-		jxc.add(outstore);
-		jxc.add(maney);
-		
-		user.add(adduser);
-		
-		top.add(index);
-		top.add(jxc);
-		top.add(user);
-		
-		tree = new JTree(top);
-		tree.setBounds(new Rectangle(20,20,120,580));
-		tree.setOpaque(false);
-//		tree.setCursor(new Cursor(Cursor.HAND_CURSOR));
+		DefaultTreeModel model=new DefaultTreeModel(root);
+		jtree = new JTree(model);
+		DefaultTreeCellRenderer render=(DefaultTreeCellRenderer)(jtree.getCellRenderer());
+		render.setOpenIcon(new ImageIcon(""));//把前面的图标去掉
+		render.setLeafIcon(new ImageIcon(""));
+		render.setClosedIcon(new ImageIcon(""));//把前面的图标去掉
+		render.setBackgroundNonSelectionColor(new Color(0, 0, 0, 0));//设置节点透明
+		BasicTreeUI ui=(BasicTreeUI)(jtree.getUI());
+		ui.setCollapsedIcon(new ImageIcon("resources/images/tree.png"));//自定义打开的图标
+		ui.setExpandedIcon(new ImageIcon("resources/images/tree1.png"));//自定义打开的图标
+		jtree.putClientProperty("JTree.lineStyle","None");//隐藏连接线
+		jtree.setOpaque(false);
+		jtree.setCellRenderer(render);
+		jtree.setBounds(new Rectangle(20,20,120,580));
+		jtree.setCursor(new Cursor(Cursor.HAND_CURSOR));
 		
 		jpanel = new JPanel();
 		jpanel.setBackground(Color.gray);
@@ -55,10 +64,9 @@ public class MainFrame implements MouseListener{
 		instoke = new InstockFrame();
 		instoke.setBounds(new Rectangle(140,20,670,580));
 		
-		tree.addMouseListener(this);
+		jtree.addMouseListener(this);
 		
-		
-		frame.add(tree);
+		frame.add(jtree);
 		frame.add(jpanel);
 		frame.add(instoke);
 		
@@ -76,7 +84,7 @@ public class MainFrame implements MouseListener{
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		if(SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 1){
-			DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
+			DefaultMutableTreeNode node = (DefaultMutableTreeNode) jtree.getLastSelectedPathComponent();
 			if(node != null && node.getChildCount() == 0){
 				if(node.getUserObject().equals("首页")){
 					jpanel.setVisible(true);
