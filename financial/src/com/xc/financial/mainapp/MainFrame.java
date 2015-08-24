@@ -1,6 +1,7 @@
 package com.xc.financial.mainapp;
 
 import java.awt.Color;
+import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
@@ -44,13 +45,13 @@ public class MainFrame implements MouseListener{
 		DefaultTreeModel model=new DefaultTreeModel(root);
 		jtree = new JTree(model);
 		DefaultTreeCellRenderer render=(DefaultTreeCellRenderer)(jtree.getCellRenderer());
-		render.setOpenIcon(new ImageIcon(""));//把前面的图标去掉
+//		render.setOpenIcon(new ImageIcon(""));//把前面的图标去掉
 		render.setLeafIcon(new ImageIcon(""));
-		render.setClosedIcon(new ImageIcon(""));//把前面的图标去掉
+//		render.setClosedIcon(new ImageIcon(""));//把前面的图标去掉
 		render.setBackgroundNonSelectionColor(new Color(0, 0, 0, 0));//设置节点透明
 		BasicTreeUI ui=(BasicTreeUI)(jtree.getUI());
-		ui.setCollapsedIcon(new ImageIcon("resources/images/tree.png"));//自定义打开的图标
-		ui.setExpandedIcon(new ImageIcon("resources/images/tree1.png"));//自定义打开的图标
+//		ui.setCollapsedIcon(new ImageIcon("resources/images/tree.png"));//自定义打开的图标
+//		ui.setExpandedIcon(new ImageIcon("resources/images/tree1.png"));//自定义打开的图标
 		jtree.putClientProperty("JTree.lineStyle","None");//隐藏连接线
 		jtree.setOpaque(false);
 		jtree.setCellRenderer(render);
@@ -58,11 +59,11 @@ public class MainFrame implements MouseListener{
 		jtree.setCursor(new Cursor(Cursor.HAND_CURSOR));
 		
 		jpanel = new JPanel();
-		jpanel.setBackground(Color.gray);
-		jpanel.setBounds(new Rectangle(140,20,670,580));
+//		jpanel.setBackground(Color.gray);
+		jpanel.setBounds(new Rectangle(130,20,660,546));
 		
 		instoke = new InstockFrame();
-		instoke.setBounds(new Rectangle(140,20,670,580));
+		instoke.setBounds(new Rectangle(130,20,660,546));
 		
 		jtree.addMouseListener(this);
 		
@@ -70,12 +71,19 @@ public class MainFrame implements MouseListener{
 		frame.add(jpanel);
 		frame.add(instoke);
 		
+		doLay();
 		frame.setVisible(true);
 		frame.setSize(800, 600);
 		frame.setLocationRelativeTo(null);
 		frame.setResizable(false);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
+	
+	private void doLay() {
+        Container container = frame.getContentPane();
+        container.setBackground(new Color(167, 201, 219));
+        frame.pack();
+    } 
 	
 	public static void main(String[] args){
 		new MainFrame();

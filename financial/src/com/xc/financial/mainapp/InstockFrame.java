@@ -5,6 +5,7 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -21,8 +22,12 @@ public class InstockFrame extends JPanel{
 	private Object[][] rowData = {};
 	private JScrollPane pane3;
 	private JButton button,save,delete;
+	private JLabel lable;
 	
 	public InstockFrame(){
+		
+		lable = new JLabel("编码：");
+		
 		
 		table = new JTable(rowData, columnNames);
 		table.setPreferredScrollableViewportSize(new Dimension(670, 480));
@@ -47,6 +52,7 @@ public class InstockFrame extends JPanel{
         table.setShowGrid(false);// 是否显示网格线
         table.setShowHorizontalLines(true);// 是否显示水平的网格线
         table.setShowVerticalLines(true);// 是否显示垂直的网格线
+        table.setBackground(Color.BLACK);
         table.doLayout();
         
         pane3 = new JScrollPane(table);
@@ -58,12 +64,14 @@ public class InstockFrame extends JPanel{
         delete = new JButton("删除");
         delete.setCursor(new Cursor(Cursor.HAND_CURSOR));
 		
+        
+        this.add(lable);
         this.add(pane3);
         this.add(button);
         this.add(save);
         this.add(delete);
         
-		this.setSize(670, 580);
+		this.setSize(650, 546);
 		this.setVisible(false);
 		
 	}
