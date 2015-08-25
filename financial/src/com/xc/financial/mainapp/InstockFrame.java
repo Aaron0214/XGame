@@ -1,36 +1,98 @@
 package com.xc.financial.mainapp;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.text.ParseException;
 
 import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.table.TableColumn;
 
-public class InstockFrame extends JPanel{
+import org.apache.commons.lang3.ObjectUtils;
+
+import com.xc.financial.beans.InstockBean;
+import com.xc.financial.beans.SearchBean;
+import com.xc.financial.utils.DateUtils;
+import com.xc.financial.utils.StringUtils;
+
+public class InstockFrame extends JPanel implements ActionListener{
 	
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 	private JTable table;
-	private Object[] columnNames = {"","序号","订单编码","收入类型","金额","创建时间","操作员"};
+	private Object[] columnNames = {"","序号","订单编码","家庭成员","收入类型","金额","创建时间","修改时间","操作员"};
 	private Object[][] rowData = {};
 	private JScrollPane pane3;
-	private JButton button,save,delete;
-	private JLabel lable;
+	private JButton button,save,delete,search;
+	private JLabel label,label1,label2;
+	private JComboBox<String> type;
+	private JTextField field,startDate,endDate;
+	private DatePicker datepicker,datepicker1;
+	private String[] str = {"A","B"};
+	private Connection connect;
+	private Statement statement;
+	private ResultSet result;
+	private static final String url="";
+	private static final String username="";
+	private static final String password="";
 	
 	public InstockFrame(){
+		init();
 		
-		lable = new JLabel("编码：");
+		label = new JLabel("编码：");
+		label.setFont(new Font("宋体", Font.PLAIN, 13));
+		label.setVerticalAlignment(SwingConstants.TOP);
 		
+		field = new JTextField();
+		field.setPreferredSize(new Dimension(100, 20));
+		
+		label1 = new JLabel("开始日期：");
+		label1.setFont(new Font("宋体", Font.PLAIN, 13));
+		
+		startDate = new JTextField();
+		startDate.setPreferredSize(new Dimension(175, 20));
+		datepicker = DatePicker.getInstance("yyyy-MM-dd");
+		datepicker.register(startDate);
+		
+		label2 = new JLabel("结束日期：");
+		label2.setFont(new Font("宋体", Font.PLAIN, 13));
+		
+		endDate = new JTextField();
+		endDate.setPreferredSize(new Dimension(175, 20));
+		datepicker1 = DatePicker.getInstance("yyyy-MM-dd");
+		datepicker1.register(endDate);
+		
+		type = new JComboBox<String>(str);
+		type.setFont(new Font("宋体", Font.PLAIN, 13));
+		type.setPreferredSize(new Dimension(50, 20));
+		
+		search = new JButton("搜索");
+		search.setPreferredSize(new Dimension(70, 20));
+		search.setCursor(new Cursor(Cursor.HAND_CURSOR));
 		
 		table = new JTable(rowData, columnNames);
-		table.setPreferredScrollableViewportSize(new Dimension(670, 480));
+		table.setPreferredScrollableViewportSize(new Dimension(670, 440));
 		
 		//设置第一列的宽度
 		TableColumn firsetColumn = table.getColumnModel().getColumn(0);
@@ -56,6 +118,13 @@ public class InstockFrame extends JPanel{
         table.doLayout();
         
         pane3 = new JScrollPane(table);
+        pane3.addMouseListener(new MouseAdapter() {
+			public void mousePressed(MouseEvent e) {
+				if(e.getSource() != datepicker){
+					datepicker.hidePanel();
+				}
+			}
+		});
         
         button = new JButton("添加");
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -65,18 +134,106 @@ public class InstockFrame extends JPanel{
         delete.setCursor(new Cursor(Cursor.HAND_CURSOR));
 		
         
-        this.add(lable);
+        this.add(label);
+        this.add(field);
+        this.add(label1);
+        this.add(startDate);
+        this.add(label2);
+        this.add(endDate);
+        this.add(type);
+        this.add(search);
+        
         this.add(pane3);
         this.add(button);
         this.add(save);
         this.add(delete);
         
-		this.setSize(650, 546);
-		this.setVisible(false);
+        this.addMouseListener(new MouseAdapter() {
+			public void mousePressed(MouseEvent e) {
+				if(e.getSource() != datepicker){
+					datepicker.hidePanel();
+				}
+			}
+		});
+        
+//		this.setSize(650, 546);
+//		this.setVisible(false);
 		
 	}
 	
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		if(e.getSource() == search){
+			SearchBean searchBean = new SearchBean();
+			searchBean.setCode(field.getText());
+			searchBean.setStartDate(startDate.getText());
+			searchBean.setEndDate(endDate.getText());
+			searchBean.setType(type.getSelectedItem().toString());
+			getDatas(searchBean);
+		}
+		
+	}
+	
+	private void init(){
+		getDatas(null);
+	}
+	
+	private void getDatas(SearchBean searchBean){
+		StringBuffer sb = new StringBuffer();	
+		sb.append("select * from instock where 1=1 ");
+		if(StringUtils.isNotEmpty(searchBean.getCode())){
+			sb.append("and code like %" + searchBean.getCode() +"%");
+		}
+		if(StringUtils.isNotEmpty(searchBean.getStartDate())){
+			sb.append("and createDate >=" + DateUtils.dateBegin(DateUtils.parseDate(searchBean.getStartDate())));
+		}
+		if(StringUtils.isNotEmpty(searchBean.getEndDate())){
+			sb.append("and createDate <=" + DateUtils.dateEnd(DateUtils.parseDate(searchBean.getEndDate())));
+		}
+		if(StringUtils.isNotEmpty(searchBean.getType())){
+			sb.append("and type =" + searchBean.getType());
+		}
+		try {
+			connect = DriverManager.getConnection(url, username, password);
+			statement = connect.createStatement();
+			result = statement.executeQuery(sb.toString());
+			if(null != result){
+				Integer index = 1;
+				while(result.next()){
+					rowData = buildData(result,index);
+				}
+			}
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+		}
+	}
+	
+	private Object[][] buildData(ResultSet rs,Integer index){
+		Object[][] data = {};
+		InstockBean instockBean = new InstockBean();
+		try {
+			instockBean.setIndex(index);
+			instockBean.setCode(rs.getString("code"));
+			instockBean.setMember(rs.getString("member"));
+			instockBean.setStartDate(DateUtils.parseLongDate(DateUtils.parseDate(rs.getString("startDate"))));
+			instockBean.setEndDate(DateUtils.parseLongDate(DateUtils.parseDate(rs.getString("endDate"))));
+			instockBean.setType(rs.getString("type"));
+			instockBean.setOperate(rs.getString("operate"));
+			data[index] = (Object[])(Object)instockBean;
+		} catch (SQLException|ParseException e) {
+			e.printStackTrace();
+		}
+		return data;
+	}
+	
 	public static void main(String[] args){
-		new InstockFrame();
+		JFrame frame = new JFrame();
+		JPanel panel = new InstockFrame();
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	    frame.add(panel,BorderLayout.CENTER);
+	    frame.setSize(680, 580);
+	    frame.setLocationRelativeTo(null);
+	    frame.setResizable(false);
+	    frame.setVisible(true);
 	}
 }

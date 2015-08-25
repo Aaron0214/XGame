@@ -8,6 +8,8 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Vector;
@@ -25,12 +27,15 @@ import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 
-public class JTableFrame{
+import com.xc.financial.utils.DateUtils;
+import com.xc.financial.utils.StringUtils;
+
+public class JTableFrame implements ActionListener{
 	
 	private JFrame frame;
 	private static final long serialVersionUID = 1L;
 	private JTable table;
-	private Object[] columnNames = {"","序号","订单编码","收入类型","金额","创建时间","修改时间","操作员"};
+	private Object[] columnNames = {"","序号","订单编码","家庭成员","收入类型","金额","创建时间","修改时间","操作员"};
 	private Object[][] rowData = {};
 	private JScrollPane pane3;
 	private JButton button,save,delete,search;
@@ -93,7 +98,7 @@ public class JTableFrame{
 		type.setPreferredSize(new Dimension(50, 20));
 		
 		search = new JButton("搜索");
-		search.setPreferredSize(new Dimension(70, 25));
+		search.setPreferredSize(new Dimension(70, 20));
 		
 		table = new JTable(rowData, columnNames);
 		table.setPreferredScrollableViewportSize(new Dimension(670, 455));
@@ -157,6 +162,31 @@ public class JTableFrame{
 	
 	public static void main(String[] args){
 		new JTableFrame();
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		if(e.getSource() == search){
+			String code = field.getText();
+			String start = startDate.getText();
+			String end = endDate.getText();
+			String typeValue = type.getSelectedItem().toString();
+			StringBuffer sb = new StringBuffer();	
+			sb.append("select * from instock where 1=1 ");
+			if(StringUtils.isNotEmpty(code)){
+				sb.append("and code like %" + code +"%");
+			}
+			if(StringUtils.isNotEmpty(start)){
+				sb.append("and createDate >=" + DateUtils.dateBegin(DateUtils.parseDate(start)));
+			}
+			if(StringUtils.isNotEmpty(end)){
+				sb.append("and createDate <=" + DateUtils.dateEnd(DateUtils.parseDate(end)));
+			}
+			if(StringUtils.isNotEmpty(typeValue)){
+				sb.append("and type =" + typeValue);
+			}
+		}
+		
 	}
 	
 }
