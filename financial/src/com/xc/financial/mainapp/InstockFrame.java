@@ -1,7 +1,6 @@
 package com.xc.financial.mainapp;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -15,23 +14,28 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.ParseException;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
+import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
 import javax.swing.table.TableColumn;
 
-import org.apache.commons.lang3.ObjectUtils;
-
 import com.xc.financial.beans.InstockBean;
 import com.xc.financial.beans.SearchBean;
+import com.xc.financial.enums.InstockColumnEnum;
 import com.xc.financial.utils.DateUtils;
+import com.xc.financial.utils.ObjectUtils;
 import com.xc.financial.utils.StringUtils;
 
 public class InstockFrame extends JPanel implements ActionListener{
@@ -40,7 +44,7 @@ public class InstockFrame extends JPanel implements ActionListener{
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private JTable table;
+	private Table table;
 	private Object[] columnNames = {"","序号","订单编码","家庭成员","收入类型","金额","创建时间","修改时间","操作员"};
 	private Object[][] rowData = {};
 	private JScrollPane pane3;
@@ -53,8 +57,8 @@ public class InstockFrame extends JPanel implements ActionListener{
 	private Connection connect;
 	private Statement statement;
 	private ResultSet result;
-	private static final String url="";
-	private static final String username="";
+	private static final String url="jdbc:mysql://localhost:3306/financial?useUnicode=true&characterEncoding=UTF-8";
+	private static final String username="root";
 	private static final String password="";
 	
 	public InstockFrame(){
@@ -91,33 +95,39 @@ public class InstockFrame extends JPanel implements ActionListener{
 		search.setPreferredSize(new Dimension(70, 20));
 		search.setCursor(new Cursor(Cursor.HAND_CURSOR));
 		
-		table = new JTable(rowData, columnNames);
-		table.setPreferredScrollableViewportSize(new Dimension(670, 440));
 		
+		table = new Table(rowData, columnNames);
+		table.setPreferredScrollableViewportSize(new Dimension(790, 420));
+		
+		table.isCellEditable(0,2);
 		//设置第一列的宽度
-		TableColumn firsetColumn = table.getColumnModel().getColumn(0);
-		firsetColumn.setMaxWidth(2);
-		
+		table.changeColumnWidth(0, 20);
 		//设置第二列的宽度
-		TableColumn twoColumn = table.getColumnModel().getColumn(1);
-		twoColumn.setMaxWidth(50);
-				
-		table.setRowHeight(30);// 设置每行的高度为20
-		table.setRowHeight(0, 20);// 设置第1行的高度为15
-		table.setRowMargin(5);// 设置相邻两行单元格的距离
-        table.setRowSelectionAllowed(true);// 设置可否被选择.默认为false
-        table.setSelectionBackground(Color.white);// 设置所选择行的背景色
-        table.setSelectionForeground(Color.red);// 设置所选择行的前景色
-        table.setGridColor(Color.black);// 设置网格线的颜色
+		table.changeColumnWidth(1, 50);
+		//设置第3列的宽度
+		table.changeColumnWidth(2, 120);
+		//设置第4列的宽度
+		table.changeColumnWidth(3, 100);
+		//设置第5列的宽度
+		table.changeColumnWidth(4, 100);
+		//设置第6列的宽度
+		table.changeColumnWidth(5, 100);
+		//设置第7列的宽度
+		table.changeColumnWidth(6, 150);
+		//设置第8列的宽度
+		table.changeColumnWidth(7, 150);
+		//设置第9列的宽度
+		table.changeColumnWidth(8, 100);
+		
+		TableColumn fiveColumn = table.getColumnModel().getColumn(4);
+		fiveColumn.setCellEditor(new MyComboBoxEditor(str));
+		
+		pane3 = new JScrollPane();
+//        pane3 = new JScrollPane(table);
+        pane3.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        pane3.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        pane3.setViewportView(table);
         
-        table.setDragEnabled(false);// 不懂这个
-        table.setShowGrid(false);// 是否显示网格线
-        table.setShowHorizontalLines(true);// 是否显示水平的网格线
-        table.setShowVerticalLines(true);// 是否显示垂直的网格线
-        table.setBackground(Color.BLACK);
-        table.doLayout();
-        
-        pane3 = new JScrollPane(table);
         pane3.addMouseListener(new MouseAdapter() {
 			public void mousePressed(MouseEvent e) {
 				if(e.getSource() != datepicker){
@@ -133,6 +143,11 @@ public class InstockFrame extends JPanel implements ActionListener{
         delete = new JButton("删除");
         delete.setCursor(new Cursor(Cursor.HAND_CURSOR));
 		
+        
+        search.addActionListener(this);
+        button.addActionListener(this);
+        save.addActionListener(this);
+        delete.addActionListener(this);
         
         this.add(label);
         this.add(field);
@@ -171,11 +186,50 @@ public class InstockFrame extends JPanel implements ActionListener{
 			searchBean.setType(type.getSelectedItem().toString());
 			getDatas(searchBean);
 		}
+		if(e.getSource() == button){
+			table.addTableRow();
+		}
+		if(e.getSource() == save){
+			insertDate();
+		}
 		
 	}
 	
 	private void init(){
-		getDatas(null);
+//		getDatas(new SearchBean());
+	}
+	
+	private void insertDate(){
+		StringBuffer sb = new StringBuffer();
+		List<Map<String, Object>> datas = table.getSelectRowValue(table.getSelectedRows());
+		for(Map<String, Object> data : datas){
+			try {
+				sb.append("insert into instock(code,type,member,amount,creat_date,modify_date,operate) values(");
+				sb.append("'F20150826000001',");
+				sb.append("'"+ data.get(InstockColumnEnum.getInstockColumnValueByKey("type").getValue())+"',");
+				sb.append("'"+ data.get(InstockColumnEnum.getInstockColumnValueByKey("member").getValue())+"',");
+				sb.append("'"+ data.get(InstockColumnEnum.getInstockColumnValueByKey("amount").getValue()) +"',");
+				sb.append("'"+ DateUtils.parseLongDate(new Date()) +"',");
+				sb.append("'"+ DateUtils.parseLongDate(new Date()) +"',");
+				sb.append(data.get("abc") == null ? null + ")": "'"+ data.get("abc") +"')");
+				
+				connect = DriverManager.getConnection(url, username, password);
+				statement = connect.createStatement();
+				statement.executeUpdate(sb.toString());
+				statement.close();
+				connect.close();
+			} catch (SQLException|ParseException e1) {
+				e1.printStackTrace();
+			}finally{
+				try {
+					statement.close();
+					connect.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		
 	}
 	
 	private void getDatas(SearchBean searchBean){
@@ -197,34 +251,55 @@ public class InstockFrame extends JPanel implements ActionListener{
 			connect = DriverManager.getConnection(url, username, password);
 			statement = connect.createStatement();
 			result = statement.executeQuery(sb.toString());
+			result.last();
+			int count = result.getRow();
+			result.beforeFirst();
 			if(null != result){
 				Integer index = 1;
 				while(result.next()){
-					rowData = buildData(result,index);
+					rowData = buildData(result,index,count);
 				}
 			}
+			statement.close();
+			connect.close();
 		} catch (SQLException e1) {
 			e1.printStackTrace();
+		}finally{
+			try {
+				statement.close();
+				connect.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 	
-	private Object[][] buildData(ResultSet rs,Integer index){
-		Object[][] data = {};
+	private Object[][] buildData(ResultSet rs,Integer index,int count){
+		Object[][] data = new Object[count][];
 		InstockBean instockBean = new InstockBean();
 		try {
 			instockBean.setIndex(index);
 			instockBean.setCode(rs.getString("code"));
 			instockBean.setMember(rs.getString("member"));
-			instockBean.setStartDate(DateUtils.parseLongDate(DateUtils.parseDate(rs.getString("startDate"))));
-			instockBean.setEndDate(DateUtils.parseLongDate(DateUtils.parseDate(rs.getString("endDate"))));
+			instockBean.setCreateDate(DateUtils.parseLongDate(DateUtils.parseDate(rs.getString("create_date"))));
+			instockBean.setModifyDate(DateUtils.parseLongDate(DateUtils.parseDate(rs.getString("modify_date"))));
 			instockBean.setType(rs.getString("type"));
 			instockBean.setOperate(rs.getString("operate"));
-			data[index] = (Object[])(Object)instockBean;
+			Object obj = ObjectUtils.changeToObject(instockBean);
+			data[index - 1] = (Object[])obj;
 		} catch (SQLException|ParseException e) {
 			e.printStackTrace();
 		}
 		return data;
 	}
+	
+	class MyComboBoxEditor extends DefaultCellEditor {
+		private static final long serialVersionUID = 1L;
+
+		public MyComboBoxEditor(String[] items) {
+		    super(new JComboBox<Object>(items));
+		}
+	 }
 	
 	public static void main(String[] args){
 		JFrame frame = new JFrame();

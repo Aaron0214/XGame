@@ -4,17 +4,14 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.GridLayout;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Vector;
 
-import javax.swing.BoxLayout;
+import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -33,7 +30,6 @@ import com.xc.financial.utils.StringUtils;
 public class JTableFrame implements ActionListener{
 	
 	private JFrame frame;
-	private static final long serialVersionUID = 1L;
 	private JTable table;
 	private Object[] columnNames = {"","序号","订单编码","家庭成员","收入类型","金额","创建时间","修改时间","操作员"};
 	private Object[][] rowData = {};
@@ -100,20 +96,22 @@ public class JTableFrame implements ActionListener{
 		search = new JButton("搜索");
 		search.setPreferredSize(new Dimension(70, 20));
 		
-		table = new JTable(rowData, columnNames);
-		table.setPreferredScrollableViewportSize(new Dimension(670, 455));
+		defaultmodel = new DefaultTableModel(rowData, columnNames);
+		table = new JTable(defaultmodel);
+		table.setPreferredScrollableViewportSize(new Dimension(670, 440));
 		
 		//设置第一列的宽度
 		TableColumn firsetColumn = table.getColumnModel().getColumn(0);
-		firsetColumn.setMaxWidth(2);
+		firsetColumn.setMaxWidth(5);
 		
 		//设置第二列的宽度
 		TableColumn twoColumn = table.getColumnModel().getColumn(1);
 		twoColumn.setMaxWidth(50);
+		twoColumn.setCellEditor(new MyComboBoxEditor(str));
 				
-		table.setRowHeight(30);// 设置每行的高度为20
+		table.setRowHeight(20);// 设置每行的高度为20
 		table.setRowHeight(0, 20);// 设置第1行的高度为15
-		table.setRowMargin(5);// 设置相邻两行单元格的距离
+//		table.setRowMargin(5);// 设置相邻两行单元格的距离
         table.setRowSelectionAllowed(true);// 设置可否被选择.默认为false
         table.setSelectionBackground(Color.white);// 设置所选择行的背景色
         table.setSelectionForeground(Color.red);// 设置所选择行的前景色
@@ -123,7 +121,7 @@ public class JTableFrame implements ActionListener{
         table.setShowGrid(false);// 是否显示网格线
         table.setShowHorizontalLines(true);// 是否显示水平的网格线
         table.setShowVerticalLines(true);// 是否显示垂直的网格线
-        table.setBackground(Color.BLACK);
+        table.setBackground(Color.WHITE);
         table.doLayout();
         
         pane3 = new JScrollPane(table);
@@ -142,6 +140,7 @@ public class JTableFrame implements ActionListener{
         delete = new JButton("删除");
         delete.setCursor(new Cursor(Cursor.HAND_CURSOR));
 		
+        button.addActionListener(this);
         
         jpanel.add(label);
         jpanel.add(field);
@@ -159,6 +158,7 @@ public class JTableFrame implements ActionListener{
         return jpanel;
 	}
 
+	
 	
 	public static void main(String[] args){
 		new JTableFrame();
@@ -187,6 +187,21 @@ public class JTableFrame implements ActionListener{
 			}
 		}
 		
+		if(e.getSource() == button){
+			defaultmodel.addRow(new Vector<Object>());
+		}
+		
+	}
+	
+	class MyComboBoxEditor extends DefaultCellEditor {
+	  /**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+
+	public MyComboBoxEditor(String[] items) {
+	    super(new JComboBox<Object>(items));
+	  }
 	}
 	
 }

@@ -20,9 +20,9 @@ public class InstockBean implements Serializable{
 	
 	private BigDecimal amount;
 	
-	private String startDate;
+	private String createDate;
 	
-	private String endDate;
+	private String modifyDate;
 	
 	private String operate;
 
@@ -66,20 +66,20 @@ public class InstockBean implements Serializable{
 		this.amount = amount;
 	}
 
-	public String getStartDate() {
-		return startDate;
+	public String getCreateDate() {
+		return createDate;
 	}
 
-	public void setStartDate(String startDate) {
-		this.startDate = startDate;
+	public void setCreateDate(String createDate) {
+		this.createDate = createDate;
 	}
 
-	public String getEndDate() {
-		return endDate;
+	public String getModifyDate() {
+		return modifyDate;
 	}
 
-	public void setEndDate(String endDate) {
-		this.endDate = endDate;
+	public void setModifyDate(String modifyDate) {
+		this.modifyDate = modifyDate;
 	}
 
 	public String getOperate() {
