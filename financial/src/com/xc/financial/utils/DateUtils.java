@@ -26,7 +26,7 @@ public class DateUtils {
 	 * @return
 	 */
     public static Date parseDate(String date) {
-        SimpleDateFormat sdf = new SimpleDateFormat(format1);
+        SimpleDateFormat sdf = new SimpleDateFormat(format2);
         try {
             return sdf.parse(date);
         } catch (ParseException e) {

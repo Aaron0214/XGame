@@ -79,6 +79,7 @@ public class LoginFrame implements ActionListener{
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource() == login){
+			frame.dispose();
 //			JOptionPane.showMessageDialog(frame, "登陆成功！");
 			new MainFrame();
 		}

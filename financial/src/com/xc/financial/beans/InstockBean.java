@@ -1,15 +1,9 @@
 package com.xc.financial.beans;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 
-public class InstockBean implements Serializable{
+public class InstockBean{
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	
 	private Integer index;
 	
 	private String code;

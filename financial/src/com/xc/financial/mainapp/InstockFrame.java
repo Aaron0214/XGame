@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -17,19 +18,18 @@ import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 
 import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
-import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
-import javax.swing.table.TableColumn;
 
 import com.xc.financial.beans.InstockBean;
 import com.xc.financial.beans.SearchBean;
@@ -45,8 +45,9 @@ public class InstockFrame extends JPanel implements ActionListener{
 	 */
 	private static final long serialVersionUID = 1L;
 	private Table table;
-	private Object[] columnNames = {"","序号","订单编码","家庭成员","收入类型","金额","创建时间","修改时间","操作员"};
-	private Object[][] rowData = {};
+	private Vector<Object> columns = new Vector<Object>();
+	private String[] columnNames= {"","序号","订单编码","家庭成员","收入类型","金额(元)","创建时间","修改时间","操作员"}; 
+	private Vector<Object> rowData = new Vector<Object>();
 	private JScrollPane pane3;
 	private JButton button,save,delete,search;
 	private JLabel label,label1,label2;
@@ -92,12 +93,12 @@ public class InstockFrame extends JPanel implements ActionListener{
 		type.setPreferredSize(new Dimension(50, 20));
 		
 		search = new JButton("搜索");
-		search.setPreferredSize(new Dimension(70, 20));
+		search.setPreferredSize(new Dimension(60, 20));
 		search.setCursor(new Cursor(Cursor.HAND_CURSOR));
 		
 		
-		table = new Table(rowData, columnNames);
-		table.setPreferredScrollableViewportSize(new Dimension(790, 420));
+		table = new Table(rowData, columns);
+		table.setPreferredScrollableViewportSize(new Dimension(670, 420));
 		
 		table.isCellEditable(0,2);
 		//设置第一列的宽度
@@ -119,17 +120,14 @@ public class InstockFrame extends JPanel implements ActionListener{
 		//设置第9列的宽度
 		table.changeColumnWidth(8, 100);
 		
-		TableColumn fiveColumn = table.getColumnModel().getColumn(4);
-		fiveColumn.setCellEditor(new MyComboBoxEditor(str));
+		table.setCellEditor(4, new MyComboBoxEditor(str));
 		
-		pane3 = new JScrollPane();
-//        pane3 = new JScrollPane(table);
-        pane3.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        pane3.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-        pane3.setViewportView(table);
+		table.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
+		
+        pane3 = new JScrollPane(table);
         
         pane3.addMouseListener(new MouseAdapter() {
-			public void mousePressed(MouseEvent e) {
+			public void mouseClicked(MouseEvent e) {
 				if(e.getSource() != datepicker){
 					datepicker.hidePanel();
 				}
@@ -164,16 +162,13 @@ public class InstockFrame extends JPanel implements ActionListener{
         this.add(delete);
         
         this.addMouseListener(new MouseAdapter() {
-			public void mousePressed(MouseEvent e) {
+			public void mouseClicked(MouseEvent e) {
 				if(e.getSource() != datepicker){
 					datepicker.hidePanel();
 				}
 			}
 		});
-        
-//		this.setSize(650, 546);
 //		this.setVisible(false);
-		
 	}
 	
 	@Override
@@ -190,16 +185,23 @@ public class InstockFrame extends JPanel implements ActionListener{
 			table.addTableRow();
 		}
 		if(e.getSource() == save){
-			insertDate();
+			insertData();
+		}
+		if(e.getSource() == delete){
+			table.deleteTableRows(table.getSelectedRows());
 		}
 		
 	}
 	
 	private void init(){
-//		getDatas(new SearchBean());
+		//初始化表头
+		for(String column : columnNames){
+			columns.add(column);
+		}
+		getDatas(new SearchBean());
 	}
 	
-	private void insertDate(){
+	private void insertData(){
 		StringBuffer sb = new StringBuffer();
 		List<Map<String, Object>> datas = table.getSelectRowValue(table.getSelectedRows());
 		for(Map<String, Object> data : datas){
@@ -234,18 +236,18 @@ public class InstockFrame extends JPanel implements ActionListener{
 	
 	private void getDatas(SearchBean searchBean){
 		StringBuffer sb = new StringBuffer();	
-		sb.append("select * from instock where 1=1 ");
+		sb.append("select * from instock where 1=1");
 		if(StringUtils.isNotEmpty(searchBean.getCode())){
-			sb.append("and code like %" + searchBean.getCode() +"%");
+			sb.append(" and code like '%" + searchBean.getCode() +"%'");
 		}
 		if(StringUtils.isNotEmpty(searchBean.getStartDate())){
-			sb.append("and createDate >=" + DateUtils.dateBegin(DateUtils.parseDate(searchBean.getStartDate())));
+			sb.append(" and createDate >= '" + DateUtils.dateBegin(DateUtils.parseDate(searchBean.getStartDate())) + "'");
 		}
 		if(StringUtils.isNotEmpty(searchBean.getEndDate())){
-			sb.append("and createDate <=" + DateUtils.dateEnd(DateUtils.parseDate(searchBean.getEndDate())));
+			sb.append(" and createDate <= '" + DateUtils.dateEnd(DateUtils.parseDate(searchBean.getEndDate())) + "'");
 		}
 		if(StringUtils.isNotEmpty(searchBean.getType())){
-			sb.append("and type =" + searchBean.getType());
+			sb.append(" and type = '" + searchBean.getType() + "'");
 		}
 		try {
 			connect = DriverManager.getConnection(url, username, password);
@@ -253,12 +255,19 @@ public class InstockFrame extends JPanel implements ActionListener{
 			result = statement.executeQuery(sb.toString());
 			result.last();
 			int count = result.getRow();
-			result.beforeFirst();
-			if(null != result){
+			if(count != 0){
+				result.beforeFirst();
 				Integer index = 1;
 				while(result.next()){
-					rowData = buildData(result,index,count);
+					rowData.clear();
+					buildData(result,index,count);
+					if(null != table){
+						table.updateTable();
+					}
 				}
+			}else{
+				rowData.clear();
+				table.updateTable();
 			}
 			statement.close();
 			connect.close();
@@ -274,8 +283,7 @@ public class InstockFrame extends JPanel implements ActionListener{
 		}
 	}
 	
-	private Object[][] buildData(ResultSet rs,Integer index,int count){
-		Object[][] data = new Object[count][];
+	private void buildData(ResultSet rs,Integer index,int count){
 		InstockBean instockBean = new InstockBean();
 		try {
 			instockBean.setIndex(index);
@@ -283,14 +291,14 @@ public class InstockFrame extends JPanel implements ActionListener{
 			instockBean.setMember(rs.getString("member"));
 			instockBean.setCreateDate(DateUtils.parseLongDate(DateUtils.parseDate(rs.getString("create_date"))));
 			instockBean.setModifyDate(DateUtils.parseLongDate(DateUtils.parseDate(rs.getString("modify_date"))));
+			instockBean.setAmount(BigDecimal.valueOf(Double.valueOf(rs.getString("amount"))));
 			instockBean.setType(rs.getString("type"));
 			instockBean.setOperate(rs.getString("operate"));
-			Object obj = ObjectUtils.changeToObject(instockBean);
-			data[index - 1] = (Object[])obj;
+			Vector<Object> obj = ObjectUtils.changeToVecto(instockBean);
+			rowData.add(obj);
 		} catch (SQLException|ParseException e) {
 			e.printStackTrace();
 		}
-		return data;
 	}
 	
 	class MyComboBoxEditor extends DefaultCellEditor {
@@ -298,6 +306,14 @@ public class InstockFrame extends JPanel implements ActionListener{
 
 		public MyComboBoxEditor(String[] items) {
 		    super(new JComboBox<Object>(items));
+		}
+	 }
+	
+	class MyCheckBoxEditor extends DefaultCellEditor {
+		private static final long serialVersionUID = 1L;
+
+		public MyCheckBoxEditor() {
+		    super(new JCheckBox());
 		}
 	 }
 	
