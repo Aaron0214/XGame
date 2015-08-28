@@ -36,6 +36,26 @@ public class DateUtils {
             sdf = null;
         }
     }
+    
+    /**
+	 * <p>
+	 * 将时间字符串转化为 yyyy-MM-dd 的时间形式
+	 * </p>
+	 * 
+	 * @param date
+	 * @return
+	 */
+    public static Date parseSingleDate(String date) {
+        SimpleDateFormat sdf = new SimpleDateFormat(format1);
+        try {
+            return sdf.parse(date);
+        } catch (ParseException e) {
+            return null;
+        }
+        finally{
+            sdf = null;
+        }
+    }
 
     public static Date parseDate(String date, String format) {
         SimpleDateFormat sdf = new SimpleDateFormat(format);
@@ -134,6 +154,50 @@ public class DateUtils {
 			dateFormat = null;
     	}
     }
+    
+    /**
+   	 * <p>
+   	 * 获取指定时间的当天开始时间 String
+   	 * </p>
+   	 * 
+   	 * param date
+   	 * @return
+   	 */
+       public static String dayBegin(Date date){
+	       	if(null == date){
+	       		return null;
+	       	}
+	       	DateFormat dateFormat = new SimpleDateFormat(format1);
+	       	try {
+	       		String simple_date = dateFormat.format(date);
+	       		String datetime = simple_date + DAY_BEGIN;
+	       		return datetime;
+	   		} finally{
+	   			dateFormat = null;
+	       	}
+       }
+       
+    /**
+   	 * <p>
+   	 * 获取指定时间的当天结束时间String
+   	 * </p>
+   	 * 
+   	 * param date
+   	 * @return
+   	 */
+       public static String dayEnd(Date date){
+       	if(null == date){
+       		return null;
+       	}
+       	DateFormat dateFormat = new SimpleDateFormat(format1);
+       	try {
+       		String simple_date = dateFormat.format(date);
+       		String datetime = simple_date + DAY_END;
+       		return datetime;
+   		}finally{
+   			dateFormat = null;
+       	}
+       }
     
     /**
 	 * <p>

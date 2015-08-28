@@ -2,7 +2,7 @@ package com.xc.financial.mainapp;
 
 import java.awt.Color;
 import java.awt.Cursor;
-import java.awt.Rectangle;
+import java.awt.event.MouseListener;
 
 import javax.swing.ImageIcon;
 import javax.swing.JTree;
@@ -33,9 +33,9 @@ public class Tree extends JTree{
 		DefaultTreeModel model=new DefaultTreeModel(root);
 		this.setModel(model);
 		DefaultTreeCellRenderer render=(DefaultTreeCellRenderer)(this.getCellRenderer());
-//		render.setOpenIcon(new ImageIcon(""));//把前面的图标去掉
+		render.setOpenIcon(new ImageIcon(""));//把前面的图标去掉
 		render.setLeafIcon(new ImageIcon(""));
-//		render.setClosedIcon(new ImageIcon(""));//把前面的图标去掉
+		render.setClosedIcon(new ImageIcon(""));//把前面的图标去掉
 		render.setBackgroundNonSelectionColor(new Color(0, 0, 0, 0));//设置节点透明
 		BasicTreeUI ui=(BasicTreeUI)(this.getUI());
 //		ui.setCollapsedIcon(new ImageIcon("resources/images/tree.png"));//自定义打开的图标

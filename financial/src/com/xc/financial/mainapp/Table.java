@@ -14,6 +14,7 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 
+import com.xc.financial.utils.CollectionUtils;
 import com.xc.financial.utils.ObjectUtils;
 
 public class Table extends JTable{
@@ -23,7 +24,7 @@ public class Table extends JTable{
 	private Vector<Object>  columnNames;
 	private Vector<Object>  data;
 	private Table table = null;
-	private List<Integer> rows = new ArrayList<Integer>();
+	private List<Object> rows = new ArrayList<Object>();
 	
 	public Table(Vector<Object> data,Vector<Object> columnNames){
 		this.columnNames = columnNames;
@@ -55,12 +56,18 @@ public class Table extends JTable{
         	public void mouseClicked(MouseEvent e) {
 	        	if(e.getSource() == table){
 					Object value = table.getValueAt(table.getSelectedRow(), 0);
-					if(value == Boolean.TRUE){
-						rows.add(table.getSelectedRow());
+					if(!rows.contains((Object)table.getSelectedRow())){
+						if(value == Boolean.TRUE){
+							rows.add((Object)table.getSelectedRow());
+						}else{
+							rows.remove((Object)table.getSelectedRow());
+						}
 					}else{
-						rows.remove(table.getSelectedRow());
+						if(value == Boolean.FALSE){
+							rows.remove((Object)table.getSelectedRow());
+						}
 					}
-					updateSelectionRows();
+//					updateSelectionRows();
 				}
         	}
         });
@@ -78,10 +85,29 @@ public class Table extends JTable{
 		return datas;
 	}
 	
+	public List<Map<String,Object>> getSelectRowValue(){
+		List<Map<String,Object>> datas = new ArrayList<Map<String,Object>>();
+		for(int i = 0; i < rows.size(); i++){
+			Map<String,Object> rowdata = new HashMap<String,Object>();
+			for(int j = 0; j< columnNames.size(); j++){
+				rowdata.put(this.getColumnName(j), this.getValueAt((int)rows.get(i), j));
+			}
+			datas.add(rowdata);
+		}
+		return datas;
+	}
+	
+	@SuppressWarnings("unchecked")
 	public void addTableRow(){
 		Vector<Object> obj = new Vector<Object>();
 		obj.add(Boolean.FALSE);
-		for(int i = 0;i<8;i++){
+		if(CollectionUtils.isNotEmpty(data)){
+			Vector<Object> last = (Vector<Object>) data.get(data.size() -1);
+			obj.add((int)last.get(1) + 1);
+		}else{
+			obj.add(1);
+		}
+		for(int i = 0;i<columnNames.size()-2;i++){
 			obj.add("");
 		}
 		data.add(obj);
@@ -100,9 +126,7 @@ public class Table extends JTable{
 	}
 	
 	public void updateSelectionRows(){
-		for(Integer i : rows){
-			table.setRowSelectionInterval(1, i);
-		}
+		
 	}
 	public void changeColumnWidth(int columnIndex,int width){
 		TableColumn column = this.getColumnModel().getColumn(columnIndex);

@@ -63,7 +63,7 @@ public class ObjectUtils {
      * @param source
      * @param destinationObject
      */
-	public static <T> Vector<Object> changeToVecto(T obj){
+	public static <T> Vector<Object> createNewVecto(T obj){
 		Vector<Object> o = null;
 		 try {
 	    	if(null == obj){

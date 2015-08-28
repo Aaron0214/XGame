@@ -2,7 +2,7 @@ package com.xc.financial.beans;
 
 import java.math.BigDecimal;
 
-public class InstockBean{
+public class FinancialBean{
 
 	private Integer index;
 	
@@ -17,6 +17,8 @@ public class InstockBean{
 	private String createDate;
 	
 	private String modifyDate;
+	
+	private String comments;
 	
 	private String operate;
 
@@ -76,6 +78,14 @@ public class InstockBean{
 		this.modifyDate = modifyDate;
 	}
 	
+	public String getComments() {
+		return comments;
+	}
+
+	public void setComments(String comments) {
+		this.comments = comments;
+	}
+
 	public String getOperate() {
 		return operate;
 	}

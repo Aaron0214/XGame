@@ -5,8 +5,6 @@ import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
@@ -22,7 +20,7 @@ public class MainFrame implements MouseListener{
 	
 	private JFrame frame;
 	private Tree jtree;
-	private JPanel jpanel,instoke;
+	private JPanel jpanel,instock,outstock,financial;
 	private JLabel label,username,logout;
 	
 	public MainFrame(){
@@ -46,13 +44,19 @@ public class MainFrame implements MouseListener{
 		logout.setCursor(new Cursor(Cursor.HAND_CURSOR));
 		
 		jtree = new Tree();
-		jtree.setBounds(new Rectangle(20,35,120,580));
+		jtree.setBounds(new Rectangle(20,35,100,580));
 		
 		jpanel = new JPanel();
 		jpanel.setBounds(new Rectangle(130,30,672,546));
 		
-		instoke = new InstockFrame();
-		instoke.setBounds(new Rectangle(125,30,672,546));
+		instock = new InstockFrame();
+		instock.setBounds(new Rectangle(125,30,672,546));
+		
+		outstock = new OutStockFrame();
+		outstock.setBounds(new Rectangle(125,30,672,546));
+		
+		financial = new FinancialFrame();
+		financial.setBounds(new Rectangle(125,30,672,546));
 		
 		jtree.addMouseListener(this);
 		logout.addMouseListener(this);
@@ -62,7 +66,9 @@ public class MainFrame implements MouseListener{
 		frame.add(logout);
 		frame.add(jtree);
 		frame.add(jpanel);
-		frame.add(instoke);
+		frame.add(instock);
+		frame.add(outstock);
+		frame.add(financial);
 		
 		doLay();
 		frame.setVisible(true);
@@ -74,7 +80,7 @@ public class MainFrame implements MouseListener{
 	
 	private void doLay() {
         Container container = frame.getContentPane();
-//        container.setBackground(new Color(167, 201, 219));
+        container.setBackground(new Color(167, 201, 219));
         frame.pack();
     } 
 	
@@ -90,11 +96,29 @@ public class MainFrame implements MouseListener{
 				if(node != null && node.getChildCount() == 0){
 					if(node.getUserObject().equals("首页")){
 						jpanel.setVisible(true);
-						instoke.setVisible(false);
+						instock.setVisible(false);
+						outstock.setVisible(false);
+						financial.setVisible(false);
 					}
 					if(node.getUserObject().equals("收入管理")){
 						jpanel.setVisible(false);
-						instoke.setVisible(true);
+						outstock.setVisible(false);
+						financial.setVisible(false);
+						instock.setVisible(true);
+					}
+					
+					if(node.getUserObject().equals("消费管理")){
+						jpanel.setVisible(false);
+						instock.setVisible(false);
+						financial.setVisible(false);
+						outstock.setVisible(true);
+					}
+					
+					if(node.getUserObject().equals("余额管理")){
+						jpanel.setVisible(false);
+						instock.setVisible(false);
+						outstock.setVisible(false);
+						financial.setVisible(true);
 					}
 				}
 			}

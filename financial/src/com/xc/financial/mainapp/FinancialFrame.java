@@ -25,11 +25,12 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
-import com.xc.financial.beans.InstockBean;
+import com.xc.financial.beans.FinancialBean;
+import com.xc.financial.beans.OutstockBean;
 import com.xc.financial.beans.SearchBean;
-import com.xc.financial.enums.InstockColumnEnum;
+import com.xc.financial.enums.FinancialColumnEnum;
 import com.xc.financial.enums.SnTypeEnum;
-import com.xc.financial.mapper.InstockMapper;
+import com.xc.financial.mapper.FinancialMapper;
 import com.xc.financial.mapper.SnMapper;
 import com.xc.financial.utils.CollectionUtils;
 import com.xc.financial.utils.DateUtils;
@@ -37,7 +38,7 @@ import com.xc.financial.utils.NumberFormatUtils;
 import com.xc.financial.utils.ObjectUtils;
 import com.xc.financial.utils.StringUtils;
 
-public class InstockFrame extends JPanel implements ActionListener{
+public class FinancialFrame extends JPanel implements ActionListener{
 	
 	/**
 	 * 
@@ -45,7 +46,7 @@ public class InstockFrame extends JPanel implements ActionListener{
 	private static final long serialVersionUID = 1L;
 	private Table table;
 	private Vector<Object> columns = new Vector<Object>();
-	private String[] columnNames= {"","序号","编码","家庭成员","收入类型","金额(元)","创建时间","修改时间","操作员"}; 
+	private String[] columnNames= {"","序号","编码","家庭成员","存储类型","金额(元)","创建时间","修改时间","备注","操作员"}; 
 	private Vector<Object> rowData = new Vector<Object>();
 	private JScrollPane pane3;
 	private JButton button,save,delete,search;
@@ -54,10 +55,10 @@ public class InstockFrame extends JPanel implements ActionListener{
 	private JTextField field,startDate,endDate;
 	private DatePicker datepicker,datepicker1;
 	private String[] str = {"","A","B"};
-	private InstockMapper instockMapper = new InstockMapper();
+	private FinancialMapper financialMapper = new FinancialMapper();
 	private SnMapper snMapper = new SnMapper();
 	
-	public InstockFrame(){
+	public FinancialFrame(){
 		init();
 		
 		label = new JLabel("编码：");
@@ -66,6 +67,13 @@ public class InstockFrame extends JPanel implements ActionListener{
 		
 		field = new JTextField();
 		field.setPreferredSize(new Dimension(100, 20));
+		
+		label3 = new JLabel("存储类型：");
+		label3.setFont(new Font("宋体", Font.PLAIN, 13));
+		
+		type = new JComboBox<String>(str);
+		type.setFont(new Font("宋体", Font.PLAIN, 13));
+		type.setPreferredSize(new Dimension(50, 20));
 		
 		label1 = new JLabel("开始日期：");
 		label1.setFont(new Font("宋体", Font.PLAIN, 13));
@@ -83,24 +91,19 @@ public class InstockFrame extends JPanel implements ActionListener{
 		datepicker1 = DatePicker.getInstance("yyyy-MM-dd");
 		datepicker1.register(endDate);
 		
-		label3 = new JLabel("收入类型：");
-		label3.setFont(new Font("宋体", Font.PLAIN, 13));
-		
-		type = new JComboBox<String>(str);
-		type.setFont(new Font("宋体", Font.PLAIN, 13));
-		type.setPreferredSize(new Dimension(50, 20));
-		
 		search = new JButton("搜索");
 		search.setPreferredSize(new Dimension(60, 20));
 		search.setCursor(new Cursor(Cursor.HAND_CURSOR));
 		
 		
 		table = new Table(rowData, columns){
-			
+			/**
+			 * 
+			 */
 			private static final long serialVersionUID = 1L;
 
 			public boolean isCellEditable(int row, int column) {
-				if(column == 0 || column == 3 || column == 4 || column == 5){
+				if(column == 0 || column == 3 || column == 4 || column == 5 || column == 8){
 					return true;
 				}else{
 					return false;
@@ -127,7 +130,9 @@ public class InstockFrame extends JPanel implements ActionListener{
 		//设置第8列的宽度
 		table.changeColumnWidth(7, 150);
 		//设置第9列的宽度
-		table.changeColumnWidth(8, 100);
+		table.changeColumnWidth(8, 150);
+		//设置第9列的宽度
+		table.changeColumnWidth(9, 100);
 		
 		table.setCellEditor(4, new MyComboBoxEditor(str));
 		
@@ -158,12 +163,12 @@ public class InstockFrame extends JPanel implements ActionListener{
         
         this.add(label);
         this.add(field);
+        this.add(label3);
+        this.add(type);
         this.add(label1);
         this.add(startDate);
         this.add(label2);
         this.add(endDate);
-        this.add(label3);
-        this.add(type);
         this.add(search);
         
         this.add(pane3);
@@ -185,7 +190,6 @@ public class InstockFrame extends JPanel implements ActionListener{
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource() == search){
 			SearchBean searchBean = new SearchBean();
-			searchBean.setCode(field.getText());
 			searchBean.setStartDate(startDate.getText());
 			searchBean.setEndDate(endDate.getText());
 			searchBean.setType(type.getSelectedItem().toString());
@@ -216,12 +220,12 @@ public class InstockFrame extends JPanel implements ActionListener{
 		if(CollectionUtils.isNotEmpty(datas)){
 			for(Map<String, Object> data : datas){
 				try {
-					if(StringUtils.isEmpty((String)data.get(InstockColumnEnum.getInstockColumnValueByKey("code").getValue()))){
-						int num = snMapper.selectSn(SnTypeEnum.INSTOCK_CODE.getKey());
-						data.put(InstockColumnEnum.getInstockColumnValueByKey("code").getValue(),"F" + DateUtils.parseDates(new Date()) + NumberFormatUtils.formatNumber(num));
-						instockMapper.insertInstock(data);
+					if(StringUtils.isEmpty((String)data.get(FinancialColumnEnum.getFinancialColumnValueByKey("code").getValue()))){
+						int num = snMapper.selectSn(SnTypeEnum.FINANCIAL_CODE.getKey());
+						data.put(FinancialColumnEnum.getFinancialColumnValueByKey("code").getValue(),"F" + DateUtils.parseDates(new Date()) + NumberFormatUtils.formatNumber(num));
+						financialMapper.insertFinancial(data);
 					}else{
-						instockMapper.updateInstock(data);
+						financialMapper.updateFinancial(data);
 					}
 				} catch (Exception e1) {
 					e1.printStackTrace();
@@ -234,11 +238,11 @@ public class InstockFrame extends JPanel implements ActionListener{
 	}
 	
 	private void getDatas(SearchBean searchBean){
-		List<InstockBean> instockBeanList = instockMapper.selectInstocksByParams(searchBean);
-		if(CollectionUtils.isNotEmpty(instockBeanList)){
+		List<FinancialBean> finanacialBeanList = financialMapper.selectFinancialsByParams(searchBean);
+		if(CollectionUtils.isNotEmpty(finanacialBeanList)){
 			rowData.clear();
-			for(InstockBean instockBean:instockBeanList){
-				rowData.add(buildVectorData(instockBean));
+			for(FinancialBean financialBean : finanacialBeanList){
+				rowData.add(buildVectorData(financialBean));
 			}
 		}else{
 			rowData.clear();
@@ -248,9 +252,9 @@ public class InstockFrame extends JPanel implements ActionListener{
 		}
 	}
 	
-	private Vector<Object> buildVectorData(InstockBean instockBean){
+	private Vector<Object> buildVectorData(FinancialBean financialBean){
 		try {
-			return ObjectUtils.createNewVecto(instockBean);
+			return ObjectUtils.createNewVecto(financialBean);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
@@ -275,7 +279,8 @@ public class InstockFrame extends JPanel implements ActionListener{
 	
 	public static void main(String[] args){
 		JFrame frame = new JFrame();
-		JPanel panel = new InstockFrame();
+		frame.setTitle("余额管理界面");
+		JPanel panel = new FinancialFrame();
 		panel.setVisible(true);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	    frame.add(panel,BorderLayout.CENTER);
