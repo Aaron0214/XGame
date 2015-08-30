@@ -25,11 +25,12 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
-import com.xc.financial.beans.OutstockBean;
+import com.xc.financial.beans.InstockBean;
 import com.xc.financial.beans.SearchBean;
-import com.xc.financial.enums.OutstockColumnEnum;
+import com.xc.financial.enums.UserColumnEnum;
 import com.xc.financial.enums.SnTypeEnum;
-import com.xc.financial.mapper.OutstockMapper;
+import com.xc.financial.enums.UserColumnEnum;
+import com.xc.financial.mapper.InstockMapper;
 import com.xc.financial.mapper.SnMapper;
 import com.xc.financial.utils.CollectionUtils;
 import com.xc.financial.utils.DateUtils;
@@ -37,7 +38,7 @@ import com.xc.financial.utils.NumberFormatUtils;
 import com.xc.financial.utils.ObjectUtils;
 import com.xc.financial.utils.StringUtils;
 
-public class OutStockFrame extends JPanel implements ActionListener{
+public class UserFrame extends JPanel implements ActionListener{
 	
 	/**
 	 * 
@@ -45,7 +46,7 @@ public class OutStockFrame extends JPanel implements ActionListener{
 	private static final long serialVersionUID = 1L;
 	private Table table;
 	private Vector<Object> columns = new Vector<Object>();
-	private String[] columnNames= {"","序号","编码","家庭成员","消费类型","金额(元)","创建时间","修改时间","备注","操作员"}; 
+	private String[] columnNames= {"","序号","用户编码","姓名","性别","状态","地址 ","用户名","邮箱","创建时间","修改时间","备注","操作员"}; 
 	private Vector<Object> rowData = new Vector<Object>();
 	private JScrollPane pane3;
 	private JButton button,save,delete,search;
@@ -54,10 +55,10 @@ public class OutStockFrame extends JPanel implements ActionListener{
 	private JTextField field,startDate,endDate;
 	private DatePicker datepicker,datepicker1;
 	private String[] str = {"","A","B"};
-	private OutstockMapper outstockMapper = new OutstockMapper();
+	private InstockMapper instockMapper = new InstockMapper();
 	private SnMapper snMapper = new SnMapper();
 	
-	public OutStockFrame(){
+	public UserFrame(){
 		init();
 		
 		label = new JLabel("编码：");
@@ -83,7 +84,7 @@ public class OutStockFrame extends JPanel implements ActionListener{
 		datepicker1 = DatePicker.getInstance("yyyy-MM-dd");
 		datepicker1.register(endDate);
 		
-		label3 = new JLabel("消费类型：");
+		label3 = new JLabel("用户名：");
 		label3.setFont(new Font("宋体", Font.PLAIN, 13));
 		
 		type = new JComboBox<String>(str);
@@ -96,13 +97,11 @@ public class OutStockFrame extends JPanel implements ActionListener{
 		
 		
 		table = new Table(rowData, columns){
-			/**
-			 * 
-			 */
+			
 			private static final long serialVersionUID = 1L;
 
 			public boolean isCellEditable(int row, int column) {
-				if(column == 0 || column == 3 || column == 4 || column == 5 || column == 8){
+				if(column == 0 || column == 3 || column == 4 || column == 5){
 					return true;
 				}else{
 					return false;
@@ -129,9 +128,7 @@ public class OutStockFrame extends JPanel implements ActionListener{
 		//设置第8列的宽度
 		table.changeColumnWidth(7, 150);
 		//设置第9列的宽度
-		table.changeColumnWidth(8, 150);
-		//设置第10列的宽度
-		table.changeColumnWidth(9, 100);
+		table.changeColumnWidth(8, 100);
 		
 		table.setCellEditor(4, new MyComboBoxEditor(str));
 		
@@ -220,12 +217,12 @@ public class OutStockFrame extends JPanel implements ActionListener{
 		if(CollectionUtils.isNotEmpty(datas)){
 			for(Map<String, Object> data : datas){
 				try {
-					if(StringUtils.isEmpty((String)data.get(OutstockColumnEnum.getOutstockColumnValueByKey("code").getValue()))){
-						int num = snMapper.selectSn(SnTypeEnum.OUTSOCK_CODE.getKey());
-						data.put(OutstockColumnEnum.getOutstockColumnValueByKey("code").getValue(),"F" + DateUtils.parseDates(new Date()) + NumberFormatUtils.formatNumber(num));
-						outstockMapper.insertOutstock(data);
+					if(StringUtils.isEmpty((String)data.get(UserColumnEnum.getUserColumnValueByKey("code").getValue()))){
+						int num = snMapper.selectSn(SnTypeEnum.USER_CODE.getKey());
+						data.put(UserColumnEnum.getUserColumnValueByKey("code").getValue(),"F" + DateUtils.parseDates(new Date()) + NumberFormatUtils.formatNumber(num));
+						instockMapper.insertInstock(data);
 					}else{
-						outstockMapper.updateOutstock(data);
+						instockMapper.updateInstock(data);
 					}
 				} catch (Exception e1) {
 					e1.printStackTrace();
@@ -238,11 +235,11 @@ public class OutStockFrame extends JPanel implements ActionListener{
 	}
 	
 	private void getDatas(SearchBean searchBean){
-		List<OutstockBean> outstockBeanList = outstockMapper.selectOutstocksByParams(searchBean);
-		if(CollectionUtils.isNotEmpty(outstockBeanList)){
+		List<InstockBean> instockBeanList = instockMapper.selectInstocksByParams(searchBean);
+		if(CollectionUtils.isNotEmpty(instockBeanList)){
 			rowData.clear();
-			for(OutstockBean outstockBean : outstockBeanList){
-				rowData.add(buildVectorData(outstockBean));
+			for(InstockBean instockBean:instockBeanList){
+				rowData.add(buildVectorData(instockBean));
 			}
 		}else{
 			rowData.clear();
@@ -252,9 +249,9 @@ public class OutStockFrame extends JPanel implements ActionListener{
 		}
 	}
 	
-	private Vector<Object> buildVectorData(OutstockBean outstockBean){
+	private Vector<Object> buildVectorData(InstockBean instockBean){
 		try {
-			return ObjectUtils.createNewVecto(outstockBean);
+			return ObjectUtils.createNewVecto(instockBean);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
@@ -279,8 +276,7 @@ public class OutStockFrame extends JPanel implements ActionListener{
 	
 	public static void main(String[] args){
 		JFrame frame = new JFrame();
-		frame.setTitle("消费界面");
-		JPanel panel = new OutStockFrame();
+		JPanel panel = new UserFrame();
 		panel.setVisible(true);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	    frame.add(panel,BorderLayout.CENTER);

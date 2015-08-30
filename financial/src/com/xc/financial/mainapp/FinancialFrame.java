@@ -26,7 +26,6 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
 import com.xc.financial.beans.FinancialBean;
-import com.xc.financial.beans.OutstockBean;
 import com.xc.financial.beans.SearchBean;
 import com.xc.financial.enums.FinancialColumnEnum;
 import com.xc.financial.enums.SnTypeEnum;

@@ -23,7 +23,7 @@ public class MainFrame implements MouseListener{
 	private JPanel jpanel,instock,outstock,financial;
 	private JLabel label,username,logout;
 	
-	public MainFrame(){
+	public MainFrame(String name){
 		frame = new JFrame();
 		frame.setLayout(null);
 		
@@ -31,9 +31,9 @@ public class MainFrame implements MouseListener{
 		label.setFont(new Font("宋体", Font.PLAIN, 13));
 		label.setBounds(new Rectangle(675,5,40,20));
 		
-		username = new JLabel("abc");
+		username = new JLabel(name);
 		username.setFont(new Font("宋体", Font.PLAIN, 13));
-		username.setBounds(new Rectangle(710,5,30,20));
+		username.setBounds(new Rectangle(710,5,name.length() * 20,20));
 		username.setForeground(Color.BLUE);
 		username.setCursor(new Cursor(Cursor.HAND_CURSOR));
 		
@@ -85,7 +85,7 @@ public class MainFrame implements MouseListener{
     } 
 	
 	public static void main(String[] args){
-		new MainFrame();
+		new MainFrame("abc");
 	}
 
 	@Override

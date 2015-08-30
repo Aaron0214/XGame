@@ -81,7 +81,7 @@ public class LoginFrame implements ActionListener{
 		if(e.getSource() == login){
 			frame.dispose();
 //			JOptionPane.showMessageDialog(frame, "登陆成功！");
-			new MainFrame();
+			new MainFrame("abc");
 		}
 	}
 }
