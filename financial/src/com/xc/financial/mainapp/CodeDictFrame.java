@@ -6,17 +6,14 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
 import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -25,19 +22,15 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
-import com.xc.financial.beans.InstockBean;
+import com.xc.financial.beans.CodeDictBean;
 import com.xc.financial.beans.SearchBean;
-import com.xc.financial.enums.SnTypeEnum;
-import com.xc.financial.enums.column.InstockColumnEnum;
-import com.xc.financial.mapper.InstockMapper;
-import com.xc.financial.mapper.SnMapper;
+import com.xc.financial.enums.column.CodeDictColumnEnum;
+import com.xc.financial.mapper.CodeDictMapper;
 import com.xc.financial.utils.CollectionUtils;
-import com.xc.financial.utils.DateUtils;
-import com.xc.financial.utils.NumberFormatUtils;
 import com.xc.financial.utils.ObjectUtils;
 import com.xc.financial.utils.StringUtils;
 
-public class InstockFrame extends JPanel implements ActionListener{
+public class CodeDictFrame extends JPanel implements ActionListener{
 	
 	/**
 	 * 
@@ -45,50 +38,33 @@ public class InstockFrame extends JPanel implements ActionListener{
 	private static final long serialVersionUID = 1L;
 	private Table table;
 	private Vector<Object> columns = new Vector<Object>();
-	private String[] columnNames= {"","序号","编码","家庭成员","收入类型","金额(元)","创建时间","修改时间","操作员"}; 
+	private String[] columnNames= {"","编号","类型","内容","关联项"}; 
 	private Vector<Object> rowData = new Vector<Object>();
 	private JScrollPane pane3;
 	private JButton button,save,delete,search;
-	private JLabel label,label1,label2,label3;
-	private JComboBox<String> type;
-	private JTextField field,startDate,endDate;
-	private DatePicker datepicker,datepicker1;
-	private String[] str = {"","A","B"};
-	private InstockMapper instockMapper = new InstockMapper();
-	private SnMapper snMapper = new SnMapper();
+	private JLabel label,label3;
+	private MyComboBox type;
+	private JTextField field;
+	private static List<Map<String,Object>> str = new ArrayList<Map<String,Object>>();
+	private static List<Map<String,Object>> parent = new ArrayList<Map<String,Object>>();
+	private CodeDictMapper codeDictMapper = new CodeDictMapper();
 	
-	public InstockFrame(){
+	public CodeDictFrame(){
 		init();
 		
-		label = new JLabel("编码：");
+		label = new JLabel("编号：");
 		label.setFont(new Font("宋体", Font.PLAIN, 13));
 		label.setVerticalAlignment(SwingConstants.TOP);
 		
 		field = new JTextField();
 		field.setPreferredSize(new Dimension(100, 20));
 		
-		label1 = new JLabel("开始日期：");
-		label1.setFont(new Font("宋体", Font.PLAIN, 13));
-		
-		startDate = new JTextField();
-		startDate.setPreferredSize(new Dimension(175, 20));
-		datepicker = DatePicker.getInstance("yyyy-MM-dd");
-		datepicker.register(startDate);
-		
-		label2 = new JLabel("结束日期：");
-		label2.setFont(new Font("宋体", Font.PLAIN, 13));
-		
-		endDate = new JTextField();
-		endDate.setPreferredSize(new Dimension(175, 20));
-		datepicker1 = DatePicker.getInstance("yyyy-MM-dd");
-		datepicker1.register(endDate);
-		
-		label3 = new JLabel("收入类型：");
+		label3 = new JLabel("类型：");
 		label3.setFont(new Font("宋体", Font.PLAIN, 13));
 		
-		type = new JComboBox<String>(str);
+		type = new MyComboBox(str);
 		type.setFont(new Font("宋体", Font.PLAIN, 13));
-		type.setPreferredSize(new Dimension(50, 20));
+		type.setPreferredSize(new Dimension(80, 20));
 		
 		search = new JButton("搜索");
 		search.setPreferredSize(new Dimension(60, 20));
@@ -96,52 +72,40 @@ public class InstockFrame extends JPanel implements ActionListener{
 		
 		
 		table = new Table(rowData, columns){
-			
+			/**
+			 * 
+			 */
 			private static final long serialVersionUID = 1L;
 
 			public boolean isCellEditable(int row, int column) {
-				if(column == 0 || column == 3 || column == 4 || column == 5){
-					return true;
-				}else{
+				if(column == 1){
 					return false;
+				}else{
+					return true;
 				}
             }
 		};
-		table.setPreferredScrollableViewportSize(new Dimension(670, 420));
+		table.setPreferredScrollableViewportSize(new Dimension(670, 450));
 		
-		table.isCellEditable(0,2);
+		table.isCellEditable(0,1);
 		//设置第一列的宽度
-		table.changeColumnWidth(0, 20);
+		table.changeColumnWidth(0, 30);
 		//设置第二列的宽度
-		table.changeColumnWidth(1, 50);
+		table.changeColumnWidth(1, 150);
 		//设置第3列的宽度
-		table.changeColumnWidth(2, 120);
+		table.changeColumnWidth(2, 150);
 		//设置第4列的宽度
-		table.changeColumnWidth(3, 100);
+		table.changeColumnWidth(3, 190);
 		//设置第5列的宽度
-		table.changeColumnWidth(4, 100);
-		//设置第6列的宽度
-		table.changeColumnWidth(5, 100);
-		//设置第7列的宽度
-		table.changeColumnWidth(6, 150);
-		//设置第8列的宽度
-		table.changeColumnWidth(7, 150);
-		//设置第9列的宽度
-		table.changeColumnWidth(8, 100);
+		table.changeColumnWidth(4, 150);
 		
-		table.setCellEditor(4, new MyComboBoxEditor(str));
+		table.setCellEditor(2, new MyComboBoxEditor());
+		
+		table.setCellEditor(4, new MyParentComboBoxEditor());
 		
 		table.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
 		
         pane3 = new JScrollPane(table);
-        
-        pane3.addMouseListener(new MouseAdapter() {
-			public void mouseClicked(MouseEvent e) {
-				if(e.getSource() != datepicker){
-					datepicker.hidePanel();
-				}
-			}
-		});
         
         button = new JButton("添加");
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -158,10 +122,6 @@ public class InstockFrame extends JPanel implements ActionListener{
         
         this.add(label);
         this.add(field);
-        this.add(label1);
-        this.add(startDate);
-        this.add(label2);
-        this.add(endDate);
         this.add(label3);
         this.add(type);
         this.add(search);
@@ -171,13 +131,6 @@ public class InstockFrame extends JPanel implements ActionListener{
         this.add(save);
         this.add(delete);
         
-        this.addMouseListener(new MouseAdapter() {
-			public void mouseClicked(MouseEvent e) {
-				if(e.getSource() != datepicker){
-					datepicker.hidePanel();
-				}
-			}
-		});
 		this.setVisible(false);
 	}
 	
@@ -185,14 +138,12 @@ public class InstockFrame extends JPanel implements ActionListener{
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource() == search){
 			SearchBean searchBean = new SearchBean();
-			searchBean.setCode(field.getText());
-			searchBean.setStartDate(startDate.getText());
-			searchBean.setEndDate(endDate.getText());
-			searchBean.setType(type.getSelectedItem().toString());
+			searchBean.setId(StringUtils.isEmpty(field.getText()) ? null : Integer.parseInt(field.getText()));
+			searchBean.setType(type.getSelectedItemValue().toString());
 			getDatas(searchBean);
 		}
 		if(e.getSource() == button){
-			table.addTableRow();
+			table.addTableRow(false);
 		}
 		if(e.getSource() == save){
 			saveUpdateData();
@@ -208,6 +159,27 @@ public class InstockFrame extends JPanel implements ActionListener{
 		for(String column : columnNames){
 			columns.add(column);
 		}
+		
+		//初始化静态数据
+		Map<String,Object> item = new HashMap<String,Object>();
+		item.put("label", "收入");
+		item.put("value", 0);
+		str.add(item);
+		
+		Map<String,Object> item1 = new HashMap<String,Object>();
+		item1.put("label", "支出");
+		item1.put("value", 1);
+		str.add(item1);
+		
+		Map<String,Object> item2 = new HashMap<String,Object>();
+		item2.put("label", "余额");
+		item2.put("value", 2);
+		str.add(item2);
+		Map<String,Object> black = new HashMap<String,Object>();
+		black.put("label", "");
+		black.put("value", null);
+		parent.add(black);
+		
 		getDatas(new SearchBean());
 	}
 	
@@ -216,12 +188,10 @@ public class InstockFrame extends JPanel implements ActionListener{
 		if(CollectionUtils.isNotEmpty(datas)){
 			for(Map<String, Object> data : datas){
 				try {
-					if(StringUtils.isEmpty((String)data.get(InstockColumnEnum.getInstockColumnValueByKey("code").getValue()))){
-						int num = snMapper.selectSn(SnTypeEnum.INSTOCK_CODE.getKey());
-						data.put(InstockColumnEnum.getInstockColumnValueByKey("code").getValue(),"F" + DateUtils.parseDates(new Date()) + NumberFormatUtils.formatNumber(num));
-						instockMapper.insertInstock(data);
+					if(StringUtils.isEmpty((Object)data.get(CodeDictColumnEnum.getCodeDictColumnValueByKey("id").getValue()))){
+						codeDictMapper.insertCodeDict(data);
 					}else{
-						instockMapper.updateInstock(data);
+						codeDictMapper.updateCodeDict(data);
 					}
 				} catch (Exception e1) {
 					e1.printStackTrace();
@@ -234,11 +204,15 @@ public class InstockFrame extends JPanel implements ActionListener{
 	}
 	
 	private void getDatas(SearchBean searchBean){
-		List<InstockBean> instockBeanList = instockMapper.selectInstocksByParams(searchBean);
-		if(CollectionUtils.isNotEmpty(instockBeanList)){
+		List<CodeDictBean> codeDictBeanList = codeDictMapper.selectCodeDictsByParams(searchBean);
+		if(CollectionUtils.isNotEmpty(codeDictBeanList)){
 			rowData.clear();
-			for(InstockBean instockBean:instockBeanList){
-				rowData.add(buildVectorData(instockBean));
+			for(CodeDictBean codeDictBean : codeDictBeanList){
+				rowData.add(buildVectorData(codeDictBean));
+				Map<String,Object> item = new HashMap<String,Object>();
+				item.put("label", codeDictBean.getId() + " - " + codeDictBean.getValue());
+				item.put("value", codeDictBean.getId());
+				parent.add(item);
 			}
 		}else{
 			rowData.clear();
@@ -248,34 +222,55 @@ public class InstockFrame extends JPanel implements ActionListener{
 		}
 	}
 	
-	private Vector<Object> buildVectorData(InstockBean instockBean){
+	private Vector<Object> buildVectorData(CodeDictBean codeDictBean){
 		try {
-			return ObjectUtils.createNewVecto(instockBean);
+			return ObjectUtils.createNewVecto(codeDictBean);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
 		}
 	}
 	
-	class MyComboBoxEditor extends DefaultCellEditor {
+	static class MyComboBoxEditor extends DefaultCellEditor {
 		private static final long serialVersionUID = 1L;
-
-		public MyComboBoxEditor(String[] items) {
-		    super(new JComboBox<Object>(items));
+		
+		private static MyComboBox comb = new MyComboBox(str);
+		
+		public MyComboBoxEditor() {
+			super(comb);
+		}
+		
+		public Object getSelectedItemValue(){
+			return comb.getSelectedItemValue();
+		}
+		
+		public void setSelectedItem(int index){
+			comb.setSelectedIndex(index);
 		}
 	 }
 	
-	class MyCheckBoxEditor extends DefaultCellEditor {
+	static class MyParentComboBoxEditor extends DefaultCellEditor {
 		private static final long serialVersionUID = 1L;
-
-		public MyCheckBoxEditor() {
-		    super(new JCheckBox());
+		
+		private static MyComboBox comb = new MyComboBox(parent);
+		
+		public MyParentComboBoxEditor() {
+			super(comb);
+		}
+		
+		public Object getSelectedItemValue(){
+			return comb.getSelectedItemValue();
+		}
+		
+		public void setSelectedItem(int index){
+			comb.setSelectedIndex(index);
 		}
 	 }
 	
 	public static void main(String[] args){
 		JFrame frame = new JFrame();
-		JPanel panel = new InstockFrame();
+		frame.setTitle("配置项管理界面");
+		JPanel panel = new CodeDictFrame();
 		panel.setVisible(true);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	    frame.add(panel,BorderLayout.CENTER);

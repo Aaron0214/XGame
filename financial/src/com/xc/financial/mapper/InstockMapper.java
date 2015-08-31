@@ -14,7 +14,7 @@ import java.util.Map;
 
 import com.xc.financial.beans.InstockBean;
 import com.xc.financial.beans.SearchBean;
-import com.xc.financial.enums.InstockColumnEnum;
+import com.xc.financial.enums.column.InstockColumnEnum;
 import com.xc.financial.utils.DateUtils;
 import com.xc.financial.utils.StringUtils;
 

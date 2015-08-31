@@ -11,9 +11,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import com.xc.financial.beans.SearchBean;
 import com.xc.financial.beans.UserBean;
-import com.xc.financial.enums.UserColumnEnum;
+import com.xc.financial.beans.UserSearchBean;
+import com.xc.financial.enums.StatusEnum;
+import com.xc.financial.enums.column.UserColumnEnum;
 import com.xc.financial.utils.DateUtils;
 import com.xc.financial.utils.StringUtils;
 
@@ -37,28 +38,52 @@ public class UserMapper {
 		try{
 			StringBuffer sb = new StringBuffer();
 			sb.append("insert into user(name,status,sex,code,address,username,password,email,create_date,modify_date,comments,operate) values(");
-			if(StringUtils.isEmpty((String)data.get(UserColumnEnum.getUserColumnValueByKey("code").getValue()))){
+			if(StringUtils.isEmpty((String)data.get(UserColumnEnum.getUserColumnValueByKey("name").getValue()))){
+				sb.append("null,");
+			}else{
+				sb.append("'"+ data.get(UserColumnEnum.getUserColumnValueByKey("name").getValue())+"',");
+			}
+			
+			if(StringUtils.isEmpty((String)data.get(UserColumnEnum.getUserColumnValueByKey("status").getValue()))){
+				sb.append("null,");
+			}else{
+				sb.append("'"+ data.get(UserColumnEnum.getUserColumnValueByKey("status").getValue())+"',");
+			}
+			
+			if(StringUtils.isEmpty((String)data.get(UserColumnEnum.getUserColumnValueByKey("sex").getValue()))){
+				sb.append("null,");
+			}else{
+				sb.append("'"+ data.get(UserColumnEnum.getUserColumnValueByKey("sex").getValue())+"',");
+			}
+			
+			if(StringUtils.isEmpty(data.get(UserColumnEnum.getUserColumnValueByKey("code").getValue()))){
 				sb.append("null,");
 			}else{
 				sb.append("'"+ data.get(UserColumnEnum.getUserColumnValueByKey("code").getValue())+"',");
 			}
 			
-			if(StringUtils.isEmpty((String)data.get(UserColumnEnum.getUserColumnValueByKey("type").getValue()))){
+			if(StringUtils.isEmpty(data.get(UserColumnEnum.getUserColumnValueByKey("address").getValue()))){
 				sb.append("null,");
 			}else{
-				sb.append("'"+ data.get(UserColumnEnum.getUserColumnValueByKey("type").getValue())+"',");
+				sb.append("'"+ data.get(UserColumnEnum.getUserColumnValueByKey("address").getValue())+"',");
 			}
 			
-			if(StringUtils.isEmpty((String)data.get(UserColumnEnum.getUserColumnValueByKey("member").getValue()))){
+			if(StringUtils.isEmpty(data.get(UserColumnEnum.getUserColumnValueByKey("username").getValue()))){
 				sb.append("null,");
 			}else{
-				sb.append("'"+ data.get(UserColumnEnum.getUserColumnValueByKey("member").getValue())+"',");
+				sb.append("'"+ data.get(UserColumnEnum.getUserColumnValueByKey("username").getValue())+"',");
 			}
 			
-			if(StringUtils.isEmpty(data.get(UserColumnEnum.getUserColumnValueByKey("amount").getValue()))){
+			if(StringUtils.isEmpty(data.get(UserColumnEnum.getUserColumnValueByKey("password").getValue()))){
 				sb.append("null,");
 			}else{
-				sb.append("'"+ data.get(UserColumnEnum.getUserColumnValueByKey("amount").getValue())+"',");
+				sb.append("'"+ data.get(UserColumnEnum.getUserColumnValueByKey("password").getValue())+"',");
+			}
+			
+			if(StringUtils.isEmpty(data.get(UserColumnEnum.getUserColumnValueByKey("email").getValue()))){
+				sb.append("null,");
+			}else{
+				sb.append("'"+ data.get(UserColumnEnum.getUserColumnValueByKey("email").getValue())+"',");
 			}
 			
 			if(StringUtils.isEmpty((String)data.get(UserColumnEnum.getUserColumnValueByKey("create_date").getValue()))){
@@ -112,22 +137,46 @@ public class UserMapper {
 		try{
 			StringBuffer sb = new StringBuffer();
 			sb.append("update user set ");
-			if(StringUtils.isEmpty((String)data.get(UserColumnEnum.getUserColumnValueByKey("type").getValue()))){
+			if(StringUtils.isEmpty((String)data.get(UserColumnEnum.getUserColumnValueByKey("name").getValue()))){
 				sb.append("type = null,");
 			}else{
-				sb.append("type = '"+ data.get(UserColumnEnum.getUserColumnValueByKey("type").getValue())+"',");
+				sb.append("type = '"+ data.get(UserColumnEnum.getUserColumnValueByKey("name").getValue())+"',");
 			}
 			
-			if(StringUtils.isEmpty((String)data.get(UserColumnEnum.getUserColumnValueByKey("member").getValue()))){
+			if(StringUtils.isEmpty((String)data.get(UserColumnEnum.getUserColumnValueByKey("status").getValue()))){
 				sb.append("member = null,");
 			}else{
-				sb.append("member = '"+ data.get(UserColumnEnum.getUserColumnValueByKey("member").getValue())+"',");
+				sb.append("member = '"+ data.get(UserColumnEnum.getUserColumnValueByKey("status").getValue())+"',");
 			}
 			
-			if(StringUtils.isEmpty(data.get(UserColumnEnum.getUserColumnValueByKey("amount").getValue()))){
+			if(StringUtils.isEmpty(data.get(UserColumnEnum.getUserColumnValueByKey("sex").getValue()))){
 				sb.append("amount = null,");
 			}else{
-				sb.append("amount = '"+ data.get(UserColumnEnum.getUserColumnValueByKey("amount").getValue()) +"',");
+				sb.append("amount = '"+ data.get(UserColumnEnum.getUserColumnValueByKey("sex").getValue()) +"',");
+			}
+			
+			if(StringUtils.isEmpty(data.get(UserColumnEnum.getUserColumnValueByKey("address").getValue()))){
+				sb.append("amount = null,");
+			}else{
+				sb.append("amount = '"+ data.get(UserColumnEnum.getUserColumnValueByKey("address").getValue()) +"',");
+			}
+			
+			if(StringUtils.isEmpty(data.get(UserColumnEnum.getUserColumnValueByKey("username").getValue()))){
+				sb.append("amount = null,");
+			}else{
+				sb.append("amount = '"+ data.get(UserColumnEnum.getUserColumnValueByKey("username").getValue()) +"',");
+			}
+			
+			if(StringUtils.isEmpty(data.get(UserColumnEnum.getUserColumnValueByKey("password").getValue()))){
+				sb.append("amount = null,");
+			}else{
+				sb.append("amount = '"+ data.get(UserColumnEnum.getUserColumnValueByKey("password").getValue()) +"',");
+			}
+			
+			if(StringUtils.isEmpty(data.get(UserColumnEnum.getUserColumnValueByKey("email").getValue()))){
+				sb.append("amount = null,");
+			}else{
+				sb.append("amount = '"+ data.get(UserColumnEnum.getUserColumnValueByKey("email").getValue()) +"',");
 			}
 			
 			if(StringUtils.isEmpty((String)data.get(UserColumnEnum.getUserColumnValueByKey("modify_date").getValue()))){
@@ -201,11 +250,20 @@ public class UserMapper {
 	 * @param data
 	 * @return
 	 */
-	public List<UserBean> selectUsersByParams(SearchBean searchBean){
+	public List<UserBean> selectUsersByParams(UserSearchBean searchBean){
 		List<UserBean> userList = new ArrayList<UserBean>();
 		try{
 			StringBuffer sb = new StringBuffer();	
 			sb.append("select * from user where 1=1");
+			
+			if(StringUtils.isNotEmpty(searchBean.getName())){
+				sb.append(" and name like '%" + searchBean.getName() +"%'");
+			}
+			
+			if(StringUtils.isNotEmpty(searchBean.getUsername())){
+				sb.append(" and username like '%" + searchBean.getUsername() +"%'");
+			}
+			
 			if(StringUtils.isNotEmpty(searchBean.getCode())){
 				sb.append(" and code like '%" + searchBean.getCode() +"%'");
 			}
@@ -228,7 +286,7 @@ public class UserMapper {
 				userBean.setIndex(index++);
 				userBean.setCode(result.getString("code"));
 				userBean.setName(result.getString("name"));
-				userBean.setStatusValue("");
+				userBean.setStatusValue(StatusEnum.getStatusValueByKey(result.getString("value")).getValue());
 				userBean.setSexValue("");
 				userBean.setAddress(result.getString("address"));
 				userBean.setUsername(result.getString("username"));

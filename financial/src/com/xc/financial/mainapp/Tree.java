@@ -27,7 +27,7 @@ public class Tree extends JTree{
 		user.add(new DefaultMutableTreeNode("用户列表"));
 		
 		DefaultMutableTreeNode system = new DefaultMutableTreeNode("系统管理");
-		system.add(new DefaultMutableTreeNode("用户列表"));
+		system.add(new DefaultMutableTreeNode("配置项管理"));
 		
 		root.add(index);
 		root.add(jxc);

@@ -10,10 +10,30 @@ Target Server Type    : MYSQL
 Target Server Version : 50623
 File Encoding         : 65001
 
-Date: 2015-08-28 18:02:20
+Date: 2015-08-31 18:11:29
 */
 
 SET FOREIGN_KEY_CHECKS=0;
+
+-- ----------------------------
+-- Table structure for code_dict
+-- ----------------------------
+DROP TABLE IF EXISTS `code_dict`;
+CREATE TABLE `code_dict` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `type` int(11) DEFAULT NULL COMMENT '0，收入；1，消费；2，余额；',
+  `value` varchar(255) DEFAULT NULL,
+  `pid` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of code_dict
+-- ----------------------------
+INSERT INTO `code_dict` VALUES ('1', '0', '收入类型', null);
+INSERT INTO `code_dict` VALUES ('2', '0', '收红包', '1');
+INSERT INTO `code_dict` VALUES ('3', '0', '工资', '1');
+INSERT INTO `code_dict` VALUES ('4', '0', '借贷', '1');
 
 -- ----------------------------
 -- Table structure for financial

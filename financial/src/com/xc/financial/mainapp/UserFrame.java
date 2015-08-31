@@ -27,9 +27,8 @@ import javax.swing.SwingConstants;
 
 import com.xc.financial.beans.InstockBean;
 import com.xc.financial.beans.SearchBean;
-import com.xc.financial.enums.UserColumnEnum;
 import com.xc.financial.enums.SnTypeEnum;
-import com.xc.financial.enums.UserColumnEnum;
+import com.xc.financial.enums.column.UserColumnEnum;
 import com.xc.financial.mapper.InstockMapper;
 import com.xc.financial.mapper.SnMapper;
 import com.xc.financial.utils.CollectionUtils;

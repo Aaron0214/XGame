@@ -1,6 +1,8 @@
 package com.xc.financial.utils;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Vector;
 
 import org.dozer.DozerBeanMapper;
@@ -86,6 +88,52 @@ public class ObjectUtils {
 			return null;
 		}
 		return o;
+	}
+	
+	/**
+     * 执行类中的方法
+     * @param Object ,class ,functionName
+     * @return value
+     */
+	public static <T> Object excuteGetFunction(Object obj,T a,String functionName){
+		try {
+			Method m = obj.getClass().getDeclaredMethod(functionName);
+			m.setAccessible(true);
+			return m.invoke(a);
+		} catch (IllegalAccessException e) {
+			return null;
+		} catch (IllegalArgumentException e) {
+			return null;
+		} catch (InvocationTargetException e) {
+			return null;
+		} catch (NoSuchMethodException e) {
+			return null;
+		} catch (SecurityException e) {
+			return null;
+		}
+	}
+	
+	/**
+     * 执行类中的方法
+     * @param Object ,class ,functionName,Object value
+     * @return value
+     */
+	public static <T> void excuteSetFunction(Object obj,T a,String functionName,Object value){
+		try {
+			Method m = obj.getClass().getDeclaredMethod(functionName);
+			m.setAccessible(true);
+			 m.invoke(a,value);
+		} catch (IllegalAccessException e) {
+			
+		} catch (IllegalArgumentException e) {
+			
+		} catch (InvocationTargetException e) {
+			
+		} catch (NoSuchMethodException e) {
+			
+		} catch (SecurityException e) {
+			
+		}
 	}
 	
 	/**

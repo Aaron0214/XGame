@@ -14,6 +14,8 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 
+import com.xc.financial.mainapp.CodeDictFrame.MyComboBoxEditor;
+import com.xc.financial.mainapp.CodeDictFrame.MyParentComboBoxEditor;
 import com.xc.financial.utils.CollectionUtils;
 import com.xc.financial.utils.ObjectUtils;
 
@@ -35,6 +37,7 @@ public class Table extends JTable{
 
 			private static final long serialVersionUID = 1L;
 			
+			@SuppressWarnings({ "unchecked", "rawtypes" })
 			public Class getColumnClass(int c) {
 				 return getValueAt(0, c).getClass();
 			 }
@@ -90,11 +93,44 @@ public class Table extends JTable{
 		for(int i = 0; i < rows.size(); i++){
 			Map<String,Object> rowdata = new HashMap<String,Object>();
 			for(int j = 0; j< columnNames.size(); j++){
-				rowdata.put(this.getColumnName(j), this.getValueAt((int)rows.get(i), j));
+				if(this.getColumnModel().getColumn(j).getCellEditor() != null) {
+					if(this.getColumnModel().getColumn(j).getCellEditor().getClass().getName().equals(MyComboBoxEditor.class.getName())){
+						rowdata.put(this.getColumnName(j),ObjectUtils.excuteGetFunction(this.getColumnModel().getColumn(j).getCellEditor(),new MyComboBoxEditor(),"getSelectedItemValue"));
+					}else if(this.getColumnModel().getColumn(j).getCellEditor().getClass().getName().equals(MyParentComboBoxEditor.class.getName())){
+						rowdata.put(this.getColumnName(j),ObjectUtils.excuteGetFunction(this.getColumnModel().getColumn(j).getCellEditor(),new MyParentComboBoxEditor(),"getSelectedItemValue"));
+					}else{
+						rowdata.put(this.getColumnName(j), this.getValueAt((int)rows.get(i), j));
+					}
+				}else{
+					rowdata.put(this.getColumnName(j), this.getValueAt((int)rows.get(i), j));
+				}
 			}
 			datas.add(rowdata);
 		}
 		return datas;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public void addTableRow(boolean hasIndex){
+		Vector<Object> obj = new Vector<Object>();
+		obj.add(Boolean.FALSE);
+		if(hasIndex){
+			if(CollectionUtils.isNotEmpty(data)){
+				Vector<Object> last = (Vector<Object>) data.get(data.size() -1);
+				obj.add((int)last.get(1) + 1);
+			}else{
+				obj.add(1);
+			}
+			for(int i = 0;i<columnNames.size()-2;i++){
+				obj.add("");
+			}
+		}else{
+			for(int i = 0;i<columnNames.size() -1;i++){
+				obj.add("");
+			}
+		}
+		data.add(obj);
+		updateTable();
 	}
 	
 	@SuppressWarnings("unchecked")
