@@ -8,7 +8,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
@@ -25,10 +27,13 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
+import com.xc.financial.beans.CodeDictBean;
 import com.xc.financial.beans.FinancialBean;
 import com.xc.financial.beans.SearchBean;
+import com.xc.financial.enums.CodeDictEnum;
 import com.xc.financial.enums.SnTypeEnum;
 import com.xc.financial.enums.column.FinancialColumnEnum;
+import com.xc.financial.mapper.CodeDictMapper;
 import com.xc.financial.mapper.FinancialMapper;
 import com.xc.financial.mapper.SnMapper;
 import com.xc.financial.utils.CollectionUtils;
@@ -36,6 +41,7 @@ import com.xc.financial.utils.DateUtils;
 import com.xc.financial.utils.NumberFormatUtils;
 import com.xc.financial.utils.ObjectUtils;
 import com.xc.financial.utils.StringUtils;
+import com.xc.financial.mainapp.MyComboBox;
 
 public class FinancialFrame extends JPanel implements ActionListener{
 	
@@ -50,12 +56,13 @@ public class FinancialFrame extends JPanel implements ActionListener{
 	private JScrollPane pane3;
 	private JButton button,save,delete,search;
 	private JLabel label,label1,label2,label3;
-	private JComboBox<String> type;
+	private MyComboBox type;
 	private JTextField field,startDate,endDate;
 	private DatePicker datepicker,datepicker1;
-	private String[] str = {"","A","B"};
+	private static List<Map<String,Object>> str = new ArrayList<Map<String,Object>>();
 	private FinancialMapper financialMapper = new FinancialMapper();
 	private SnMapper snMapper = new SnMapper();
+	private CodeDictMapper codeDictMapper = new CodeDictMapper();
 	
 	public FinancialFrame(){
 		init();
@@ -70,9 +77,9 @@ public class FinancialFrame extends JPanel implements ActionListener{
 		label3 = new JLabel("存储类型：");
 		label3.setFont(new Font("宋体", Font.PLAIN, 13));
 		
-		type = new JComboBox<String>(str);
+		type = new MyComboBox(str);
 		type.setFont(new Font("宋体", Font.PLAIN, 13));
-		type.setPreferredSize(new Dimension(50, 20));
+		type.setPreferredSize(new Dimension(80, 20));
 		
 		label1 = new JLabel("开始日期：");
 		label1.setFont(new Font("宋体", Font.PLAIN, 13));
@@ -133,7 +140,7 @@ public class FinancialFrame extends JPanel implements ActionListener{
 		//设置第9列的宽度
 		table.changeColumnWidth(9, 100);
 		
-		table.setCellEditor(4, new MyComboBoxEditor(str));
+		table.setCellEditor(4, new ComboBoxEditor(str));
 		
 		table.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
 		
@@ -191,7 +198,7 @@ public class FinancialFrame extends JPanel implements ActionListener{
 			SearchBean searchBean = new SearchBean();
 			searchBean.setStartDate(startDate.getText());
 			searchBean.setEndDate(endDate.getText());
-			searchBean.setType(type.getSelectedItem().toString());
+			searchBean.setType(StringUtils.isNotEmpty(type.getSelectedItem()) ? null :type.getSelectedItem().toString());
 			getDatas(searchBean);
 		}
 		if(e.getSource() == button){
@@ -211,6 +218,27 @@ public class FinancialFrame extends JPanel implements ActionListener{
 		for(String column : columnNames){
 			columns.add(column);
 		}
+		//初始化静态数据
+		str.clear();
+		Map<String,Object> black = new HashMap<String,Object>();
+		black.put("label", "");
+		black.put("value", null);
+		str.add(black);
+		
+		Map<String,Object> params = new HashMap<String,Object>();
+		params.put("type", Integer.parseInt(CodeDictEnum.FINANCIAL.getKey()));
+		params.put("value", "存储类型");
+		
+		List<CodeDictBean> codeDictList = codeDictMapper.selectChildrenByParams(params);
+		if(CollectionUtils.isNotEmpty(codeDictList)){
+			for(CodeDictBean codeDictBean : codeDictList){
+				Map<String,Object> item = new HashMap<String,Object>();
+				item.put("label", codeDictBean.getValue());
+				item.put("value", codeDictBean.getId());
+				str.add(item);
+			}
+		}
+		
 		getDatas(new SearchBean());
 	}
 	
@@ -259,22 +287,6 @@ public class FinancialFrame extends JPanel implements ActionListener{
 			return null;
 		}
 	}
-	
-	class MyComboBoxEditor extends DefaultCellEditor {
-		private static final long serialVersionUID = 1L;
-
-		public MyComboBoxEditor(String[] items) {
-		    super(new JComboBox<Object>(items));
-		}
-	 }
-	
-	class MyCheckBoxEditor extends DefaultCellEditor {
-		private static final long serialVersionUID = 1L;
-
-		public MyCheckBoxEditor() {
-		    super(new JCheckBox());
-		}
-	 }
 	
 	public static void main(String[] args){
 		JFrame frame = new JFrame();

@@ -10,7 +10,7 @@ public class FinancialBean{
 	
 	private String member;
 	
-	private String type;
+	private String typeValue;
 	
 	private BigDecimal amount;
 	
@@ -21,7 +21,7 @@ public class FinancialBean{
 	private String comments;
 	
 	private String operate;
-
+	
 	public Integer getIndex() {
 		return index;
 	}
@@ -46,12 +46,12 @@ public class FinancialBean{
 		this.member = member;
 	}
 
-	public String getType() {
-		return type;
+	public String getTypeValue() {
+		return typeValue;
 	}
 
-	public void setType(String type) {
-		this.type = type;
+	public void setTypeValue(String typeValue) {
+		this.typeValue = typeValue;
 	}
 
 	public BigDecimal getAmount() {

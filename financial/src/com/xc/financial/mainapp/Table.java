@@ -14,8 +14,6 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 
-import com.xc.financial.mainapp.CodeDictFrame.MyComboBoxEditor;
-import com.xc.financial.mainapp.CodeDictFrame.MyParentComboBoxEditor;
 import com.xc.financial.utils.CollectionUtils;
 import com.xc.financial.utils.ObjectUtils;
 
@@ -26,7 +24,7 @@ public class Table extends JTable{
 	private Vector<Object>  columnNames;
 	private Vector<Object>  data;
 	private Table table = null;
-	private List<Object> rows = new ArrayList<Object>();
+	public List<Object> rows = new ArrayList<Object>();
 	
 	public Table(Vector<Object> data,Vector<Object> columnNames){
 		this.columnNames = columnNames;
@@ -94,10 +92,9 @@ public class Table extends JTable{
 			Map<String,Object> rowdata = new HashMap<String,Object>();
 			for(int j = 0; j< columnNames.size(); j++){
 				if(this.getColumnModel().getColumn(j).getCellEditor() != null) {
-					if(this.getColumnModel().getColumn(j).getCellEditor().getClass().getName().equals(MyComboBoxEditor.class.getName())){
-						rowdata.put(this.getColumnName(j),ObjectUtils.excuteGetFunction(this.getColumnModel().getColumn(j).getCellEditor(),new MyComboBoxEditor(),"getSelectedItemValue"));
-					}else if(this.getColumnModel().getColumn(j).getCellEditor().getClass().getName().equals(MyParentComboBoxEditor.class.getName())){
-						rowdata.put(this.getColumnName(j),ObjectUtils.excuteGetFunction(this.getColumnModel().getColumn(j).getCellEditor(),new MyParentComboBoxEditor(),"getSelectedItemValue"));
+					if(this.getColumnModel().getColumn(j).getCellEditor().getClass().getName().equals(ComboBoxEditor.class.getName())){
+						ComboBoxEditor comboBoxEditor = (ComboBoxEditor) this.getColumnModel().getColumn(j).getCellEditor();
+						rowdata.put(this.getColumnName(j),comboBoxEditor.getSelectedItemValue());
 					}else{
 						rowdata.put(this.getColumnName(j), this.getValueAt((int)rows.get(i), j));
 					}
@@ -131,6 +128,18 @@ public class Table extends JTable{
 		}
 		data.add(obj);
 		updateTable();
+	}
+	
+	public void initCombox(List<Integer> columns){
+		int size = data.size();
+		for(int i = 0 ; i < size; i++){
+			if(CollectionUtils.isNotEmpty(columns)){
+				for(int j = 0; j < columns.size(); j++){
+					ComboBoxEditor myComboBoxEditor = (ComboBoxEditor) this.getColumnModel().getColumn(columns.get(j)).getCellEditor();
+					myComboBoxEditor.setSelectedItem(this.getValueAt(i, columns.get(j)));
+				}
+			}
+		}
 	}
 	
 	@SuppressWarnings("unchecked")

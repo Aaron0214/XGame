@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
-import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -38,7 +37,7 @@ public class CodeDictFrame extends JPanel implements ActionListener{
 	private static final long serialVersionUID = 1L;
 	private Table table;
 	private Vector<Object> columns = new Vector<Object>();
-	private String[] columnNames= {"","编号","类型","内容","关联项"}; 
+	private String[] columnNames= {"","编号","分类","内容","上级分类"}; 
 	private Vector<Object> rowData = new Vector<Object>();
 	private JScrollPane pane3;
 	private JButton button,save,delete,search;
@@ -59,7 +58,7 @@ public class CodeDictFrame extends JPanel implements ActionListener{
 		field = new JTextField();
 		field.setPreferredSize(new Dimension(100, 20));
 		
-		label3 = new JLabel("类型：");
+		label3 = new JLabel("分类：");
 		label3.setFont(new Font("宋体", Font.PLAIN, 13));
 		
 		type = new MyComboBox(str);
@@ -99,11 +98,16 @@ public class CodeDictFrame extends JPanel implements ActionListener{
 		//设置第5列的宽度
 		table.changeColumnWidth(4, 150);
 		
-		table.setCellEditor(2, new MyComboBoxEditor());
+		table.setCellEditor(2, new ComboBoxEditor(str));
 		
-		table.setCellEditor(4, new MyParentComboBoxEditor());
+		table.setCellEditor(4, new ComboBoxEditor(parent));
 		
 		table.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
+		
+		List<Integer> columns = new ArrayList<Integer>();
+		columns.add(2);
+		columns.add(4);
+		table.initCombox(columns);
 		
         pane3 = new JScrollPane(table);
         
@@ -139,7 +143,7 @@ public class CodeDictFrame extends JPanel implements ActionListener{
 		if(e.getSource() == search){
 			SearchBean searchBean = new SearchBean();
 			searchBean.setId(StringUtils.isEmpty(field.getText()) ? null : Integer.parseInt(field.getText()));
-			searchBean.setType(type.getSelectedItemValue().toString());
+			searchBean.setType(type.getSelectedItemValue() == null ? null : type.getSelectedItemValue() .toString());
 			getDatas(searchBean);
 		}
 		if(e.getSource() == button){
@@ -161,6 +165,11 @@ public class CodeDictFrame extends JPanel implements ActionListener{
 		}
 		
 		//初始化静态数据
+		Map<String,Object> black = new HashMap<String,Object>();
+		black.put("label", "");
+		black.put("value", null);
+		str.add(black);
+		
 		Map<String,Object> item = new HashMap<String,Object>();
 		item.put("label", "收入");
 		item.put("value", 0);
@@ -175,9 +184,7 @@ public class CodeDictFrame extends JPanel implements ActionListener{
 		item2.put("label", "余额");
 		item2.put("value", 2);
 		str.add(item2);
-		Map<String,Object> black = new HashMap<String,Object>();
-		black.put("label", "");
-		black.put("value", null);
+		
 		parent.add(black);
 		
 		getDatas(new SearchBean());
@@ -207,6 +214,11 @@ public class CodeDictFrame extends JPanel implements ActionListener{
 		List<CodeDictBean> codeDictBeanList = codeDictMapper.selectCodeDictsByParams(searchBean);
 		if(CollectionUtils.isNotEmpty(codeDictBeanList)){
 			rowData.clear();
+			parent.clear();
+			Map<String,Object> black = new HashMap<String,Object>();
+			black.put("label", "");
+			black.put("value", null);
+			parent.add(black);
 			for(CodeDictBean codeDictBean : codeDictBeanList){
 				rowData.add(buildVectorData(codeDictBean));
 				Map<String,Object> item = new HashMap<String,Object>();
@@ -219,6 +231,8 @@ public class CodeDictFrame extends JPanel implements ActionListener{
 		}
 		if(table != null){
 			table.updateTable();
+			table.getColumnModel().getColumn(4).setCellEditor(new ComboBoxEditor(parent));
+			table.rows.clear();
 		}
 	}
 	
@@ -230,42 +244,6 @@ public class CodeDictFrame extends JPanel implements ActionListener{
 			return null;
 		}
 	}
-	
-	static class MyComboBoxEditor extends DefaultCellEditor {
-		private static final long serialVersionUID = 1L;
-		
-		private static MyComboBox comb = new MyComboBox(str);
-		
-		public MyComboBoxEditor() {
-			super(comb);
-		}
-		
-		public Object getSelectedItemValue(){
-			return comb.getSelectedItemValue();
-		}
-		
-		public void setSelectedItem(int index){
-			comb.setSelectedIndex(index);
-		}
-	 }
-	
-	static class MyParentComboBoxEditor extends DefaultCellEditor {
-		private static final long serialVersionUID = 1L;
-		
-		private static MyComboBox comb = new MyComboBox(parent);
-		
-		public MyParentComboBoxEditor() {
-			super(comb);
-		}
-		
-		public Object getSelectedItemValue(){
-			return comb.getSelectedItemValue();
-		}
-		
-		public void setSelectedItem(int index){
-			comb.setSelectedIndex(index);
-		}
-	 }
 	
 	public static void main(String[] args){
 		JFrame frame = new JFrame();

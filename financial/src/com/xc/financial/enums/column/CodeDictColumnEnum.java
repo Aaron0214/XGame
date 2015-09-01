@@ -2,7 +2,7 @@ package com.xc.financial.enums.column;
 
 public enum CodeDictColumnEnum {
 	
-	COLUMN_ID("id","编号"),COLUMN_TYPE("type","类型"),COLUMN_VALUE("value","内容"),COLUMN_PARENT("pid","关联项");
+	COLUMN_ID("id","编号"),COLUMN_TYPE("type","分类"),COLUMN_VALUE("value","内容"),COLUMN_PARENT("pid","上级分类");
 	
 	private String key;
 	

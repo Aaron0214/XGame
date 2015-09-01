@@ -95,11 +95,11 @@ public class CodeDictMapper {
 			}
 			
 			if(StringUtils.isEmpty((Object)data.get(CodeDictColumnEnum.getCodeDictColumnValueByKey("pid").getValue()))){
-				sb.append("pid = null,");
+				sb.append("pid = null");
 			}else{
 				sb.append("pid = '"+ data.get(CodeDictColumnEnum.getCodeDictColumnValueByKey("pid").getValue()) +"'");
 			}
-			
+			sb.append(" where id = " + data.get(CodeDictColumnEnum.getCodeDictColumnValueByKey("id").getValue()));
 			connect = DriverManager.getConnection(url, username, password);
 			statement = connect.createStatement();
 			return statement.executeUpdate(sb.toString());
@@ -154,17 +154,17 @@ public class CodeDictMapper {
 	 * @return
 	 */
 	public List<CodeDictBean> selectCodeDictsByParams(SearchBean searchBean){
-		List<CodeDictBean> instockList = new ArrayList<CodeDictBean>();
+		List<CodeDictBean> codeDictList = new ArrayList<CodeDictBean>();
 		try{
 			StringBuffer sb = new StringBuffer();	
 			sb.append("select c.*,p.value as pidValue from code_dict c left join code_dict p on c.pid = p.id where 1=1 ");
 			
 			if(null != searchBean.getId()){
-				sb.append(" and id = '" + searchBean.getId() + "'");
+				sb.append(" and c.id = '" + searchBean.getId() + "'");
 			}
 			
 			if(StringUtils.isNotEmpty(searchBean.getType())){
-				sb.append(" and type = '" + searchBean.getType() + "'");
+				sb.append(" and c.type = " + Integer.parseInt(searchBean.getType()));
 			}
 			sb.append(" order by c.id;");
 			connect = DriverManager.getConnection(url, username, password);
@@ -178,12 +178,12 @@ public class CodeDictMapper {
 				codeDictBean.setValue(result.getString("value"));
 				codeDictBean.setPid(result.getString("pid") == null ? null : Integer.parseInt(result.getString("pid")));
 				codeDictBean.setPidValue(result.getString("pidValue") == null ? null : result.getString("pidValue"));
-				instockList.add(codeDictBean);
+				codeDictList.add(codeDictBean);
 			}
-			return instockList;
+			return codeDictList;
 		}catch(SQLException e){
 			e.printStackTrace();
-			return instockList;
+			return codeDictList;
 		}finally{
 			try {
 				result.close();
@@ -216,6 +216,59 @@ public class CodeDictMapper {
 		}catch(SQLException e){
 			e.printStackTrace();
 			return -1;
+		}finally{
+			try {
+				result.close();
+				statement.close();
+				connect.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	/**
+	 * <p>
+	 * 查询一个数据的子集
+	 * </p>
+	 * 
+	 * @param data
+	 * @return
+	 */
+	public List<CodeDictBean> selectChildrenByParams(Map<String,Object> params){
+		List<CodeDictBean> codeDictList = new ArrayList<CodeDictBean>();
+		try{
+			StringBuffer sb = new StringBuffer();	
+			sb.append("select c.* from code_dict c left join code_dict p on c.pid = p.id where 1=1");
+			
+			if(StringUtils.isNotEmpty(params.get("id"))){
+				sb.append(" and p.id = " + params.get("id"));
+			}
+			
+			if(StringUtils.isNotEmpty(params.get("type"))){
+				sb.append(" and c.type = " + params.get("type"));
+			}
+			
+			if(StringUtils.isNotEmpty(params.get("value"))){
+				sb.append(" and p.value = '" + params.get("value") +"'");
+			}
+			sb.append(" order by c.id;");
+			connect = DriverManager.getConnection(url, username, password);
+			statement = connect.createStatement();
+			result = statement.executeQuery(sb.toString());
+			while(result.next()){
+				CodeDictBean codeDictBean = new CodeDictBean();
+				codeDictBean.setId(Integer.parseInt(result.getString("id")));
+				codeDictBean.setType(Integer.parseInt(result.getString("type")));
+				codeDictBean.setTypeValue(CodeDictEnum.getCodeDictValueByKey(result.getString("type")).getValue());
+				codeDictBean.setValue(result.getString("value"));
+				codeDictBean.setPid(result.getString("pid") == null ? null : Integer.parseInt(result.getString("pid")));
+				codeDictList.add(codeDictBean);
+			}
+			return codeDictList;
+		}catch(SQLException e){
+			e.printStackTrace();
+			return codeDictList;
 		}finally{
 			try {
 				result.close();

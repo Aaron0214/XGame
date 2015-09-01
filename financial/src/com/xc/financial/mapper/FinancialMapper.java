@@ -46,7 +46,7 @@ public class FinancialMapper {
 				sb.append("'"+ data.get(OutstockColumnEnum.getOutstockColumnValueByKey("code").getValue())+"',");
 			}
 			
-			if(StringUtils.isEmpty((String)data.get(FinancialColumnEnum.getFinancialColumnValueByKey("type").getValue()))){
+			if(StringUtils.isEmpty(data.get(FinancialColumnEnum.getFinancialColumnValueByKey("type").getValue()))){
 				sb.append("null,");
 			}else{
 				sb.append("'"+ data.get(FinancialColumnEnum.getFinancialColumnValueByKey("type").getValue())+"',");
@@ -115,7 +115,7 @@ public class FinancialMapper {
 		try{
 			StringBuffer sb = new StringBuffer();
 			sb.append("update financial set ");
-			if(StringUtils.isEmpty((String)data.get(FinancialColumnEnum.getFinancialColumnValueByKey("type").getValue()))){
+			if(StringUtils.isEmpty(data.get(FinancialColumnEnum.getFinancialColumnValueByKey("type").getValue()))){
 				sb.append("type = null,");
 			}else{
 				sb.append("type = '"+ data.get(FinancialColumnEnum.getFinancialColumnValueByKey("type").getValue())+"',");
@@ -208,7 +208,7 @@ public class FinancialMapper {
 		List<FinancialBean> finanacialList = new ArrayList<FinancialBean>();
 		try{
 			StringBuffer sb = new StringBuffer();	
-			sb.append("select * from financial where 1=1");
+			sb.append("select f.*,c.value as typeValue from financial f left join code_dict c on f.type = c.id where 1=1");
 			if(StringUtils.isNotEmpty(searchBean.getCode())){
 				sb.append(" and code like '%" + searchBean.getCode() +"%'");
 			}
@@ -219,7 +219,7 @@ public class FinancialMapper {
 				sb.append(" and create_Date <= '" + DateUtils.dayEnd(DateUtils.parseSingleDate(searchBean.getEndDate())) + "'");
 			}
 			if(StringUtils.isNotEmpty(searchBean.getType())){
-				sb.append(" and type = '" + searchBean.getType() + "'");
+				sb.append(" and type = " + Integer.parseInt(searchBean.getType()));
 			}
 			
 			connect = DriverManager.getConnection(url, username, password);
@@ -234,7 +234,7 @@ public class FinancialMapper {
 				financialBean.setCreateDate(DateUtils.parseLongDate(DateUtils.parseDate(result.getString("create_date"))));
 				financialBean.setModifyDate(DateUtils.parseLongDate(DateUtils.parseDate(result.getString("modify_date"))));
 				financialBean.setAmount(BigDecimal.valueOf(Double.valueOf(result.getString("amount"))));
-				financialBean.setType(result.getString("type"));
+				financialBean.setTypeValue(result.getString("typeValue"));
 				financialBean.setComments(result.getString("comments"));
 				financialBean.setOperate(result.getString("operate"));
 				finanacialList.add(financialBean);

@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50623
 File Encoding         : 65001
 
-Date: 2015-08-31 18:11:29
+Date: 2015-09-01 18:00:04
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -25,7 +25,7 @@ CREATE TABLE `code_dict` (
   `value` varchar(255) DEFAULT NULL,
   `pid` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of code_dict
@@ -33,7 +33,17 @@ CREATE TABLE `code_dict` (
 INSERT INTO `code_dict` VALUES ('1', '0', '收入类型', null);
 INSERT INTO `code_dict` VALUES ('2', '0', '收红包', '1');
 INSERT INTO `code_dict` VALUES ('3', '0', '工资', '1');
-INSERT INTO `code_dict` VALUES ('4', '0', '借贷', '1');
+INSERT INTO `code_dict` VALUES ('4', '0', '借/还', '1');
+INSERT INTO `code_dict` VALUES ('5', '0', '父母给予', '1');
+INSERT INTO `code_dict` VALUES ('6', '0', '其他', '1');
+INSERT INTO `code_dict` VALUES ('7', '1', '消费类型', null);
+INSERT INTO `code_dict` VALUES ('8', '1', '买东西', '7');
+INSERT INTO `code_dict` VALUES ('9', '1', '发红包', '7');
+INSERT INTO `code_dict` VALUES ('10', '1', '还钱', '7');
+INSERT INTO `code_dict` VALUES ('11', '1', '孝敬父母', '7');
+INSERT INTO `code_dict` VALUES ('12', '1', '其他', '7');
+INSERT INTO `code_dict` VALUES ('13', '2', '存储类型', null);
+INSERT INTO `code_dict` VALUES ('14', '2', '银行卡', '13');
 
 -- ----------------------------
 -- Table structure for financial
@@ -43,7 +53,7 @@ CREATE TABLE `financial` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `code` varchar(255) DEFAULT NULL,
   `member` varchar(255) DEFAULT NULL,
-  `type` varchar(255) DEFAULT NULL,
+  `type` int(255) DEFAULT NULL,
   `amount` decimal(10,0) DEFAULT NULL,
   `create_date` datetime DEFAULT NULL,
   `modify_date` datetime DEFAULT NULL,
@@ -55,7 +65,7 @@ CREATE TABLE `financial` (
 -- ----------------------------
 -- Records of financial
 -- ----------------------------
-INSERT INTO `financial` VALUES ('1', 'F20150828000002', 'member', 'A', '10000', '2015-08-28 17:43:04', '2015-08-28 17:43:04', '收入', null);
+INSERT INTO `financial` VALUES ('1', 'F20150828000002', 'member', '14', '10000', '2015-08-28 17:43:04', '2015-08-28 17:43:04', '收入', null);
 
 -- ----------------------------
 -- Table structure for instock
