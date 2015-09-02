@@ -4,31 +4,34 @@ import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
-import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
-import javax.swing.SwingConstants;
 
+import com.xc.financial.beans.CodeDictBean;
 import com.xc.financial.beans.InstockBean;
+import com.xc.financial.beans.InstockSearchBean;
 import com.xc.financial.beans.SearchBean;
+import com.xc.financial.enums.CodeDictEnum;
 import com.xc.financial.enums.SnTypeEnum;
 import com.xc.financial.enums.column.InstockColumnEnum;
+import com.xc.financial.mapper.CodeDictMapper;
 import com.xc.financial.mapper.InstockMapper;
 import com.xc.financial.mapper.SnMapper;
 import com.xc.financial.utils.CollectionUtils;
@@ -45,53 +48,69 @@ public class InstockFrame extends JPanel implements ActionListener{
 	private static final long serialVersionUID = 1L;
 	private Table table;
 	private Vector<Object> columns = new Vector<Object>();
-	private String[] columnNames= {"","序号","编码","家庭成员","收入类型","金额(元)","创建时间","修改时间","操作员"}; 
+	private String[] columnNames= {"","序号","编码","家庭成员","收入类型","金额(元)","存储类型","创建时间","修改时间","操作员"}; 
 	private Vector<Object> rowData = new Vector<Object>();
 	private JScrollPane pane3;
 	private JButton button,save,delete,search;
-	private JLabel label,label1,label2,label3;
-	private JComboBox<String> type;
+	private JLabel label,label1,label2,label3,label4;
+	private MyComboBox type,store;
 	private JTextField field,startDate,endDate;
 	private DatePicker datepicker,datepicker1;
-	private String[] str = {"","A","B"};
+	private static List<Map<String,Object>> str = new ArrayList<Map<String,Object>>();
+	private static List<Map<String,Object>> storeType = new ArrayList<Map<String,Object>>();
 	private InstockMapper instockMapper = new InstockMapper();
+	private CodeDictMapper codeDictMapper = new CodeDictMapper();
 	private SnMapper snMapper = new SnMapper();
 	
 	public InstockFrame(){
+		this.setLayout(null);
 		init();
 		
 		label = new JLabel("编码：");
 		label.setFont(new Font("宋体", Font.PLAIN, 13));
-		label.setVerticalAlignment(SwingConstants.TOP);
+		label.setBounds(new Rectangle(5,15,50,20));
 		
 		field = new JTextField();
-		field.setPreferredSize(new Dimension(100, 20));
+		field.setBounds(new Rectangle(45,15,120,20));
+		
+		label3 = new JLabel("收入类型：");
+		label3.setFont(new Font("宋体", Font.PLAIN, 13));
+		label3.setBounds(new Rectangle(185,15,80,20));
+		
+		type = new MyComboBox(str);
+		type.setFont(new Font("宋体", Font.PLAIN, 13));
+		type.setBounds(new Rectangle(250,15,90,20));
+		type.setCursor(new Cursor(Cursor.HAND_CURSOR));
+		
+		label4 = new JLabel("存储类型：");
+		label4.setFont(new Font("宋体", Font.PLAIN, 13));
+		label4.setBounds(new Rectangle(360,15,80,20));
+		
+		store = new MyComboBox(storeType);
+		store.setFont(new Font("宋体", Font.PLAIN, 13));
+		store.setBounds(new Rectangle(430,15,90,20));
+		store.setCursor(new Cursor(Cursor.HAND_CURSOR));
 		
 		label1 = new JLabel("开始日期：");
 		label1.setFont(new Font("宋体", Font.PLAIN, 13));
+		label1.setBounds(new Rectangle(5,45,80,20));
 		
 		startDate = new JTextField();
-		startDate.setPreferredSize(new Dimension(175, 20));
+		startDate.setBounds(new Rectangle(75,45,175,20));
 		datepicker = DatePicker.getInstance("yyyy-MM-dd");
 		datepicker.register(startDate);
 		
 		label2 = new JLabel("结束日期：");
 		label2.setFont(new Font("宋体", Font.PLAIN, 13));
+		label2.setBounds(new Rectangle(265,45,80,20));
 		
 		endDate = new JTextField();
-		endDate.setPreferredSize(new Dimension(175, 20));
+		endDate.setBounds(new Rectangle(335,45,175,20));
 		datepicker1 = DatePicker.getInstance("yyyy-MM-dd");
 		datepicker1.register(endDate);
 		
-		label3 = new JLabel("收入类型：");
-		label3.setFont(new Font("宋体", Font.PLAIN, 13));
-		
-		type = new JComboBox<String>(str);
-		type.setFont(new Font("宋体", Font.PLAIN, 13));
-		type.setPreferredSize(new Dimension(50, 20));
-		
 		search = new JButton("搜索");
-		search.setPreferredSize(new Dimension(60, 20));
+		search.setBounds(new Rectangle(530,45,60,20));
 		search.setCursor(new Cursor(Cursor.HAND_CURSOR));
 		
 		
@@ -100,7 +119,7 @@ public class InstockFrame extends JPanel implements ActionListener{
 			private static final long serialVersionUID = 1L;
 
 			public boolean isCellEditable(int row, int column) {
-				if(column == 0 || column == 3 || column == 4 || column == 5){
+				if(column == 0 || column == 3 || column == 4 || column == 5 || column == 6){
 					return true;
 				}else{
 					return false;
@@ -122,18 +141,28 @@ public class InstockFrame extends JPanel implements ActionListener{
 		table.changeColumnWidth(4, 100);
 		//设置第6列的宽度
 		table.changeColumnWidth(5, 100);
+		//设置第6列的宽度
+		table.changeColumnWidth(6, 100);
 		//设置第7列的宽度
-		table.changeColumnWidth(6, 150);
-		//设置第8列的宽度
 		table.changeColumnWidth(7, 150);
+		//设置第8列的宽度
+		table.changeColumnWidth(8, 150);
 		//设置第9列的宽度
-		table.changeColumnWidth(8, 100);
+		table.changeColumnWidth(9, 100);
 		
-		table.setCellEditor(4, new MyComboBoxEditor(str));
+		table.setCellEditor(4, new ComboBoxEditor(str));
+		
+		table.setCellEditor(6, new ComboBoxEditor(storeType));
 		
 		table.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
 		
+		List<Integer> columns = new ArrayList<Integer>();
+		columns.add(4);
+		columns.add(6);
+		table.initCombox(columns);
+		
         pane3 = new JScrollPane(table);
+        pane3.setBounds(new Rectangle(2,80,670,420));
         
         pane3.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
@@ -145,10 +174,13 @@ public class InstockFrame extends JPanel implements ActionListener{
         
         button = new JButton("添加");
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        button.setBounds(new Rectangle(240,508,60,25));
         save = new JButton("保存");
         save.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        save.setBounds(new Rectangle(310,508,60,25));
         delete = new JButton("删除");
         delete.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        delete.setBounds(new Rectangle(380,508,60,25));
 		
         
         search.addActionListener(this);
@@ -164,6 +196,8 @@ public class InstockFrame extends JPanel implements ActionListener{
         this.add(endDate);
         this.add(label3);
         this.add(type);
+        this.add(label4);
+        this.add(store);
         this.add(search);
         
         this.add(pane3);
@@ -184,11 +218,12 @@ public class InstockFrame extends JPanel implements ActionListener{
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource() == search){
-			SearchBean searchBean = new SearchBean();
+			InstockSearchBean searchBean = new InstockSearchBean();
 			searchBean.setCode(field.getText());
 			searchBean.setStartDate(startDate.getText());
 			searchBean.setEndDate(endDate.getText());
-			searchBean.setType(type.getSelectedItem().toString());
+			searchBean.setType(StringUtils.isEmpty(type.getSelectedItemValue()) ? null : type.getSelectedItemValue().toString());
+			searchBean.setStoreType(StringUtils.isEmpty(store.getSelectedItemValue()) ? null : (Integer)store.getSelectedItemValue());
 			getDatas(searchBean);
 		}
 		if(e.getSource() == button){
@@ -207,6 +242,42 @@ public class InstockFrame extends JPanel implements ActionListener{
 		//初始化表头
 		for(String column : columnNames){
 			columns.add(column);
+		}
+		//初始化静态数据
+		str.clear();
+		Map<String,Object> black = new HashMap<String,Object>();
+		black.put("label", "");
+		black.put("value", null);
+		str.add(black);
+		
+		Map<String,Object> params = new HashMap<String,Object>();
+		params.put("type", Integer.parseInt(CodeDictEnum.INSTOCK.getKey()));
+		params.put("value", "收入类型");
+		
+		List<CodeDictBean> codeDictList = codeDictMapper.selectChildrenByParams(params);
+		if(CollectionUtils.isNotEmpty(codeDictList)){
+			for(CodeDictBean codeDictBean : codeDictList){
+				Map<String,Object> item = new HashMap<String,Object>();
+				item.put("label", codeDictBean.getValue());
+				item.put("value", codeDictBean.getId());
+				str.add(item);
+			}
+		}
+		storeType.clear();
+		storeType.add(black);
+		
+		params = new HashMap<String,Object>();
+		params.put("type", Integer.parseInt(CodeDictEnum.FINANCIAL.getKey()));
+		params.put("value", "存储类型");
+		
+		List<CodeDictBean> storeTypeList = codeDictMapper.selectChildrenByParams(params);
+		if(CollectionUtils.isNotEmpty(storeTypeList)){
+			for(CodeDictBean codeDictBean : storeTypeList){
+				Map<String,Object> item = new HashMap<String,Object>();
+				item.put("label", codeDictBean.getValue());
+				item.put("value", codeDictBean.getId());
+				storeType.add(item);
+			}
 		}
 		getDatas(new SearchBean());
 	}
@@ -257,29 +328,13 @@ public class InstockFrame extends JPanel implements ActionListener{
 		}
 	}
 	
-	class MyComboBoxEditor extends DefaultCellEditor {
-		private static final long serialVersionUID = 1L;
-
-		public MyComboBoxEditor(String[] items) {
-		    super(new JComboBox<Object>(items));
-		}
-	 }
-	
-	class MyCheckBoxEditor extends DefaultCellEditor {
-		private static final long serialVersionUID = 1L;
-
-		public MyCheckBoxEditor() {
-		    super(new JCheckBox());
-		}
-	 }
-	
 	public static void main(String[] args){
 		JFrame frame = new JFrame();
 		JPanel panel = new InstockFrame();
 		panel.setVisible(true);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	    frame.add(panel,BorderLayout.CENTER);
-	    frame.setSize(680, 580);
+	    frame.setSize(680, 570);
 	    frame.setLocationRelativeTo(null);
 	    frame.setResizable(false);
 	    frame.setVisible(true);

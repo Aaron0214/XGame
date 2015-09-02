@@ -15,6 +15,7 @@ import java.util.Map;
 import com.xc.financial.beans.InstockBean;
 import com.xc.financial.beans.SearchBean;
 import com.xc.financial.enums.column.InstockColumnEnum;
+import com.xc.financial.utils.CollectionUtils;
 import com.xc.financial.utils.DateUtils;
 import com.xc.financial.utils.StringUtils;
 
@@ -44,7 +45,7 @@ public class InstockMapper {
 				sb.append("'"+ data.get(InstockColumnEnum.getInstockColumnValueByKey("code").getValue())+"',");
 			}
 			
-			if(StringUtils.isEmpty((String)data.get(InstockColumnEnum.getInstockColumnValueByKey("type").getValue()))){
+			if(StringUtils.isEmpty(data.get(InstockColumnEnum.getInstockColumnValueByKey("type").getValue()))){
 				sb.append("null,");
 			}else{
 				sb.append("'"+ data.get(InstockColumnEnum.getInstockColumnValueByKey("type").getValue())+"',");
@@ -60,6 +61,12 @@ public class InstockMapper {
 				sb.append("null,");
 			}else{
 				sb.append("'"+ data.get(InstockColumnEnum.getInstockColumnValueByKey("amount").getValue())+"',");
+			}
+			
+			if(StringUtils.isEmpty(data.get(InstockColumnEnum.getInstockColumnValueByKey("store_type").getValue()))){
+				sb.append("null,");
+			}else{
+				sb.append("'"+ data.get(InstockColumnEnum.getInstockColumnValueByKey("store_type").getValue())+"',");
 			}
 			
 			if(StringUtils.isEmpty((String)data.get(InstockColumnEnum.getInstockColumnValueByKey("create_date").getValue()))){
@@ -79,11 +86,25 @@ public class InstockMapper {
 			}else{
 				sb.append("'"+ data.get(InstockColumnEnum.getInstockColumnValueByKey("operate").getValue())+"')");
 			}
+			StringBuffer sb1 = new StringBuffer();
+			sb1.append("update financial set amount = amount + " + data.get(InstockColumnEnum.getInstockColumnValueByKey("amount").getValue()));
+			sb1.append(" where store_type = )" + data.get(InstockColumnEnum.getInstockColumnValueByKey("store_type").getValue()));
+			
 			connect = DriverManager.getConnection(url, username, password);
+			connect.setAutoCommit(false);
 			statement = connect.createStatement();
-			return statement.executeUpdate(sb.toString());
+			statement.addBatch(sb.toString());
+			statement.addBatch(sb1.toString());
+			statement.executeBatch();
+			connect.commit();
+			return 1;
 		}catch(SQLException|ParseException e){
 			e.printStackTrace();
+			try {
+				connect.rollback();
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
 			return -1;
 		}finally{
 			try {
@@ -107,7 +128,7 @@ public class InstockMapper {
 		try{
 			StringBuffer sb = new StringBuffer();
 			sb.append("update instock set ");
-			if(StringUtils.isEmpty((String)data.get(InstockColumnEnum.getInstockColumnValueByKey("type").getValue()))){
+			if(StringUtils.isEmpty(data.get(InstockColumnEnum.getInstockColumnValueByKey("type").getValue()))){
 				sb.append("type = null,");
 			}else{
 				sb.append("type = '"+ data.get(InstockColumnEnum.getInstockColumnValueByKey("type").getValue())+"',");
@@ -137,11 +158,25 @@ public class InstockMapper {
 				sb.append("operate = " + "'"+ data.get(InstockColumnEnum.getInstockColumnValueByKey("operate").getValue()) +"'");
 			}
 			
+			StringBuffer sb1 = new StringBuffer();
+			sb1.append("update financial set amount = amount + " + data.get(InstockColumnEnum.getInstockColumnValueByKey("amount").getValue()));
+			sb1.append(" where store_type = )" + data.get(InstockColumnEnum.getInstockColumnValueByKey("store_type").getValue()));
+			
 			connect = DriverManager.getConnection(url, username, password);
+			connect.setAutoCommit(false);
 			statement = connect.createStatement();
-			return statement.executeUpdate(sb.toString());
+			statement.addBatch(sb.toString());
+			statement.addBatch(sb1.toString());
+			statement.executeBatch();
+			connect.commit();
+			return 1;
 		}catch(SQLException|ParseException e){
 			e.printStackTrace();
+			try {
+				connect.rollback();
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
 			return -1;
 		}finally{
 			try {
@@ -194,18 +229,18 @@ public class InstockMapper {
 		List<InstockBean> instockList = new ArrayList<InstockBean>();
 		try{
 			StringBuffer sb = new StringBuffer();	
-			sb.append("select * from instock where 1=1");
+			sb.append("select i.*,c.value as typeValue,s.value as storeTypeValue from instock i left join code_dict c on i.type = c.id left join code_dict s on i.store_type = s.id where 1=1");
 			if(StringUtils.isNotEmpty(searchBean.getCode())){
-				sb.append(" and code like '%" + searchBean.getCode() +"%'");
+				sb.append(" and i.code like '%" + searchBean.getCode() +"%'");
 			}
 			if(StringUtils.isNotEmpty(searchBean.getStartDate())){
-				sb.append(" and create_Date >= '" + DateUtils.dayBegin(DateUtils.parseSingleDate(searchBean.getStartDate())) + "'");
+				sb.append(" and i.create_Date >= '" + DateUtils.dayBegin(DateUtils.parseSingleDate(searchBean.getStartDate())) + "'");
 			}
 			if(StringUtils.isNotEmpty(searchBean.getEndDate())){
-				sb.append(" and create_Date <= '" + DateUtils.dayEnd(DateUtils.parseSingleDate(searchBean.getEndDate())) + "'");
+				sb.append(" and i.create_Date <= '" + DateUtils.dayEnd(DateUtils.parseSingleDate(searchBean.getEndDate())) + "'");
 			}
 			if(StringUtils.isNotEmpty(searchBean.getType())){
-				sb.append(" and type = '" + searchBean.getType() + "'");
+				sb.append(" and i.type = " + Integer.parseInt(searchBean.getType()));
 			}
 			
 			connect = DriverManager.getConnection(url, username, password);
@@ -220,7 +255,8 @@ public class InstockMapper {
 				instockBean.setCreateDate(DateUtils.parseLongDate(DateUtils.parseDate(result.getString("create_date"))));
 				instockBean.setModifyDate(DateUtils.parseLongDate(DateUtils.parseDate(result.getString("modify_date"))));
 				instockBean.setAmount(BigDecimal.valueOf(Double.valueOf(result.getString("amount"))));
-				instockBean.setType(result.getString("type"));
+				instockBean.setTypeValue(result.getString("typeValue"));
+				instockBean.setStoreTypeValue(result.getString("storeTypeValue"));
 				instockBean.setOperate(result.getString("operate"));
 				instockList.add(instockBean);
 			}

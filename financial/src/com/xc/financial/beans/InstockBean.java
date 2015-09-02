@@ -10,9 +10,11 @@ public class InstockBean{
 	
 	private String member;
 	
-	private String type;
+	private String typeValue;
 	
 	private BigDecimal amount;
+	
+	private String storeTypeValue;
 	
 	private String createDate;
 	
@@ -44,12 +46,12 @@ public class InstockBean{
 		this.member = member;
 	}
 
-	public String getType() {
-		return type;
+	public String getTypeValue() {
+		return typeValue;
 	}
 
-	public void setType(String type) {
-		this.type = type;
+	public void setTypeValue(String typeValue) {
+		this.typeValue = typeValue;
 	}
 
 	public BigDecimal getAmount() {
@@ -58,6 +60,14 @@ public class InstockBean{
 
 	public void setAmount(BigDecimal amount) {
 		this.amount = amount;
+	}
+
+	public String getStoreTypeValue() {
+		return storeTypeValue;
+	}
+
+	public void setStoreTypeValue(String storeTypeValue) {
+		this.storeTypeValue = storeTypeValue;
 	}
 
 	public String getCreateDate() {

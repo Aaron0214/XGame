@@ -77,7 +77,7 @@ public class FinancialMapper {
 			}
 			
 			if(StringUtils.isEmpty((String)data.get(OutstockColumnEnum.getOutstockColumnValueByKey("comments").getValue()))){
-				sb.append("null)");
+				sb.append("null,");
 			}else{
 				sb.append("'"+ data.get(OutstockColumnEnum.getOutstockColumnValueByKey("comments").getValue())+"',");
 			}
@@ -140,7 +140,7 @@ public class FinancialMapper {
 			}
 			
 			if(StringUtils.isEmpty((String)data.get(OutstockColumnEnum.getOutstockColumnValueByKey("comments").getValue()))){
-				sb.append("comments = null");
+				sb.append("comments = null,");
 			}else{
 				sb.append("comments = " + "'"+ data.get(OutstockColumnEnum.getOutstockColumnValueByKey("comments").getValue()) +"',");
 			}
@@ -210,16 +210,16 @@ public class FinancialMapper {
 			StringBuffer sb = new StringBuffer();	
 			sb.append("select f.*,c.value as typeValue from financial f left join code_dict c on f.type = c.id where 1=1");
 			if(StringUtils.isNotEmpty(searchBean.getCode())){
-				sb.append(" and code like '%" + searchBean.getCode() +"%'");
+				sb.append(" and f.code like '%" + searchBean.getCode() +"%'");
 			}
 			if(StringUtils.isNotEmpty(searchBean.getStartDate())){
-				sb.append(" and create_Date >= '" + DateUtils.dayBegin(DateUtils.parseSingleDate(searchBean.getStartDate())) + "'");
+				sb.append(" and f.create_Date >= '" + DateUtils.dayBegin(DateUtils.parseSingleDate(searchBean.getStartDate())) + "'");
 			}
 			if(StringUtils.isNotEmpty(searchBean.getEndDate())){
-				sb.append(" and create_Date <= '" + DateUtils.dayEnd(DateUtils.parseSingleDate(searchBean.getEndDate())) + "'");
+				sb.append(" and f.create_Date <= '" + DateUtils.dayEnd(DateUtils.parseSingleDate(searchBean.getEndDate())) + "'");
 			}
 			if(StringUtils.isNotEmpty(searchBean.getType())){
-				sb.append(" and type = " + Integer.parseInt(searchBean.getType()));
+				sb.append(" and f.type = " + Integer.parseInt(searchBean.getType()));
 			}
 			
 			connect = DriverManager.getConnection(url, username, password);

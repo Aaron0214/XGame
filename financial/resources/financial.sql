@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50623
 File Encoding         : 65001
 
-Date: 2015-09-01 18:00:04
+Date: 2015-09-02 18:18:03
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -25,7 +25,7 @@ CREATE TABLE `code_dict` (
   `value` varchar(255) DEFAULT NULL,
   `pid` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of code_dict
@@ -44,6 +44,7 @@ INSERT INTO `code_dict` VALUES ('11', '1', '孝敬父母', '7');
 INSERT INTO `code_dict` VALUES ('12', '1', '其他', '7');
 INSERT INTO `code_dict` VALUES ('13', '2', '存储类型', null);
 INSERT INTO `code_dict` VALUES ('14', '2', '银行卡', '13');
+INSERT INTO `code_dict` VALUES ('15', '2', '支付宝', '13');
 
 -- ----------------------------
 -- Table structure for financial
@@ -54,18 +55,19 @@ CREATE TABLE `financial` (
   `code` varchar(255) DEFAULT NULL,
   `member` varchar(255) DEFAULT NULL,
   `type` int(255) DEFAULT NULL,
-  `amount` decimal(10,0) DEFAULT NULL,
+  `amount` decimal(20,6) DEFAULT NULL,
   `create_date` datetime DEFAULT NULL,
   `modify_date` datetime DEFAULT NULL,
   `comments` varchar(255) DEFAULT NULL,
   `operate` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of financial
 -- ----------------------------
-INSERT INTO `financial` VALUES ('1', 'F20150828000002', 'member', '14', '10000', '2015-08-28 17:43:04', '2015-08-28 17:43:04', '收入', null);
+INSERT INTO `financial` VALUES ('1', 'F20150828000002', 'member', '15', '10000.000000', '2015-08-28 17:43:04', '2015-08-28 17:43:04', '收入', null);
+INSERT INTO `financial` VALUES ('2', 'F20150902000005', 'member', '15', '10000.000000', '2015-09-02 11:10:32', '2015-08-28 17:43:04', '收入', null);
 
 -- ----------------------------
 -- Table structure for instock
@@ -76,7 +78,8 @@ CREATE TABLE `instock` (
   `code` varchar(255) DEFAULT NULL,
   `type` varchar(255) DEFAULT NULL,
   `member` varchar(255) DEFAULT NULL,
-  `amount` decimal(10,6) DEFAULT NULL,
+  `amount` decimal(20,6) DEFAULT NULL,
+  `store_type` int(11) DEFAULT NULL,
   `create_date` datetime DEFAULT NULL,
   `modify_date` datetime DEFAULT NULL,
   `operate` int(11) DEFAULT NULL,
@@ -86,11 +89,11 @@ CREATE TABLE `instock` (
 -- ----------------------------
 -- Records of instock
 -- ----------------------------
-INSERT INTO `instock` VALUES ('1', 'F20150826000001', 'B', 'A', '2.500000', '2015-08-26 15:43:48', '2015-08-26 15:43:48', null);
-INSERT INTO `instock` VALUES ('2', 'F20150828000001', 'A', 'member', '2.500000', '2015-08-28 14:34:05', '2015-08-26 15:43:48', null);
-INSERT INTO `instock` VALUES ('3', 'F20150828000003', 'A', 'member1', '2.500000', '2015-08-28 17:46:42', '2015-08-26 15:43:48', null);
-INSERT INTO `instock` VALUES ('4', 'F20150828000005', 'B', 'member', '1000.000000', '2015-08-28 17:53:40', '2015-08-28 17:53:40', null);
-INSERT INTO `instock` VALUES ('5', 'F20150828000007', 'A', 'member', '1000.000000', '2015-08-28 17:57:10', '2015-08-28 17:57:10', null);
+INSERT INTO `instock` VALUES ('1', 'F20150826000001', 'B', 'A', '2.500000', null, '2015-08-26 15:43:48', '2015-08-26 15:43:48', null);
+INSERT INTO `instock` VALUES ('2', 'F20150828000001', 'A', 'member', '2.500000', null, '2015-08-28 14:34:05', '2015-08-26 15:43:48', null);
+INSERT INTO `instock` VALUES ('3', 'F20150828000003', 'A', 'member1', '2.500000', null, '2015-08-28 17:46:42', '2015-08-26 15:43:48', null);
+INSERT INTO `instock` VALUES ('4', 'F20150828000005', '3', 'member', '10000.000000', null, '2015-08-28 17:53:40', '2015-08-28 17:53:40', null);
+INSERT INTO `instock` VALUES ('5', 'F20150828000007', '3', 'member', '10000.000000', null, '2015-08-28 17:57:10', '2015-08-28 17:57:10', null);
 
 -- ----------------------------
 -- Table structure for outstock
@@ -131,4 +134,4 @@ CREATE TABLE `sn` (
 INSERT INTO `sn` VALUES ('1', '1', '0');
 INSERT INTO `sn` VALUES ('2', '7', '1');
 INSERT INTO `sn` VALUES ('3', '7', '2');
-INSERT INTO `sn` VALUES ('4', '2', '3');
+INSERT INTO `sn` VALUES ('4', '5', '3');
