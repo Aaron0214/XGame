@@ -10,7 +10,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
+import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
 import com.xc.financial.mainapp.MainFrame;
@@ -19,7 +19,8 @@ public class LoginFrame implements ActionListener{
 	
 	private JFrame frame;
 	private JLabel usernameLabel,pwdLabel,forget;
-	private JTextField usernameInput,pwdInput;
+	private JTextField usernameInput;
+	private JPasswordField pwdInput;
 	private JButton login;
 	private JCheckBox checkBox;
 	
@@ -38,7 +39,7 @@ public class LoginFrame implements ActionListener{
 		pwdLabel.setFont(new Font("宋体", Font.BOLD, 14));
 		pwdLabel.setBounds(new Rectangle(85,140,60,25));
 		
-		pwdInput = new JTextField();
+		pwdInput = new JPasswordField();
 		pwdInput.setBounds(new Rectangle(130,140,150,25));
 		
 		checkBox = new JCheckBox("记住用户");

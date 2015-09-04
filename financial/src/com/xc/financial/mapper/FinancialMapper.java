@@ -150,6 +150,7 @@ public class FinancialMapper {
 			}else{
 				sb.append("operate = " + "'"+ data.get(FinancialColumnEnum.getFinancialColumnValueByKey("operate").getValue()) +"'");
 			}
+			sb.append(" where code = '"+ data.get(FinancialColumnEnum.getFinancialColumnValueByKey("code").getValue())+"'");
 			
 			connect = DriverManager.getConnection(url, username, password);
 			statement = connect.createStatement();

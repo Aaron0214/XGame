@@ -27,7 +27,6 @@ import javax.swing.JTextField;
 import com.xc.financial.beans.CodeDictBean;
 import com.xc.financial.beans.InstockBean;
 import com.xc.financial.beans.InstockSearchBean;
-import com.xc.financial.beans.SearchBean;
 import com.xc.financial.enums.CodeDictEnum;
 import com.xc.financial.enums.SnTypeEnum;
 import com.xc.financial.enums.column.InstockColumnEnum;
@@ -56,8 +55,8 @@ public class InstockFrame extends JPanel implements ActionListener{
 	private MyComboBox type,store;
 	private JTextField field,startDate,endDate;
 	private DatePicker datepicker,datepicker1;
-	private static List<Map<String,Object>> str = new ArrayList<Map<String,Object>>();
-	private static List<Map<String,Object>> storeType = new ArrayList<Map<String,Object>>();
+	private List<Map<String,Object>> str = new ArrayList<Map<String,Object>>();
+	private List<Map<String,Object>> storeType = new ArrayList<Map<String,Object>>();
 	private InstockMapper instockMapper = new InstockMapper();
 	private CodeDictMapper codeDictMapper = new CodeDictMapper();
 	private SnMapper snMapper = new SnMapper();
@@ -279,7 +278,7 @@ public class InstockFrame extends JPanel implements ActionListener{
 				storeType.add(item);
 			}
 		}
-		getDatas(new SearchBean());
+		getDatas(new InstockSearchBean());
 	}
 	
 	private void saveUpdateData(){
@@ -298,13 +297,13 @@ public class InstockFrame extends JPanel implements ActionListener{
 					e1.printStackTrace();
 				}
 			}
-			getDatas(new SearchBean());
+			getDatas(new InstockSearchBean());
 		}else{
 			JOptionPane.showMessageDialog(null, "请先选择需要保存的数据！");
 		}
 	}
 	
-	private void getDatas(SearchBean searchBean){
+	private void getDatas(InstockSearchBean searchBean){
 		List<InstockBean> instockBeanList = instockMapper.selectInstocksByParams(searchBean);
 		if(CollectionUtils.isNotEmpty(instockBeanList)){
 			rowData.clear();

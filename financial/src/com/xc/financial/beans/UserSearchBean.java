@@ -10,6 +10,8 @@ public class UserSearchBean extends SearchBean{
 	private String name;
 	
 	private String username;
+	
+	private String status;
 
 	public String getName() {
 		return name;
@@ -25,6 +27,14 @@ public class UserSearchBean extends SearchBean{
 
 	public void setUsername(String username) {
 		this.username = username;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
 	}
 	
 }

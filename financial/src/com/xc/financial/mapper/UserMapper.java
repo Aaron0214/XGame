@@ -11,7 +11,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import com.xc.financial.beans.AddressBean;
 import com.xc.financial.beans.UserBean;
+import com.xc.financial.beans.UserOperateBean;
 import com.xc.financial.beans.UserSearchBean;
 import com.xc.financial.enums.StatusEnum;
 import com.xc.financial.enums.column.UserColumnEnum;
@@ -34,86 +36,152 @@ public class UserMapper {
 	 * @param data
 	 * @return
 	 */
-	public int insertOutstock(Map<String,Object> data){
+	public int insertUser(UserBean userBean){
 		try{
 			StringBuffer sb = new StringBuffer();
-			sb.append("insert into user(name,status,sex,code,address,username,password,email,create_date,modify_date,comments,operate) values(");
-			if(StringUtils.isEmpty((String)data.get(UserColumnEnum.getUserColumnValueByKey("name").getValue()))){
+			sb.append("insert into user(name,status,sex,code,username,password,email,phone,create_date,modify_date,comments,operate,address_id) values(");
+			if(StringUtils.isEmpty(userBean.getName())){
 				sb.append("null,");
 			}else{
-				sb.append("'"+ data.get(UserColumnEnum.getUserColumnValueByKey("name").getValue())+"',");
+				sb.append("'"+ userBean.getName() +"',");
 			}
 			
-			if(StringUtils.isEmpty((String)data.get(UserColumnEnum.getUserColumnValueByKey("status").getValue()))){
+			if(StringUtils.isEmpty(userBean.getStatus())){
 				sb.append("null,");
 			}else{
-				sb.append("'"+ data.get(UserColumnEnum.getUserColumnValueByKey("status").getValue())+"',");
+				sb.append("'"+ userBean.getStatus() +"',");
 			}
 			
-			if(StringUtils.isEmpty((String)data.get(UserColumnEnum.getUserColumnValueByKey("sex").getValue()))){
+			if(null == userBean.getSex()){
 				sb.append("null,");
 			}else{
-				sb.append("'"+ data.get(UserColumnEnum.getUserColumnValueByKey("sex").getValue())+"',");
+				sb.append("'"+ userBean.getSex() +"',");
 			}
 			
-			if(StringUtils.isEmpty(data.get(UserColumnEnum.getUserColumnValueByKey("code").getValue()))){
+			if(StringUtils.isEmpty(userBean.getCode())){
 				sb.append("null,");
 			}else{
-				sb.append("'"+ data.get(UserColumnEnum.getUserColumnValueByKey("code").getValue())+"',");
+				sb.append("'"+ userBean.getCode() +"',");
 			}
 			
-			if(StringUtils.isEmpty(data.get(UserColumnEnum.getUserColumnValueByKey("address").getValue()))){
+			if(StringUtils.isEmpty(userBean.getUsername())){
 				sb.append("null,");
 			}else{
-				sb.append("'"+ data.get(UserColumnEnum.getUserColumnValueByKey("address").getValue())+"',");
+				sb.append("'"+ userBean.getUsername() +"',");
 			}
 			
-			if(StringUtils.isEmpty(data.get(UserColumnEnum.getUserColumnValueByKey("username").getValue()))){
+			if(StringUtils.isEmpty(userBean.getPassword())){
 				sb.append("null,");
 			}else{
-				sb.append("'"+ data.get(UserColumnEnum.getUserColumnValueByKey("username").getValue())+"',");
+				sb.append("'"+ userBean.getPassword() +"',");
 			}
 			
-			if(StringUtils.isEmpty(data.get(UserColumnEnum.getUserColumnValueByKey("password").getValue()))){
+			if(StringUtils.isEmpty(userBean.getEmail())){
 				sb.append("null,");
 			}else{
-				sb.append("'"+ data.get(UserColumnEnum.getUserColumnValueByKey("password").getValue())+"',");
+				sb.append("'"+ userBean.getEmail() +"',");
 			}
 			
-			if(StringUtils.isEmpty(data.get(UserColumnEnum.getUserColumnValueByKey("email").getValue()))){
+			if(StringUtils.isEmpty(userBean.getPhone())){
 				sb.append("null,");
 			}else{
-				sb.append("'"+ data.get(UserColumnEnum.getUserColumnValueByKey("email").getValue())+"',");
+				sb.append("'"+ userBean.getPhone() +"',");
 			}
 			
-			if(StringUtils.isEmpty((String)data.get(UserColumnEnum.getUserColumnValueByKey("create_date").getValue()))){
+			if(StringUtils.isEmpty(userBean.getCreateDate())){
 				sb.append("'"+ DateUtils.parseLongDate(new Date()) +"',");
 			}else{
-				sb.append("'"+ data.get(UserColumnEnum.getUserColumnValueByKey("creat_date").getValue())+"',");
+				sb.append("'"+ userBean.getCreateDate() +"',");
 			}
 			
-			if(StringUtils.isEmpty((String)data.get(UserColumnEnum.getUserColumnValueByKey("modify_date").getValue()))){
+			if(StringUtils.isEmpty(userBean.getModifyDate())){
 				sb.append("'"+ DateUtils.parseLongDate(new Date()) +"',");
 			}else{
-				sb.append("'"+ data.get(UserColumnEnum.getUserColumnValueByKey("modify_date").getValue())+"',");
+				sb.append("'"+ userBean.getModifyDate() +"',");
 			}
 			
-			if(StringUtils.isEmpty((String)data.get(UserColumnEnum.getUserColumnValueByKey("comments").getValue()))){
-				sb.append("null)");
+			if(StringUtils.isEmpty(userBean.getComments())){
+				sb.append("null,");
 			}else{
-				sb.append("'"+ data.get(UserColumnEnum.getUserColumnValueByKey("comments").getValue())+"',");
+				sb.append("'"+ userBean.getComments() +"',");
 			}
 			
-			if(StringUtils.isEmpty((String)data.get(UserColumnEnum.getUserColumnValueByKey("operate").getValue()))){
-				sb.append("null)");
+			if(StringUtils.isEmpty(userBean.getOperate())){
+				sb.append("null,");
 			}else{
-				sb.append("'"+ data.get(UserColumnEnum.getUserColumnValueByKey("operate").getValue())+"')");
+				sb.append("'"+ userBean.getOperate() +"',");
 			}
+			
+			StringBuffer sb1 = new StringBuffer();
+			sb1.append("insert into address(country_code,province_code,city_code,town_code,addr,house_code,zip_code) values (");
+			AddressBean addressBean = userBean.getAddressBean();
+			if(StringUtils.isNotEmpty(addressBean.getCountryCode())){
+				sb1.append("'"+ addressBean.getCountryCode() +"',");
+			}else{
+				sb1.append("null,");
+			}
+			
+			if(StringUtils.isNotEmpty(addressBean.getProvinceCode())){
+				sb1.append("'"+ addressBean.getProvinceCode() +"',");
+			}else{
+				sb1.append("null,");
+			}
+			
+			if(StringUtils.isNotEmpty(addressBean.getCityCode())){
+				sb1.append("'"+ addressBean.getCityCode() +"',");
+			}else{
+				sb1.append("null,");
+			}
+			
+			if(StringUtils.isNotEmpty(addressBean.getTownCode())){
+				sb1.append("'"+ addressBean.getTownCode() +"',");
+			}else{
+				sb1.append("null,");
+			}
+			
+			if(StringUtils.isNotEmpty(addressBean.getAddr())){
+				sb1.append("'"+ addressBean.getAddr() +"',");
+			}else{
+				sb1.append("null,");
+			}
+			
+			if(StringUtils.isNotEmpty(addressBean.getHouseCode())){
+				sb1.append("'"+ addressBean.getHouseCode() +"',");
+			}else{
+				sb1.append("null,");
+			}
+			
+			if(StringUtils.isNotEmpty(addressBean.getZipCode())){
+				sb1.append("'"+ addressBean.getZipCode() +"')");
+			}else{
+				sb1.append("null)");
+			}
+			
 			connect = DriverManager.getConnection(url, username, password);
+			connect.setAutoCommit(false);
 			statement = connect.createStatement();
-			return statement.executeUpdate(sb.toString());
+			statement.executeUpdate(sb1.toString());
+			ResultSet rt = statement.executeQuery("select max(id) as address_id from address");
+			while(rt.next()){
+				userBean.setAddressId(StringUtils.isEmpty(rt.getString("address_id")) ? null : Integer.parseInt(rt.getString("address_id")));
+			}
+			
+			if(null == userBean.getAddressId()){
+				sb.append("null)");
+			}else{
+				sb.append("'"+ userBean.getAddressId() +"')");
+			}
+			
+			statement.executeUpdate(sb.toString());
+			connect.commit();
+			return 1;
 		}catch(SQLException|ParseException e){
 			e.printStackTrace();
+			try {
+				connect.rollback();
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
 			return -1;
 		}finally{
 			try {
@@ -196,6 +264,7 @@ public class UserMapper {
 			}else{
 				sb.append("operate = " + "'"+ data.get(UserColumnEnum.getUserColumnValueByKey("operate").getValue()) +"'");
 			}
+			sb.append(" where code = '" + data.get(UserColumnEnum.getUserColumnValueByKey("code").getValue()) +"'");
 			
 			connect = DriverManager.getConnection(url, username, password);
 			statement = connect.createStatement();
@@ -250,8 +319,8 @@ public class UserMapper {
 	 * @param data
 	 * @return
 	 */
-	public List<UserBean> selectUsersByParams(UserSearchBean searchBean){
-		List<UserBean> userList = new ArrayList<UserBean>();
+	public List<UserOperateBean> selectUsersByParams(UserSearchBean searchBean){
+		List<UserOperateBean> userList = new ArrayList<UserOperateBean>();
 		try{
 			StringBuffer sb = new StringBuffer();	
 			sb.append("select * from user where 1=1");
@@ -273,8 +342,8 @@ public class UserMapper {
 			if(StringUtils.isNotEmpty(searchBean.getEndDate())){
 				sb.append(" and create_Date <= '" + DateUtils.dayEnd(DateUtils.parseSingleDate(searchBean.getEndDate())) + "'");
 			}
-			if(StringUtils.isNotEmpty(searchBean.getType())){
-				sb.append(" and type = '" + searchBean.getType() + "'");
+			if(StringUtils.isNotEmpty(searchBean.getStatus())){
+				sb.append(" and status = '" + searchBean.getStatus() + "'");
 			}
 			
 			connect = DriverManager.getConnection(url, username, password);
@@ -282,7 +351,7 @@ public class UserMapper {
 			result = statement.executeQuery(sb.toString());
 			Integer index = 1;
 			while(result.next()){
-				UserBean userBean = new UserBean();
+				UserOperateBean userBean = new UserOperateBean();
 				userBean.setIndex(index++);
 				userBean.setCode(result.getString("code"));
 				userBean.setName(result.getString("name"));
@@ -332,6 +401,59 @@ public class UserMapper {
 			return index;
 		}catch(SQLException e){
 			throw new Exception();
+		}finally{
+			try {
+				result.close();
+				statement.close();
+				connect.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	/**
+	 * <p>
+	 * 根据code查询数据
+	 * </p>
+	 * 
+	 * @param data
+	 * @return
+	 */
+	public UserBean selectUsersByCode(String userCode){
+		UserBean userBean = new UserBean();
+		try{
+			StringBuffer sb = new StringBuffer();	
+			sb.append("select * from user u left join address adr on u.address_id = adr.id where 1=1");
+			
+			if(StringUtils.isNotEmpty(userCode)){
+				sb.append(" and code = '" + userCode +"'");
+			}
+			
+			connect = DriverManager.getConnection(url, username, password);
+			statement = connect.createStatement();
+			result = statement.executeQuery(sb.toString());
+			while(result.next()){
+				userBean.setId(Integer.parseInt(result.getString("id")));
+				userBean.setName(result.getString("name"));
+				userBean.setCode(result.getString("code"));
+				userBean.setStatus(result.getString("status"));
+				userBean.setSex(StringUtils.isEmpty(result.getString("sex"))? null : Integer.parseInt(result.getString("sex")));
+				userBean.setAddressId(StringUtils.isEmpty(result.getString("address_id"))? null : Integer.parseInt(result.getString("address_id")));
+				userBean.setUsername(result.getString("username"));
+				userBean.setEmail(result.getString("email"));
+				userBean.setPhone(result.getString("phone"));
+				userBean.setCreateDate(DateUtils.parseLongDate(DateUtils.parseDate(result.getString("create_date"))));
+				userBean.setModifyDate(DateUtils.parseLongDate(DateUtils.parseDate(result.getString("modify_date"))));
+				userBean.setComments(result.getString("comments"));
+				userBean.setOperate(result.getString("operate"));
+				
+				AddressBean addressBean = new AddressBean();
+			}
+			return userBean;
+		}catch(SQLException|ParseException e){
+			e.printStackTrace();
+			return userBean;
 		}finally{
 			try {
 				result.close();

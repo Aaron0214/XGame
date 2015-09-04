@@ -1,28 +1,22 @@
 package com.xc.financial.beans;
 
-public class UserBean {
-	
-	private Integer id;
+public class UserOperateBean {
+
+private Integer index;
 	
 	private String name;
 	
-	private String status;
+	private String statusValue;
 	
-	private Integer sex;
+	private String sexValue;
 	
 	private String code;
 	
-	private Integer addressId;
-	
-	private AddressBean addressBean;
+	private String address;
 	
 	private String username;
 	
-	private String password;
-	
 	private String email;
-	
-	private String phone;
 	
 	private String createDate;
 	
@@ -32,12 +26,12 @@ public class UserBean {
 	
 	private String operate;
 
-	public Integer getId() {
-		return id;
+	public Integer getIndex() {
+		return index;
 	}
 
-	public void setId(Integer id) {
-		this.id = id;
+	public void setIndex(Integer index) {
+		this.index = index;
 	}
 
 	public String getName() {
@@ -48,20 +42,20 @@ public class UserBean {
 		this.name = name;
 	}
 
-	public String getStatus() {
-		return status;
+	public String getStatusValue() {
+		return statusValue;
 	}
 
-	public void setStatus(String status) {
-		this.status = status;
+	public void setStatusValue(String statusValue) {
+		this.statusValue = statusValue;
 	}
 
-	public Integer getSex() {
-		return sex;
+	public String getSexValue() {
+		return sexValue;
 	}
 
-	public void setSex(Integer sex) {
-		this.sex = sex;
+	public void setSexValue(String sexValue) {
+		this.sexValue = sexValue;
 	}
 
 	public String getCode() {
@@ -72,20 +66,12 @@ public class UserBean {
 		this.code = code;
 	}
 
-	public Integer getAddressId() {
-		return addressId;
+	public String getAddress() {
+		return address;
 	}
 
-	public void setAddressId(Integer addressId) {
-		this.addressId = addressId;
-	}
-
-	public AddressBean getAddressBean() {
-		return addressBean;
-	}
-
-	public void setAddressBean(AddressBean addressBean) {
-		this.addressBean = addressBean;
+	public void setAddress(String address) {
+		this.address = address;
 	}
 
 	public String getUsername() {
@@ -96,28 +82,12 @@ public class UserBean {
 		this.username = username;
 	}
 
-	public String getPassword() {
-		return password;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
-	}
-
 	public String getEmail() {
 		return email;
 	}
 
 	public void setEmail(String email) {
 		this.email = email;
-	}
-
-	public String getPhone() {
-		return phone;
-	}
-
-	public void setPhone(String phone) {
-		this.phone = phone;
 	}
 
 	public String getCreateDate() {
@@ -151,5 +121,4 @@ public class UserBean {
 	public void setOperate(String operate) {
 		this.operate = operate;
 	}
-
 }

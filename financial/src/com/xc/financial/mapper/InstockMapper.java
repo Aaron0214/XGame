@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.xc.financial.beans.InstockBean;
-import com.xc.financial.beans.SearchBean;
+import com.xc.financial.beans.InstockSearchBean;
 import com.xc.financial.enums.column.InstockColumnEnum;
 import com.xc.financial.utils.CollectionUtils;
 import com.xc.financial.utils.DateUtils;
@@ -26,6 +26,7 @@ public class InstockMapper {
 	private static final String url="jdbc:mysql://localhost:3306/financial?useUnicode=true&characterEncoding=UTF-8";
 	private static final String username="root";
 	private static final String password="";
+	private List<InstockBean> instocks = new ArrayList<InstockBean>();
 	
 	/**
 	 * <p>
@@ -38,7 +39,7 @@ public class InstockMapper {
 	public int insertInstock(Map<String,Object> data){
 		try{
 			StringBuffer sb = new StringBuffer();
-			sb.append("insert into instock(code,type,member,amount,create_date,modify_date,operate) values(");
+			sb.append("insert into instock(code,type,member,amount,store_type,create_date,modify_date,operate) values(");
 			if(StringUtils.isEmpty((String)data.get(InstockColumnEnum.getInstockColumnValueByKey("code").getValue()))){
 				sb.append("null,");
 			}else{
@@ -88,7 +89,7 @@ public class InstockMapper {
 			}
 			StringBuffer sb1 = new StringBuffer();
 			sb1.append("update financial set amount = amount + " + data.get(InstockColumnEnum.getInstockColumnValueByKey("amount").getValue()));
-			sb1.append(" where store_type = )" + data.get(InstockColumnEnum.getInstockColumnValueByKey("store_type").getValue()));
+			sb1.append(" where type = " + data.get(InstockColumnEnum.getInstockColumnValueByKey("store_type").getValue()));
 			
 			connect = DriverManager.getConnection(url, username, password);
 			connect.setAutoCommit(false);
@@ -146,6 +147,12 @@ public class InstockMapper {
 				sb.append("amount = '"+ data.get(InstockColumnEnum.getInstockColumnValueByKey("amount").getValue()) +"',");
 			}
 			
+			if(StringUtils.isEmpty(data.get(InstockColumnEnum.getInstockColumnValueByKey("store_type").getValue()))){
+				sb.append("store_type = null,");
+			}else{
+				sb.append("store_type = '"+ data.get(InstockColumnEnum.getInstockColumnValueByKey("store_type").getValue())+"',");
+			}
+			
 			if(StringUtils.isEmpty((String)data.get(InstockColumnEnum.getInstockColumnValueByKey("modify_date").getValue()))){
 				sb.append("modify_date = '"+ DateUtils.parseLongDate(new Date()) +"',");
 			}else{
@@ -157,10 +164,20 @@ public class InstockMapper {
 			}else{
 				sb.append("operate = " + "'"+ data.get(InstockColumnEnum.getInstockColumnValueByKey("operate").getValue()) +"'");
 			}
+			sb.append(" where code = '" + data.get(InstockColumnEnum.getInstockColumnValueByKey("code").getValue()) + "'");
 			
+			BigDecimal o_amount = BigDecimal.ZERO;
+			if(CollectionUtils.isNotEmpty(instocks)){
+				for(InstockBean instockBean:instocks){
+					if(data.get(InstockColumnEnum.getInstockColumnValueByKey("code").getValue()).equals(instockBean.getCode())){
+						o_amount = instockBean.getAmount();
+						break;
+					}
+				}
+			}
 			StringBuffer sb1 = new StringBuffer();
-			sb1.append("update financial set amount = amount + " + data.get(InstockColumnEnum.getInstockColumnValueByKey("amount").getValue()));
-			sb1.append(" where store_type = )" + data.get(InstockColumnEnum.getInstockColumnValueByKey("store_type").getValue()));
+			sb1.append("update financial set amount = amount + " + ((BigDecimal)data.get(InstockColumnEnum.getInstockColumnValueByKey("amount").getValue())).subtract(o_amount));
+			sb1.append(" where type = " + data.get(InstockColumnEnum.getInstockColumnValueByKey("store_type").getValue()));
 			
 			connect = DriverManager.getConnection(url, username, password);
 			connect.setAutoCommit(false);
@@ -225,8 +242,9 @@ public class InstockMapper {
 	 * @param data
 	 * @return
 	 */
-	public List<InstockBean> selectInstocksByParams(SearchBean searchBean){
+	public List<InstockBean> selectInstocksByParams(InstockSearchBean searchBean){
 		List<InstockBean> instockList = new ArrayList<InstockBean>();
+		instocks = new ArrayList<InstockBean>();
 		try{
 			StringBuffer sb = new StringBuffer();	
 			sb.append("select i.*,c.value as typeValue,s.value as storeTypeValue from instock i left join code_dict c on i.type = c.id left join code_dict s on i.store_type = s.id where 1=1");
@@ -241,6 +259,9 @@ public class InstockMapper {
 			}
 			if(StringUtils.isNotEmpty(searchBean.getType())){
 				sb.append(" and i.type = " + Integer.parseInt(searchBean.getType()));
+			}
+			if(null != searchBean.getStoreType()){
+				sb.append(" and i.store_type = " + searchBean.getStoreType());
 			}
 			
 			connect = DriverManager.getConnection(url, username, password);
@@ -259,6 +280,7 @@ public class InstockMapper {
 				instockBean.setStoreTypeValue(result.getString("storeTypeValue"));
 				instockBean.setOperate(result.getString("operate"));
 				instockList.add(instockBean);
+				instocks.add(instockBean);
 			}
 			return instockList;
 		}catch(SQLException|ParseException e){

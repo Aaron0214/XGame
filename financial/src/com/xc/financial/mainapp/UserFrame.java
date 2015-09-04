@@ -4,38 +4,29 @@ import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
-import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
-import javax.swing.SwingConstants;
 
-import com.xc.financial.beans.InstockBean;
-import com.xc.financial.beans.SearchBean;
-import com.xc.financial.enums.SnTypeEnum;
-import com.xc.financial.enums.column.UserColumnEnum;
-import com.xc.financial.mapper.InstockMapper;
-import com.xc.financial.mapper.SnMapper;
+import com.xc.financial.beans.UserOperateBean;
+import com.xc.financial.beans.UserSearchBean;
+import com.xc.financial.mapper.UserMapper;
 import com.xc.financial.utils.CollectionUtils;
-import com.xc.financial.utils.DateUtils;
-import com.xc.financial.utils.NumberFormatUtils;
 import com.xc.financial.utils.ObjectUtils;
-import com.xc.financial.utils.StringUtils;
 
 public class UserFrame extends JPanel implements ActionListener{
 	
@@ -48,50 +39,68 @@ public class UserFrame extends JPanel implements ActionListener{
 	private String[] columnNames= {"","序号","用户编码","姓名","性别","状态","地址 ","用户名","邮箱","创建时间","修改时间","备注","操作员"}; 
 	private Vector<Object> rowData = new Vector<Object>();
 	private JScrollPane pane3;
-	private JButton button,save,delete,search;
-	private JLabel label,label1,label2,label3;
-	private JComboBox<String> type;
-	private JTextField field,startDate,endDate;
+	private JButton button,edit,delete,search;
+	private JLabel label,label1,label2,label3,label4,label5;
+	private MyComboBox type;
+	private JTextField field,field1,field2,startDate,endDate;
 	private DatePicker datepicker,datepicker1;
-	private String[] str = {"","A","B"};
-	private InstockMapper instockMapper = new InstockMapper();
-	private SnMapper snMapper = new SnMapper();
+	private static List<Map<String,Object>> str = new ArrayList<Map<String,Object>>();
+	private UserMapper userkMapper = new UserMapper();
 	
 	public UserFrame(){
+		this.setLayout(null);
 		init();
 		
 		label = new JLabel("编码：");
 		label.setFont(new Font("宋体", Font.PLAIN, 13));
-		label.setVerticalAlignment(SwingConstants.TOP);
+		label.setBounds(new Rectangle(5,15,50,20));
 		
 		field = new JTextField();
-		field.setPreferredSize(new Dimension(100, 20));
+		field.setBounds(new Rectangle(45,15,120,20));
+		
+		label3 = new JLabel("用户名：");
+		label3.setFont(new Font("宋体", Font.PLAIN, 13));
+		label3.setBounds(new Rectangle(175,15,80,20));
+		
+		field1 = new JTextField();
+		field1.setBounds(new Rectangle(230,15,120,20));
+		
+		label5 = new JLabel("姓名：");
+		label5.setFont(new Font("宋体", Font.PLAIN, 13));
+		label5.setBounds(new Rectangle(360,15,80,20));
+		
+		field2 = new JTextField();
+		field2.setBounds(new Rectangle(400,15,120,20));
+		
+		label4 = new JLabel("状态：");
+		label4.setFont(new Font("宋体", Font.PLAIN, 13));
+		label4.setBounds(new Rectangle(530,15,80,20));
+		
+		type = new MyComboBox(str);
+		type.setFont(new Font("宋体", Font.PLAIN, 13));
+		type.setBounds(new Rectangle(570,15,90,20));
+		type.setCursor(new Cursor(Cursor.HAND_CURSOR));
 		
 		label1 = new JLabel("开始日期：");
 		label1.setFont(new Font("宋体", Font.PLAIN, 13));
+		label1.setBounds(new Rectangle(5,45,80,20));
 		
 		startDate = new JTextField();
-		startDate.setPreferredSize(new Dimension(175, 20));
+		startDate.setBounds(new Rectangle(75,45,175,20));
 		datepicker = DatePicker.getInstance("yyyy-MM-dd");
 		datepicker.register(startDate);
 		
 		label2 = new JLabel("结束日期：");
 		label2.setFont(new Font("宋体", Font.PLAIN, 13));
+		label2.setBounds(new Rectangle(265,45,80,20));
 		
 		endDate = new JTextField();
-		endDate.setPreferredSize(new Dimension(175, 20));
+		endDate.setBounds(new Rectangle(335,45,175,20));
 		datepicker1 = DatePicker.getInstance("yyyy-MM-dd");
 		datepicker1.register(endDate);
 		
-		label3 = new JLabel("用户名：");
-		label3.setFont(new Font("宋体", Font.PLAIN, 13));
-		
-		type = new JComboBox<String>(str);
-		type.setFont(new Font("宋体", Font.PLAIN, 13));
-		type.setPreferredSize(new Dimension(50, 20));
-		
 		search = new JButton("搜索");
-		search.setPreferredSize(new Dimension(60, 20));
+		search.setBounds(new Rectangle(530,45,60,20));
 		search.setCursor(new Cursor(Cursor.HAND_CURSOR));
 		
 		
@@ -100,11 +109,7 @@ public class UserFrame extends JPanel implements ActionListener{
 			private static final long serialVersionUID = 1L;
 
 			public boolean isCellEditable(int row, int column) {
-				if(column == 0 || column == 3 || column == 4 || column == 5){
-					return true;
-				}else{
-					return false;
-				}
+				return false;
             }
 		};
 		table.setPreferredScrollableViewportSize(new Dimension(670, 420));
@@ -119,21 +124,28 @@ public class UserFrame extends JPanel implements ActionListener{
 		//设置第4列的宽度
 		table.changeColumnWidth(3, 100);
 		//设置第5列的宽度
-		table.changeColumnWidth(4, 100);
+		table.changeColumnWidth(4, 80);
 		//设置第6列的宽度
-		table.changeColumnWidth(5, 100);
+		table.changeColumnWidth(5, 80);
 		//设置第7列的宽度
-		table.changeColumnWidth(6, 150);
+		table.changeColumnWidth(6, 200);
 		//设置第8列的宽度
-		table.changeColumnWidth(7, 150);
+		table.changeColumnWidth(7, 100);
 		//设置第9列的宽度
-		table.changeColumnWidth(8, 100);
-		
-		table.setCellEditor(4, new MyComboBoxEditor(str));
+		table.changeColumnWidth(8, 150);
+		//设置第10列的宽度
+		table.changeColumnWidth(9, 150);
+		//设置第11列的宽度
+		table.changeColumnWidth(10, 150);
+		//设置第12列的宽度
+		table.changeColumnWidth(11, 150);
+		//设置第13列的宽度
+		table.changeColumnWidth(12, 100);
 		
 		table.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
 		
         pane3 = new JScrollPane(table);
+        pane3.setBounds(new Rectangle(2,80,670,420));
         
         pane3.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
@@ -145,30 +157,36 @@ public class UserFrame extends JPanel implements ActionListener{
         
         button = new JButton("添加");
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        save = new JButton("保存");
-        save.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        button.setBounds(new Rectangle(240,508,60,25));
+        edit = new JButton("编辑");
+        edit.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        edit.setBounds(new Rectangle(310,508,60,25));
         delete = new JButton("删除");
         delete.setCursor(new Cursor(Cursor.HAND_CURSOR));
-		
+        delete.setBounds(new Rectangle(380,508,60,25));
         
         search.addActionListener(this);
         button.addActionListener(this);
-        save.addActionListener(this);
+        edit.addActionListener(this);
         delete.addActionListener(this);
         
         this.add(label);
         this.add(field);
+        this.add(label3);
+        this.add(field1);
+        this.add(label5);
+        this.add(field2);
+        this.add(label4);
         this.add(label1);
         this.add(startDate);
         this.add(label2);
         this.add(endDate);
-        this.add(label3);
         this.add(type);
         this.add(search);
         
         this.add(pane3);
         this.add(button);
-        this.add(save);
+        this.add(edit);
         this.add(delete);
         
         this.addMouseListener(new MouseAdapter() {
@@ -184,7 +202,7 @@ public class UserFrame extends JPanel implements ActionListener{
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource() == search){
-			SearchBean searchBean = new SearchBean();
+			UserSearchBean searchBean = new UserSearchBean();
 			searchBean.setCode(field.getText());
 			searchBean.setStartDate(startDate.getText());
 			searchBean.setEndDate(endDate.getText());
@@ -192,10 +210,10 @@ public class UserFrame extends JPanel implements ActionListener{
 			getDatas(searchBean);
 		}
 		if(e.getSource() == button){
-			table.addTableRow();
+			new ManageUserFrame(null,"add");
 		}
-		if(e.getSource() == save){
-			saveUpdateData();
+		if(e.getSource() == edit){
+			new ManageUserFrame(field.getText(),"edit");
 		}
 		if(e.getSource() == delete){
 			table.deleteTableRows(table.getSelectedRows());
@@ -208,37 +226,32 @@ public class UserFrame extends JPanel implements ActionListener{
 		for(String column : columnNames){
 			columns.add(column);
 		}
-		getDatas(new SearchBean());
+		//初始化静态数据
+		str.clear();
+		Map<String,Object> black = new HashMap<String,Object>();
+		black.put("label", "");
+		black.put("value", null);
+		str.add(black);
+		
+		Map<String,Object> item = new HashMap<String,Object>();
+		item.put("label", "正常");
+		item.put("value", "Y");
+		str.add(item);
+		
+		Map<String,Object> item1 = new HashMap<String,Object>();
+		item1.put("label", "不正常");
+		item1.put("value", "N");
+		str.add(item1);
+		
+		getDatas(new UserSearchBean());
 	}
 	
-	private void saveUpdateData(){
-		List<Map<String, Object>> datas = table.getSelectRowValue();
-		if(CollectionUtils.isNotEmpty(datas)){
-			for(Map<String, Object> data : datas){
-				try {
-					if(StringUtils.isEmpty((String)data.get(UserColumnEnum.getUserColumnValueByKey("code").getValue()))){
-						int num = snMapper.selectSn(SnTypeEnum.USER_CODE.getKey());
-						data.put(UserColumnEnum.getUserColumnValueByKey("code").getValue(),"F" + DateUtils.parseDates(new Date()) + NumberFormatUtils.formatNumber(num));
-						instockMapper.insertInstock(data);
-					}else{
-						instockMapper.updateInstock(data);
-					}
-				} catch (Exception e1) {
-					e1.printStackTrace();
-				}
-			}
-			getDatas(new SearchBean());
-		}else{
-			JOptionPane.showMessageDialog(null, "请先选择需要保存的数据！");
-		}
-	}
-	
-	private void getDatas(SearchBean searchBean){
-		List<InstockBean> instockBeanList = instockMapper.selectInstocksByParams(searchBean);
-		if(CollectionUtils.isNotEmpty(instockBeanList)){
+	private void getDatas(UserSearchBean searchBean){
+		List<UserOperateBean> userBeanList = userkMapper.selectUsersByParams(searchBean);
+		if(CollectionUtils.isNotEmpty(userBeanList)){
 			rowData.clear();
-			for(InstockBean instockBean:instockBeanList){
-				rowData.add(buildVectorData(instockBean));
+			for(UserOperateBean userBean:userBeanList){
+				rowData.add(buildVectorData(userBean));
 			}
 		}else{
 			rowData.clear();
@@ -248,30 +261,14 @@ public class UserFrame extends JPanel implements ActionListener{
 		}
 	}
 	
-	private Vector<Object> buildVectorData(InstockBean instockBean){
+	private Vector<Object> buildVectorData(UserOperateBean userBean){
 		try {
-			return ObjectUtils.createNewVecto(instockBean);
+			return ObjectUtils.createNewVecto(userBean);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
 		}
 	}
-	
-	class MyComboBoxEditor extends DefaultCellEditor {
-		private static final long serialVersionUID = 1L;
-
-		public MyComboBoxEditor(String[] items) {
-		    super(new JComboBox<Object>(items));
-		}
-	 }
-	
-	class MyCheckBoxEditor extends DefaultCellEditor {
-		private static final long serialVersionUID = 1L;
-
-		public MyCheckBoxEditor() {
-		    super(new JCheckBox());
-		}
-	 }
 	
 	public static void main(String[] args){
 		JFrame frame = new JFrame();
@@ -279,7 +276,7 @@ public class UserFrame extends JPanel implements ActionListener{
 		panel.setVisible(true);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	    frame.add(panel,BorderLayout.CENTER);
-	    frame.setSize(680, 580);
+	    frame.setSize(680, 570);
 	    frame.setLocationRelativeTo(null);
 	    frame.setResizable(false);
 	    frame.setVisible(true);

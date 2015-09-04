@@ -10,9 +10,11 @@ public class OutstockBean{
 	
 	private String member;
 	
-	private String type;
+	private String typeValue;
 	
 	private BigDecimal amount;
+	
+	private String purSourceValue;
 	
 	private String createDate;
 	
@@ -46,12 +48,12 @@ public class OutstockBean{
 		this.member = member;
 	}
 
-	public String getType() {
-		return type;
+	public String getTypeValue() {
+		return typeValue;
 	}
 
-	public void setType(String type) {
-		this.type = type;
+	public void setTypeValue(String typeValue) {
+		this.typeValue = typeValue;
 	}
 
 	public BigDecimal getAmount() {
@@ -60,6 +62,14 @@ public class OutstockBean{
 
 	public void setAmount(BigDecimal amount) {
 		this.amount = amount;
+	}
+	
+	public String getPurSourceValue() {
+		return purSourceValue;
+	}
+
+	public void setPurSourceValue(String purSourceValue) {
+		this.purSourceValue = purSourceValue;
 	}
 
 	public String getCreateDate() {

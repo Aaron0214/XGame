@@ -2,13 +2,13 @@ package com.xc.financial.enums;
 
 public enum SexEnum {
 
-	NORMAL("Y","正常"),un_normal("N","异常");
+	MAN(0,"男"),WOMAN(1,"女");
 	
-	private String key;
+	private Integer key;
 	
 	private String value;
 	
-	public String getKey() {
+	public Integer getKey() {
 		return key;
 	}
 
@@ -16,15 +16,15 @@ public enum SexEnum {
 		return value;
 	}
 
-	private SexEnum(String key, String value) {
+	private SexEnum(Integer key, String value) {
 		this.key = key;
 		this.value = value;
 	}
 	
-	public static SexEnum getStatusValueByKey(String keys){
-		for(SexEnum statusEnum : SexEnum.values()){
-			if(statusEnum.getKey().equals(keys)){
-				return statusEnum;
+	public static SexEnum getStatusValueByKey(Integer keys){
+		for(SexEnum sexEnum : SexEnum.values()){
+			if(sexEnum.getKey().equals(keys)){
+				return sexEnum;
 			}
 		}
 		return null;
