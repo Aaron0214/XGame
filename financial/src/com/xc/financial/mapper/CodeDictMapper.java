@@ -174,7 +174,7 @@ public class CodeDictMapper {
 				CodeDictBean codeDictBean = new CodeDictBean();
 				codeDictBean.setId(Integer.parseInt(result.getString("id")));
 				codeDictBean.setType(Integer.parseInt(result.getString("type")));
-				codeDictBean.setTypeValue(CodeDictEnum.getCodeDictValueByKey(result.getString("type")).getValue());
+				codeDictBean.setTypeValue(CodeDictEnum.getCodeDictValueByKey(Integer.parseInt(result.getString("type"))).getValue());
 				codeDictBean.setValue(result.getString("value"));
 				codeDictBean.setPid(result.getString("pid") == null ? null : Integer.parseInt(result.getString("pid")));
 				codeDictBean.setPidValue(result.getString("pidValue") == null ? null : result.getString("pidValue"));
@@ -252,6 +252,11 @@ public class CodeDictMapper {
 			if(StringUtils.isNotEmpty(params.get("value"))){
 				sb.append(" and p.value = '" + params.get("value") +"'");
 			}
+			
+			if(StringUtils.isNotEmpty(params.get("code"))){
+				sb.append(" and p.code = '" + params.get("code") +"'");
+			}
+			
 			sb.append(" order by c.id;");
 			connect = DriverManager.getConnection(url, username, password);
 			statement = connect.createStatement();
@@ -260,9 +265,10 @@ public class CodeDictMapper {
 				CodeDictBean codeDictBean = new CodeDictBean();
 				codeDictBean.setId(Integer.parseInt(result.getString("id")));
 				codeDictBean.setType(Integer.parseInt(result.getString("type")));
-				codeDictBean.setTypeValue(CodeDictEnum.getCodeDictValueByKey(result.getString("type")).getValue());
+				codeDictBean.setTypeValue(CodeDictEnum.getCodeDictValueByKey(Integer.parseInt(result.getString("type"))).getValue());
 				codeDictBean.setValue(result.getString("value"));
 				codeDictBean.setPid(result.getString("pid") == null ? null : Integer.parseInt(result.getString("pid")));
+				codeDictBean.setCode(result.getString("code"));
 				codeDictList.add(codeDictBean);
 			}
 			return codeDictList;

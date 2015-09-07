@@ -18,12 +18,14 @@ import java.util.Vector;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
 import com.xc.financial.beans.UserOperateBean;
 import com.xc.financial.beans.UserSearchBean;
+import com.xc.financial.enums.column.UserColumnEnum;
 import com.xc.financial.mapper.UserMapper;
 import com.xc.financial.utils.CollectionUtils;
 import com.xc.financial.utils.ObjectUtils;
@@ -36,7 +38,7 @@ public class UserFrame extends JPanel implements ActionListener{
 	private static final long serialVersionUID = 1L;
 	private Table table;
 	private Vector<Object> columns = new Vector<Object>();
-	private String[] columnNames= {"","序号","用户编码","姓名","性别","状态","地址 ","用户名","邮箱","创建时间","修改时间","备注","操作员"}; 
+	private String[] columnNames= {"","序号","用户编码","姓名","性别","出生日期","状态","地址 ","用户名","邮箱","电话号码","创建时间","修改时间","备注","操作员"}; 
 	private Vector<Object> rowData = new Vector<Object>();
 	private JScrollPane pane3;
 	private JButton button,edit,delete,search;
@@ -109,7 +111,11 @@ public class UserFrame extends JPanel implements ActionListener{
 			private static final long serialVersionUID = 1L;
 
 			public boolean isCellEditable(int row, int column) {
-				return false;
+				if(column == 0){
+					return true;
+				}else{
+					return false;
+				}
             }
 		};
 		table.setPreferredScrollableViewportSize(new Dimension(670, 420));
@@ -126,21 +132,25 @@ public class UserFrame extends JPanel implements ActionListener{
 		//设置第5列的宽度
 		table.changeColumnWidth(4, 80);
 		//设置第6列的宽度
-		table.changeColumnWidth(5, 80);
+		table.changeColumnWidth(5, 100);
+		//设置第6列的宽度
+		table.changeColumnWidth(6, 80);
 		//设置第7列的宽度
-		table.changeColumnWidth(6, 200);
+		table.changeColumnWidth(7, 200);
 		//设置第8列的宽度
-		table.changeColumnWidth(7, 100);
+		table.changeColumnWidth(8, 100);
 		//设置第9列的宽度
-		table.changeColumnWidth(8, 150);
-		//设置第10列的宽度
 		table.changeColumnWidth(9, 150);
-		//设置第11列的宽度
-		table.changeColumnWidth(10, 150);
-		//设置第12列的宽度
+		//设置第9列的宽度
+		table.changeColumnWidth(10, 100);
+		//设置第10列的宽度
 		table.changeColumnWidth(11, 150);
+		//设置第11列的宽度
+		table.changeColumnWidth(12, 150);
+		//设置第12列的宽度
+		table.changeColumnWidth(13, 150);
 		//设置第13列的宽度
-		table.changeColumnWidth(12, 100);
+		table.changeColumnWidth(14, 100);
 		
 		table.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
 		
@@ -210,10 +220,20 @@ public class UserFrame extends JPanel implements ActionListener{
 			getDatas(searchBean);
 		}
 		if(e.getSource() == button){
-			new ManageUserFrame(null,"add");
+			new ManageUserFrame(this,null,"add");
 		}
 		if(e.getSource() == edit){
-			new ManageUserFrame(field.getText(),"edit");
+			List<Map<String, Object>> datas = table.getSelectRowValue();
+			if(CollectionUtils.isNotEmpty(datas)){
+				if(datas.size() > 1){
+					JOptionPane.showMessageDialog(null, "请选择一条数据进行编辑！");
+				}else{
+					Map<String, Object> data = datas.get(0);
+					new ManageUserFrame(this,(String)data.get(UserColumnEnum.getUserColumnValueByKey("code").getValue()),"edit");
+				}
+			}else{
+				JOptionPane.showMessageDialog(null, "请先选择一行需要编辑的数据！");
+			}
 		}
 		if(e.getSource() == delete){
 			table.deleteTableRows(table.getSelectedRows());
@@ -246,7 +266,7 @@ public class UserFrame extends JPanel implements ActionListener{
 		getDatas(new UserSearchBean());
 	}
 	
-	private void getDatas(UserSearchBean searchBean){
+	public void getDatas(UserSearchBean searchBean){
 		List<UserOperateBean> userBeanList = userkMapper.selectUsersByParams(searchBean);
 		if(CollectionUtils.isNotEmpty(userBeanList)){
 			rowData.clear();

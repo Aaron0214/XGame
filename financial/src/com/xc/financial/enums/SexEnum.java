@@ -21,7 +21,7 @@ public enum SexEnum {
 		this.value = value;
 	}
 	
-	public static SexEnum getStatusValueByKey(Integer keys){
+	public static SexEnum getSexValueByKey(Integer keys){
 		for(SexEnum sexEnum : SexEnum.values()){
 			if(sexEnum.getKey().equals(keys)){
 				return sexEnum;

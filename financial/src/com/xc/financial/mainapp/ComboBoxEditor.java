@@ -17,7 +17,12 @@ public class ComboBoxEditor extends DefaultCellEditor {
 	}
 	
 	public Object getSelectedItemValue(){
+		System.out.println(this.getCellEditorValue());
 		return ((MyComboBox)this.getComponent()).getSelectedItemValue();
+	}
+	
+	public Object getSelectedValue(String label){
+		return ((MyComboBox)this.getComponent()).getSelectedValue(label);
 	}
 	
 	public void setSelectedItem(Object value){

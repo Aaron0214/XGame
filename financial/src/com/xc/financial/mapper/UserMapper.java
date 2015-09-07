@@ -15,6 +15,7 @@ import com.xc.financial.beans.AddressBean;
 import com.xc.financial.beans.UserBean;
 import com.xc.financial.beans.UserOperateBean;
 import com.xc.financial.beans.UserSearchBean;
+import com.xc.financial.enums.SexEnum;
 import com.xc.financial.enums.StatusEnum;
 import com.xc.financial.enums.column.UserColumnEnum;
 import com.xc.financial.utils.DateUtils;
@@ -39,7 +40,7 @@ public class UserMapper {
 	public int insertUser(UserBean userBean){
 		try{
 			StringBuffer sb = new StringBuffer();
-			sb.append("insert into user(name,status,sex,code,username,password,email,phone,create_date,modify_date,comments,operate,address_id) values(");
+			sb.append("insert into user(name,status,sex,code,username,password,email,phone,birth,create_date,modify_date,comments,operate,address_id) values(");
 			if(StringUtils.isEmpty(userBean.getName())){
 				sb.append("null,");
 			}else{
@@ -86,6 +87,12 @@ public class UserMapper {
 				sb.append("null,");
 			}else{
 				sb.append("'"+ userBean.getPhone() +"',");
+			}
+			
+			if(StringUtils.isEmpty(userBean.getBirth())){
+				sb.append("null,");
+			}else{
+				sb.append("'"+ userBean.getBirth() +"',");
 			}
 			
 			if(StringUtils.isEmpty(userBean.getCreateDate())){
@@ -201,76 +208,132 @@ public class UserMapper {
 	 * @param data
 	 * @return
 	 */
-	public int updateUser(Map<String,Object> data){
+	public int updateUser(UserBean userBean){
 		try{
 			StringBuffer sb = new StringBuffer();
 			sb.append("update user set ");
-			if(StringUtils.isEmpty((String)data.get(UserColumnEnum.getUserColumnValueByKey("name").getValue()))){
-				sb.append("type = null,");
+			if(StringUtils.isEmpty(userBean.getName())){
+				sb.append("name = null,");
 			}else{
-				sb.append("type = '"+ data.get(UserColumnEnum.getUserColumnValueByKey("name").getValue())+"',");
+				sb.append("name = '"+ userBean.getName() +"',");
 			}
 			
-			if(StringUtils.isEmpty((String)data.get(UserColumnEnum.getUserColumnValueByKey("status").getValue()))){
-				sb.append("member = null,");
+			if(StringUtils.isEmpty(userBean.getStatus())){
+				sb.append("status = null,");
 			}else{
-				sb.append("member = '"+ data.get(UserColumnEnum.getUserColumnValueByKey("status").getValue())+"',");
+				sb.append("status = '"+ userBean.getStatus() +"',");
 			}
 			
-			if(StringUtils.isEmpty(data.get(UserColumnEnum.getUserColumnValueByKey("sex").getValue()))){
-				sb.append("amount = null,");
+			if(null == userBean.getSex()){
+				sb.append("sex = null,");
 			}else{
-				sb.append("amount = '"+ data.get(UserColumnEnum.getUserColumnValueByKey("sex").getValue()) +"',");
+				sb.append("sex = '"+ userBean.getSex() +"',");
 			}
 			
-			if(StringUtils.isEmpty(data.get(UserColumnEnum.getUserColumnValueByKey("address").getValue()))){
-				sb.append("amount = null,");
+			if(StringUtils.isEmpty(userBean.getUsername())){
+				sb.append("username = null,");
 			}else{
-				sb.append("amount = '"+ data.get(UserColumnEnum.getUserColumnValueByKey("address").getValue()) +"',");
+				sb.append("username = '"+ userBean.getUsername() +"',");
 			}
 			
-			if(StringUtils.isEmpty(data.get(UserColumnEnum.getUserColumnValueByKey("username").getValue()))){
-				sb.append("amount = null,");
+			if(StringUtils.isEmpty(userBean.getEmail())){
+				sb.append("email = null,");
 			}else{
-				sb.append("amount = '"+ data.get(UserColumnEnum.getUserColumnValueByKey("username").getValue()) +"',");
+				sb.append("email = '"+ userBean.getEmail() +"',");
 			}
 			
-			if(StringUtils.isEmpty(data.get(UserColumnEnum.getUserColumnValueByKey("password").getValue()))){
-				sb.append("amount = null,");
+			if(StringUtils.isEmpty(userBean.getPhone())){
+				sb.append("phone = null,");
 			}else{
-				sb.append("amount = '"+ data.get(UserColumnEnum.getUserColumnValueByKey("password").getValue()) +"',");
+				sb.append("phone = '"+ userBean.getPhone() +"',");
 			}
 			
-			if(StringUtils.isEmpty(data.get(UserColumnEnum.getUserColumnValueByKey("email").getValue()))){
-				sb.append("amount = null,");
+			if(StringUtils.isEmpty(userBean.getBirth())){
+				sb.append("birth = null,");
 			}else{
-				sb.append("amount = '"+ data.get(UserColumnEnum.getUserColumnValueByKey("email").getValue()) +"',");
+				sb.append("birth = '"+ userBean.getBirth() +"',");
 			}
 			
-			if(StringUtils.isEmpty((String)data.get(UserColumnEnum.getUserColumnValueByKey("modify_date").getValue()))){
+			if(StringUtils.isEmpty(userBean.getModifyDate())){
 				sb.append("modify_date = '"+ DateUtils.parseLongDate(new Date()) +"',");
 			}else{
-				sb.append("modify_date = '"+ data.get(UserColumnEnum.getUserColumnValueByKey("modify_date").getValue()) +"',");
+				sb.append("modify_date = '"+ userBean.getModifyDate() +"',");
 			}
 			
-			if(StringUtils.isEmpty((String)data.get(UserColumnEnum.getUserColumnValueByKey("comments").getValue()))){
-				sb.append("comments = null");
+			if(StringUtils.isEmpty(userBean.getComments())){
+				sb.append("comments = null,");
 			}else{
-				sb.append("comments = " + "'"+ data.get(UserColumnEnum.getUserColumnValueByKey("comments").getValue()) +"',");
+				sb.append("comments = '"+ userBean.getComments() +"',");
 			}
 			
-			if(StringUtils.isEmpty((String)data.get(UserColumnEnum.getUserColumnValueByKey("operate").getValue()))){
+			if(StringUtils.isEmpty(userBean.getOperate())){
 				sb.append("operate = null");
 			}else{
-				sb.append("operate = " + "'"+ data.get(UserColumnEnum.getUserColumnValueByKey("operate").getValue()) +"'");
+				sb.append("operate = '"+ userBean.getOperate() +"'");
 			}
-			sb.append(" where code = '" + data.get(UserColumnEnum.getUserColumnValueByKey("code").getValue()) +"'");
+			sb.append(" where code = '" + userBean.getCode() +"'");
+			
+			StringBuffer sb1 = new StringBuffer();
+			sb1.append("update address set ");
+			AddressBean addressBean = userBean.getAddressBean();
+			
+			if(StringUtils.isNotEmpty(addressBean.getCountryCode())){
+				sb1.append("country_code = '"+ addressBean.getCountryCode() +"',");
+			}else{
+				sb1.append("country_code = null,");
+			}
+			
+			if(StringUtils.isNotEmpty(addressBean.getProvinceCode())){
+				sb1.append("province_code = '"+ addressBean.getProvinceCode() +"',");
+			}else{
+				sb1.append("province_code = null,");
+			}
+			
+			if(StringUtils.isNotEmpty(addressBean.getCityCode())){
+				sb1.append("city_code = '"+ addressBean.getCityCode() +"',");
+			}else{
+				sb1.append("city_code = null,");
+			}
+			
+			if(StringUtils.isNotEmpty(addressBean.getTownCode())){
+				sb1.append("town_code = '"+ addressBean.getTownCode() +"',");
+			}else{
+				sb1.append("town_code = null,");
+			}
+			
+			if(StringUtils.isNotEmpty(addressBean.getAddr())){
+				sb1.append("addr = '"+ addressBean.getAddr() +"',");
+			}else{
+				sb1.append("addr = null,");
+			}
+			
+			if(StringUtils.isNotEmpty(addressBean.getHouseCode())){
+				sb1.append("house_code = '"+ addressBean.getHouseCode() +"',");
+			}else{
+				sb1.append("house_code = null,");
+			}
+			
+			if(StringUtils.isNotEmpty(addressBean.getZipCode())){
+				sb1.append("zip_code = '"+ addressBean.getZipCode() +"'");
+			}else{
+				sb1.append("zip_code = null");
+			}
+			sb1.append(" where id = " + addressBean.getId());
 			
 			connect = DriverManager.getConnection(url, username, password);
+			connect.setAutoCommit(false);
 			statement = connect.createStatement();
-			return statement.executeUpdate(sb.toString());
+			statement.executeUpdate(sb1.toString());
+			statement.executeUpdate(sb.toString());
+			connect.commit();
+			return 1;
 		}catch(SQLException|ParseException e){
 			e.printStackTrace();
+			try {
+				connect.rollback();
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
 			return -1;
 		}finally{
 			try {
@@ -323,7 +386,11 @@ public class UserMapper {
 		List<UserOperateBean> userList = new ArrayList<UserOperateBean>();
 		try{
 			StringBuffer sb = new StringBuffer();	
-			sb.append("select * from user where 1=1");
+			sb.append("select u.*,a.addr,a.house_code,province.value as provinceValue,city.value as cityValue,town.value as townValue from user u ");
+			sb.append("left join address a on u.address_id = a.id ");
+			sb.append("left join code_dict province on a.province_code = province.code ");
+			sb.append("left join code_dict city on a.city_code = city.code ");
+			sb.append("left join code_dict town on a.town_code = town.code where 1=1");
 			
 			if(StringUtils.isNotEmpty(searchBean.getName())){
 				sb.append(" and name like '%" + searchBean.getName() +"%'");
@@ -355,15 +422,34 @@ public class UserMapper {
 				userBean.setIndex(index++);
 				userBean.setCode(result.getString("code"));
 				userBean.setName(result.getString("name"));
-				userBean.setStatusValue(StatusEnum.getStatusValueByKey(result.getString("value")).getValue());
-				userBean.setSexValue("");
-				userBean.setAddress(result.getString("address"));
+				userBean.setStatusValue(StatusEnum.getStatusValueByKey(result.getString("status")).getValue());
+				userBean.setSexValue(SexEnum.getSexValueByKey(Integer.parseInt(result.getString("sex"))).getValue());
+				userBean.setBirth(result.getString("birth"));
 				userBean.setUsername(result.getString("username"));
 				userBean.setEmail(result.getString("email"));
+				userBean.setPhone(result.getString("phone"));
 				userBean.setCreateDate(DateUtils.parseLongDate(DateUtils.parseDate(result.getString("create_date"))));
 				userBean.setModifyDate(DateUtils.parseLongDate(DateUtils.parseDate(result.getString("modify_date"))));
 				userBean.setComments(result.getString("comments"));
 				userBean.setOperate(result.getString("operate"));
+				//构建地址信息
+				String address = "";
+				if(StringUtils.isNotEmpty(result.getString("provinceValue"))){
+					address += result.getString("provinceValue");
+				}
+				if(StringUtils.isNotEmpty(result.getString("cityValue"))){
+					address += " - " +result.getString("cityValue");
+				}
+				if(StringUtils.isNotEmpty(result.getString("townValue"))){
+					address += " - " +result.getString("townValue");
+				}
+				if(StringUtils.isNotEmpty(result.getString("addr"))){
+					address += " - " +result.getString("addr");
+				}
+				if(StringUtils.isNotEmpty(result.getString("house_code"))){
+					address += " - " +result.getString("house_code");
+				}
+				userBean.setAddress(address);
 				userList.add(userBean);
 			}
 			return userList;
@@ -425,10 +511,7 @@ public class UserMapper {
 		try{
 			StringBuffer sb = new StringBuffer();	
 			sb.append("select * from user u left join address adr on u.address_id = adr.id where 1=1");
-			
-			if(StringUtils.isNotEmpty(userCode)){
-				sb.append(" and code = '" + userCode +"'");
-			}
+			sb.append(" and code = '" + userCode +"'");
 			
 			connect = DriverManager.getConnection(url, username, password);
 			statement = connect.createStatement();
@@ -443,12 +526,22 @@ public class UserMapper {
 				userBean.setUsername(result.getString("username"));
 				userBean.setEmail(result.getString("email"));
 				userBean.setPhone(result.getString("phone"));
+				userBean.setBirth(StringUtils.isEmpty(result.getString("birth")) ? null :DateUtils.parseDate(DateUtils.parseSingleDate(result.getString("birth"))));
 				userBean.setCreateDate(DateUtils.parseLongDate(DateUtils.parseDate(result.getString("create_date"))));
 				userBean.setModifyDate(DateUtils.parseLongDate(DateUtils.parseDate(result.getString("modify_date"))));
 				userBean.setComments(result.getString("comments"));
 				userBean.setOperate(result.getString("operate"));
 				
 				AddressBean addressBean = new AddressBean();
+				addressBean.setId(StringUtils.isEmpty(result.getString("address_id"))? null : Integer.parseInt(result.getString("address_id")));
+				addressBean.setCountryCode(result.getString("country_code"));
+				addressBean.setProvinceCode(result.getString("province_code"));
+				addressBean.setCityCode(result.getString("city_code"));
+				addressBean.setTownCode(result.getString("town_code"));
+				addressBean.setHouseCode(result.getString("house_code"));
+				addressBean.setAddr(result.getString("addr"));
+				addressBean.setZipCode(result.getString("zip_code"));
+				userBean.setAddressBean(addressBean);
 			}
 			return userBean;
 		}catch(SQLException|ParseException e){

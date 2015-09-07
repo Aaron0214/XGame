@@ -2,21 +2,25 @@ package com.xc.financial.beans;
 
 public class UserOperateBean {
 
-private Integer index;
+	private Integer index;
+	
+	private String code;
 	
 	private String name;
 	
-	private String statusValue;
-	
 	private String sexValue;
 	
-	private String code;
+	private String birth;
+	
+	private String statusValue;
 	
 	private String address;
 	
 	private String username;
 	
 	private String email;
+	
+	private String phone;
 	
 	private String createDate;
 	
@@ -120,5 +124,21 @@ private Integer index;
 
 	public void setOperate(String operate) {
 		this.operate = operate;
+	}
+
+	public String getBirth() {
+		return birth;
+	}
+
+	public void setBirth(String birth) {
+		this.birth = birth;
+	}
+
+	public String getPhone() {
+		return phone;
+	}
+
+	public void setPhone(String phone) {
+		this.phone = phone;
 	}
 }

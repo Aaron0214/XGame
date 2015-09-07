@@ -250,7 +250,7 @@ public class InstockFrame extends JPanel implements ActionListener{
 		str.add(black);
 		
 		Map<String,Object> params = new HashMap<String,Object>();
-		params.put("type", Integer.parseInt(CodeDictEnum.INSTOCK.getKey()));
+		params.put("type", CodeDictEnum.INSTOCK.getKey());
 		params.put("value", "收入类型");
 		
 		List<CodeDictBean> codeDictList = codeDictMapper.selectChildrenByParams(params);
@@ -266,7 +266,7 @@ public class InstockFrame extends JPanel implements ActionListener{
 		storeType.add(black);
 		
 		params = new HashMap<String,Object>();
-		params.put("type", Integer.parseInt(CodeDictEnum.FINANCIAL.getKey()));
+		params.put("type", CodeDictEnum.FINANCIAL.getKey());
 		params.put("value", "存储类型");
 		
 		List<CodeDictBean> storeTypeList = codeDictMapper.selectChildrenByParams(params);

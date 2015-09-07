@@ -27,6 +27,53 @@ public class ObjectUtils {
     public static void copy(Object source, Object destinationObject) {
         DOZER.map(source, destinationObject);
     }
+    
+    
+    /**
+     * 判断Object是否为空
+     * @param <T>
+     * @param source
+     * @param destinationObject
+     */
+	public static <T> boolean isEmpty(T obj){
+		 try {
+	    	if(null == obj){
+	    		return true;
+	    	}
+	    	boolean flag = false;
+	    	for (Field f : obj.getClass().getDeclaredFields()) {
+	    	    f.setAccessible(true);
+	    	    //判断字段是否为空，并且对象属性中的基本都会转为对象类型来判断
+	    	    if(!f.getName().equals("serialVersionUID")){
+	    	    	 if(null == f.get(obj)){
+	 	    	    	flag = true;
+	 	    	    }else{
+	 	    	    	flag = false;
+	 	    	    	break;
+	 	    	    }
+	    	    }
+	    	}
+	    	if(flag){
+	    		return true;
+	    	}else{
+	    		return false;
+	    	}
+		} catch (IllegalArgumentException e) {
+			return false;
+		} catch (IllegalAccessException e) {
+			return false;
+		}
+	}
+    
+	/**
+     * 判断Object是否不为空
+     * @param <T>
+     * @param source
+     * @param destinationObject
+     */
+	public static <T> boolean isNotEmpty(T obj){
+		return !isEmpty(obj);
+	}
 	
     /**
      * 转化为Object对象

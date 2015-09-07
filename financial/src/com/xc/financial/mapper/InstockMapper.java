@@ -156,7 +156,7 @@ public class InstockMapper {
 			if(StringUtils.isEmpty((String)data.get(InstockColumnEnum.getInstockColumnValueByKey("modify_date").getValue()))){
 				sb.append("modify_date = '"+ DateUtils.parseLongDate(new Date()) +"',");
 			}else{
-				sb.append("modify_date = '"+ data.get(InstockColumnEnum.getInstockColumnValueByKey("modify_date").getValue()) +"',");
+				sb.append("modify_date = '"+ DateUtils.parseLongDate(new Date()) +"',");
 			}
 			
 			if(StringUtils.isEmpty((String)data.get(InstockColumnEnum.getInstockColumnValueByKey("operate").getValue()))){

@@ -24,6 +24,8 @@ public class UserBean {
 	
 	private String phone;
 	
+	private String birth;
+	
 	private String createDate;
 	
 	private String modifyDate;
@@ -150,6 +152,14 @@ public class UserBean {
 
 	public void setOperate(String operate) {
 		this.operate = operate;
+	}
+
+	public String getBirth() {
+		return birth;
+	}
+
+	public void setBirth(String birth) {
+		this.birth = birth;
 	}
 
 }

@@ -37,8 +37,8 @@ public class Table extends JTable{
 			
 			@SuppressWarnings({ "unchecked", "rawtypes" })
 			public Class getColumnClass(int c) {
-				 return getValueAt(0, c).getClass();
-			 }
+				return getValueAt(0, c).getClass();
+			}
 		};
 		this.setModel(defaultmodel);
 		this.setRowHeight(20);// 设置每行的高度为20
@@ -87,14 +87,14 @@ public class Table extends JTable{
 	}
 	
 	public List<Map<String,Object>> getSelectRowValue(){
-		List<Map<String,Object>> datas = new ArrayList<Map<String,Object>>();
+		 List<Map<String,Object>> datas = new ArrayList<Map<String,Object>>();
 		for(int i = 0; i < rows.size(); i++){
 			Map<String,Object> rowdata = new HashMap<String,Object>();
 			for(int j = 0; j< columnNames.size(); j++){
 				if(this.getColumnModel().getColumn(j).getCellEditor() != null) {
 					if(this.getColumnModel().getColumn(j).getCellEditor().getClass().getName().equals(ComboBoxEditor.class.getName())){
-						ComboBoxEditor comboBoxEditor = (ComboBoxEditor) this.getColumnModel().getColumn(j).getCellEditor();
-						rowdata.put(this.getColumnName(j),comboBoxEditor.getSelectedItemValue());
+						ComboBoxEditor comboBoxEditor = (ComboBoxEditor) this.getCellEditor(i, j);
+						rowdata.put(this.getColumnName(j),comboBoxEditor.getSelectedValue((String)this.getValueAt((int)rows.get(i), j)));
 					}else{
 						rowdata.put(this.getColumnName(j), this.getValueAt((int)rows.get(i), j));
 					}

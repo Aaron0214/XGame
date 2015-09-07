@@ -15,6 +15,8 @@ public class CodeDictBean{
 	
 	private Integer pid;
 	
+	private String code;
+	
 	public Integer getId() {
 		return id;
 	}
@@ -61,6 +63,14 @@ public class CodeDictBean{
 
 	public void setPid(Integer pid) {
 		this.pid = pid;
+	}
+
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
 	}
 
 }

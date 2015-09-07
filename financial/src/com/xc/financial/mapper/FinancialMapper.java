@@ -136,7 +136,7 @@ public class FinancialMapper {
 			if(StringUtils.isEmpty((String)data.get(FinancialColumnEnum.getFinancialColumnValueByKey("modify_date").getValue()))){
 				sb.append("modify_date = '"+ DateUtils.parseLongDate(new Date()) +"',");
 			}else{
-				sb.append("modify_date = '"+ data.get(FinancialColumnEnum.getFinancialColumnValueByKey("modify_date").getValue()) +"',");
+				sb.append("modify_date = '"+ DateUtils.parseLongDate(new Date()) +"',");
 			}
 			
 			if(StringUtils.isEmpty((String)data.get(OutstockColumnEnum.getOutstockColumnValueByKey("comments").getValue()))){

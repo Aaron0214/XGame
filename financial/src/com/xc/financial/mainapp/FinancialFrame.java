@@ -71,7 +71,6 @@ public class FinancialFrame extends JPanel implements ActionListener{
 		label.setBounds(new Rectangle(5,15,50,20));
 		
 		field = new JTextField();
-//		field.setPreferredSize(new Dimension(100, 20));
 		field.setBounds(new Rectangle(45,15,100,20));
 		
 		label3 = new JLabel("存储类型：");
@@ -80,7 +79,6 @@ public class FinancialFrame extends JPanel implements ActionListener{
 		
 		type = new MyComboBox(str);
 		type.setFont(new Font("宋体", Font.PLAIN, 13));
-//		type.setPreferredSize(new Dimension(80, 20));
 		type.setBounds(new Rectangle(230,15,80,20));
 		type.setCursor(new Cursor(Cursor.HAND_CURSOR));
 		
@@ -89,7 +87,6 @@ public class FinancialFrame extends JPanel implements ActionListener{
 		label1.setBounds(new Rectangle(330,15,80,20));
 		
 		startDate = new JTextField();
-//		startDate.setPreferredSize(new Dimension(175, 20));
 		startDate.setBounds(new Rectangle(395,15,175,20));
 		datepicker = DatePicker.getInstance("yyyy-MM-dd");
 		datepicker.register(startDate);
@@ -100,13 +97,11 @@ public class FinancialFrame extends JPanel implements ActionListener{
 		label2.setBounds(new Rectangle(5,45,80,20));
 		
 		endDate = new JTextField();
-//		endDate.setPreferredSize(new Dimension(175, 20));
 		endDate.setBounds(new Rectangle(70,45,175,20));
 		datepicker1 = DatePicker.getInstance("yyyy-MM-dd");
 		datepicker1.register(endDate);
 		
 		search = new JButton("搜索");
-//		search.setPreferredSize(new Dimension(60, 20));
 		search.setBounds(new Rectangle(270,45,60,20));
 		search.setCursor(new Cursor(Cursor.HAND_CURSOR));
 		
@@ -253,7 +248,7 @@ public class FinancialFrame extends JPanel implements ActionListener{
 		str.add(black);
 		
 		Map<String,Object> params = new HashMap<String,Object>();
-		params.put("type", Integer.parseInt(CodeDictEnum.FINANCIAL.getKey()));
+		params.put("type", CodeDictEnum.FINANCIAL.getKey());
 		params.put("value", "存储类型");
 		
 		List<CodeDictBean> codeDictList = codeDictMapper.selectChildrenByParams(params);

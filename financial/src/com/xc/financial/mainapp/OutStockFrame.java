@@ -255,7 +255,7 @@ public class OutStockFrame extends JPanel implements ActionListener{
 		str.add(black);
 		
 		Map<String,Object> params = new HashMap<String,Object>();
-		params.put("type", Integer.parseInt(CodeDictEnum.OUTSTOCK.getKey()));
+		params.put("type", CodeDictEnum.OUTSTOCK.getKey());
 		params.put("value", "消费类型");
 		
 		List<CodeDictBean> codeDictList = codeDictMapper.selectChildrenByParams(params);
@@ -271,7 +271,7 @@ public class OutStockFrame extends JPanel implements ActionListener{
 		purSource.add(black);
 		
 		params = new HashMap<String,Object>();
-		params.put("type", Integer.parseInt(CodeDictEnum.FINANCIAL.getKey()));
+		params.put("type", CodeDictEnum.FINANCIAL.getKey());
 		params.put("value", "存储类型");
 		
 		List<CodeDictBean> storeTypeList = codeDictMapper.selectChildrenByParams(params);
