@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -49,25 +50,28 @@ public class CodeDictFrame extends JPanel implements ActionListener{
 	private CodeDictMapper codeDictMapper = new CodeDictMapper();
 	
 	public CodeDictFrame(){
+		this.setLayout(null);
 		init();
 		
 		label = new JLabel("编号：");
 		label.setFont(new Font("宋体", Font.PLAIN, 13));
-		label.setVerticalAlignment(SwingConstants.TOP);
+		label.setBounds(new Rectangle(5,15,50,20));
 		
 		field = new JTextField();
-		field.setPreferredSize(new Dimension(100, 20));
+		field.setBounds(new Rectangle(45,15,120,20));
 		
 		label3 = new JLabel("分类：");
 		label3.setFont(new Font("宋体", Font.PLAIN, 13));
+		label3.setBounds(new Rectangle(185,15,80,20));
 		
 		type = new MyComboBox(str);
 		type.setFont(new Font("宋体", Font.PLAIN, 13));
-		type.setPreferredSize(new Dimension(80, 20));
+		type.setBounds(new Rectangle(250,15,90,20));
+		type.setCursor(new Cursor(Cursor.HAND_CURSOR));
 		
 		search = new JButton("搜索");
-		search.setPreferredSize(new Dimension(60, 20));
 		search.setCursor(new Cursor(Cursor.HAND_CURSOR));
+		search.setBounds(new Rectangle(360,15,80,20));
 		
 		
 		table = new Table(rowData, columns){
@@ -110,13 +114,16 @@ public class CodeDictFrame extends JPanel implements ActionListener{
 		table.initCombox(columns);
 		
         pane3 = new JScrollPane(table);
+        pane3.setBounds(new Rectangle(2,50,670,420));
         
         button = new JButton("添加");
-        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        button.setBounds(new Rectangle(240,508,60,25));
         save = new JButton("保存");
         save.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        save.setBounds(new Rectangle(310,508,60,25));
         delete = new JButton("删除");
         delete.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        delete.setBounds(new Rectangle(380,508,60,25));
 		
         
         search.addActionListener(this);

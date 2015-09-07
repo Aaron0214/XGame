@@ -20,7 +20,7 @@ public class MainFrame implements MouseListener{
 	
 	private JFrame frame;
 	private Tree jtree;
-	private JPanel jpanel,instock,outstock,financial;
+	private JPanel jpanel,instock,outstock,financial,user,codeDict;
 	private JLabel label,username,logout;
 	
 	public MainFrame(String name){
@@ -44,7 +44,7 @@ public class MainFrame implements MouseListener{
 		logout.setCursor(new Cursor(Cursor.HAND_CURSOR));
 		
 		jtree = new Tree();
-		jtree.setBounds(new Rectangle(20,35,100,580));
+		jtree.setBounds(new Rectangle(15,35,110,580));
 		
 		jpanel = new JPanel();
 		jpanel.setBounds(new Rectangle(130,30,672,546));
@@ -58,6 +58,12 @@ public class MainFrame implements MouseListener{
 		financial = new FinancialFrame();
 		financial.setBounds(new Rectangle(125,30,672,546));
 		
+		user = new UserFrame();
+		user.setBounds(new Rectangle(125,30,672,546));
+		
+		codeDict = new CodeDictFrame();
+		codeDict.setBounds(new Rectangle(125,30,672,546));
+		
 		jtree.addMouseListener(this);
 		logout.addMouseListener(this);
 		
@@ -69,6 +75,8 @@ public class MainFrame implements MouseListener{
 		frame.add(instock);
 		frame.add(outstock);
 		frame.add(financial);
+		frame.add(user);
+		frame.add(codeDict);
 		
 		doLay();
 		frame.setVisible(true);
@@ -99,11 +107,15 @@ public class MainFrame implements MouseListener{
 						instock.setVisible(false);
 						outstock.setVisible(false);
 						financial.setVisible(false);
+						user.setVisible(false);
+						codeDict.setVisible(false);
 					}
 					if(node.getUserObject().equals("收入管理")){
 						jpanel.setVisible(false);
 						outstock.setVisible(false);
 						financial.setVisible(false);
+						user.setVisible(false);
+						codeDict.setVisible(false);
 						instock.setVisible(true);
 					}
 					
@@ -111,6 +123,8 @@ public class MainFrame implements MouseListener{
 						jpanel.setVisible(false);
 						instock.setVisible(false);
 						financial.setVisible(false);
+						user.setVisible(false);
+						codeDict.setVisible(false);
 						outstock.setVisible(true);
 					}
 					
@@ -118,7 +132,26 @@ public class MainFrame implements MouseListener{
 						jpanel.setVisible(false);
 						instock.setVisible(false);
 						outstock.setVisible(false);
+						user.setVisible(false);
+						codeDict.setVisible(false);
 						financial.setVisible(true);
+					}
+					
+					if(node.getUserObject().equals("用户列表")){
+						jpanel.setVisible(false);
+						instock.setVisible(false);
+						outstock.setVisible(false);
+						financial.setVisible(false);
+						codeDict.setVisible(false);
+						user.setVisible(true);
+					}
+					if(node.getUserObject().equals("配置项管理")){
+						jpanel.setVisible(false);
+						instock.setVisible(false);
+						outstock.setVisible(false);
+						financial.setVisible(false);
+						user.setVisible(false);
+						codeDict.setVisible(true);
 					}
 				}
 			}

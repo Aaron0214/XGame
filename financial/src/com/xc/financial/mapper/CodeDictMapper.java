@@ -243,18 +243,34 @@ public class CodeDictMapper {
 			
 			if(StringUtils.isNotEmpty(params.get("id"))){
 				sb.append(" and p.id = " + params.get("id"));
+			}else{
+				if(params.keySet().contains("id")){
+					sb.append(" and p.id = null ");
+				}
 			}
 			
 			if(StringUtils.isNotEmpty(params.get("type"))){
 				sb.append(" and c.type = " + params.get("type"));
+			}else{
+				if(params.keySet().contains("type")){
+					sb.append(" and c.type = null ");
+				}
 			}
 			
 			if(StringUtils.isNotEmpty(params.get("value"))){
 				sb.append(" and p.value = '" + params.get("value") +"'");
+			}else{
+				if(params.keySet().contains("value")){
+					sb.append(" and p.value = null ");
+				}
 			}
 			
 			if(StringUtils.isNotEmpty(params.get("code"))){
 				sb.append(" and p.code = '" + params.get("code") +"'");
+			}else{
+				if(params.keySet().contains("code")){
+					sb.append(" and p.code = null ");
+				}
 			}
 			
 			sb.append(" order by c.id;");
