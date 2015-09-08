@@ -48,6 +48,7 @@ public class UserFrame extends JPanel implements ActionListener{
 	private DatePicker datepicker,datepicker1;
 	private static List<Map<String,Object>> str = new ArrayList<Map<String,Object>>();
 	private UserMapper userkMapper = new UserMapper();
+	private PageToolBar pageTool;
 	
 	public UserFrame(){
 		this.setLayout(null);
@@ -153,8 +154,11 @@ public class UserFrame extends JPanel implements ActionListener{
 		table.changeColumnWidth(14, 100);
 		
 		table.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
+		table.setOpaque(false);
 		
         pane3 = new JScrollPane(table);
+        pane3.setOpaque(false);
+        pane3.getViewport().setOpaque(false);
         pane3.setBounds(new Rectangle(2,80,670,420));
         
         pane3.addMouseListener(new MouseAdapter() {
@@ -164,6 +168,9 @@ public class UserFrame extends JPanel implements ActionListener{
 				}
 			}
 		});
+        
+        pageTool = new PageToolBar(null);
+        pageTool.setBounds(new Rectangle(255,455,411,22));
         
         button = new JButton("添加");
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -194,6 +201,7 @@ public class UserFrame extends JPanel implements ActionListener{
         this.add(type);
         this.add(search);
         
+        this.add(pageTool);
         this.add(pane3);
         this.add(button);
         this.add(edit);

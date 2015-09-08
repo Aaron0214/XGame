@@ -25,6 +25,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
 import com.xc.financial.beans.CodeDictBean;
+import com.xc.financial.beans.SearchPage;
 import com.xc.financial.beans.InstockBean;
 import com.xc.financial.beans.InstockSearchBean;
 import com.xc.financial.enums.CodeDictEnum;
@@ -60,6 +61,7 @@ public class InstockFrame extends JPanel implements ActionListener{
 	private InstockMapper instockMapper = new InstockMapper();
 	private CodeDictMapper codeDictMapper = new CodeDictMapper();
 	private SnMapper snMapper = new SnMapper();
+	private PageToolBar pageTool;
 	
 	public InstockFrame(){
 		this.setLayout(null);
@@ -125,7 +127,7 @@ public class InstockFrame extends JPanel implements ActionListener{
 				}
             }
 		};
-		table.setPreferredScrollableViewportSize(new Dimension(670, 420));
+		table.setPreferredScrollableViewportSize(new Dimension(670, 390));
 		
 		table.isCellEditable(0,2);
 		//设置第一列的宽度
@@ -159,8 +161,11 @@ public class InstockFrame extends JPanel implements ActionListener{
 		columns.add(4);
 		columns.add(6);
 		table.initCombox(columns);
+		table.setOpaque(false);
 		
         pane3 = new JScrollPane(table);
+        pane3.setOpaque(false);
+        pane3.getViewport().setOpaque(false);
         pane3.setBounds(new Rectangle(2,80,670,420));
         
         pane3.addMouseListener(new MouseAdapter() {
@@ -170,6 +175,9 @@ public class InstockFrame extends JPanel implements ActionListener{
 				}
 			}
 		});
+        
+        pageTool = new PageToolBar<>(null);
+        pageTool.setBounds(new Rectangle(255,455,411,22));
         
         button = new JButton("添加");
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -199,6 +207,7 @@ public class InstockFrame extends JPanel implements ActionListener{
         this.add(store);
         this.add(search);
         
+        this.add(pageTool);
         this.add(pane3);
         this.add(button);
         this.add(save);
@@ -316,6 +325,16 @@ public class InstockFrame extends JPanel implements ActionListener{
 		if(table != null){
 			table.updateTable();
 		}
+	}
+	
+	private void search(SearchPage searchParams){
+		InstockSearchBean searchBean = (InstockSearchBean) searchParams;
+		searchBean.setCode(field.getText());
+		searchBean.setStartDate(startDate.getText());
+		searchBean.setEndDate(endDate.getText());
+		searchBean.setType(StringUtils.isEmpty(type.getSelectedItemValue()) ? null : type.getSelectedItemValue().toString());
+		searchBean.setStoreType(StringUtils.isEmpty(store.getSelectedItemValue()) ? null : (Integer)store.getSelectedItemValue());
+		
 	}
 	
 	private Vector<Object> buildVectorData(InstockBean instockBean){

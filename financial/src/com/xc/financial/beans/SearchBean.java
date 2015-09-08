@@ -1,8 +1,7 @@
 package com.xc.financial.beans;
 
-import java.io.Serializable;
 
-public class SearchBean implements Serializable{
+public class SearchBean extends SearchPage{
 
 	/**
 	 * 

@@ -60,6 +60,7 @@ public class OutStockFrame extends JPanel implements ActionListener{
 	private OutstockMapper outstockMapper = new OutstockMapper();
 	private CodeDictMapper codeDictMapper = new CodeDictMapper();
 	private SnMapper snMapper = new SnMapper();
+	private PageToolBar pageTool;
 	
 	public OutStockFrame(){
 		this.setLayout(null);
@@ -164,8 +165,11 @@ public class OutStockFrame extends JPanel implements ActionListener{
 		columns.add(4);
 		columns.add(6);
 		table.initCombox(columns);
+		table.setOpaque(false);
 		
         pane3 = new JScrollPane(table);
+        pane3.setOpaque(false);
+        pane3.getViewport().setOpaque(false);
         pane3.setBounds(new Rectangle(2,80,670,420));
         
         pane3.addMouseListener(new MouseAdapter() {
@@ -175,6 +179,9 @@ public class OutStockFrame extends JPanel implements ActionListener{
 				}
 			}
 		});
+        
+        pageTool = new PageToolBar(null);
+        pageTool.setBounds(new Rectangle(255,455,411,22));
         
         button = new JButton("添加");
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -204,6 +211,7 @@ public class OutStockFrame extends JPanel implements ActionListener{
         this.add(store);
         this.add(search);
         
+        this.add(pageTool);
         this.add(pane3);
         this.add(button);
         this.add(save);
