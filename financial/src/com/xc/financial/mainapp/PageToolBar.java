@@ -6,8 +6,6 @@ import java.awt.Font;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -18,22 +16,22 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import com.xc.financial.beans.SearchPage;
-
 public class PageToolBar<T> extends JPanel implements ActionListener{
 
 	private static final long serialVersionUID = 1L;
 	
 	private JButton firstPage,prewPage,nextPage,lastPage,refresh;
-	private JLabel label,label1,label2,label3,label4,label5,label6;
+	private JLabel label,label1,label2,label3,label4,label5,label6,label7;
 	private JTextField field;
 	private JComboBox<Integer> comboBox;
 	private Integer[] str = {5,10,15,20,25};
-	private Integer num = 100;
+	private Integer num;
 	private Integer num_per = 15;
 	private Class<T> frame;
+	private int m =0 ;
 	
-	public PageToolBar(Class<T> frame){
+	public PageToolBar(Class<T> frame,Integer totalNumber){
+		this.num = totalNumber;
 		this.frame = frame;
 		this.setLayout(null);
 //		this.setBackground(Color.white);
@@ -65,7 +63,9 @@ public class PageToolBar<T> extends JPanel implements ActionListener{
 		
 		field = new JTextField();
 		field.setText("1");
-		field.setBounds(new Rectangle(62,3,25,16));
+//		field.setEditable(false);
+		field.setBounds(new Rectangle(60,3,30,16));
+		field.setToolTipText("1");
 		
 		label1 = new JLabel("页");
 		label1.setFont(new Font("宋体", Font.PLAIN, 13));
@@ -75,9 +75,17 @@ public class PageToolBar<T> extends JPanel implements ActionListener{
 		label2.setFont(new Font("宋体", Font.PLAIN, 13));
 		label2.setBounds(new Rectangle(108,3,20,16));
 		
-		label3 = new JLabel(Math.round(1.0 * num/num_per) + "页");
+		Integer length = getLabelLength(getPageNumber(totalNumber) + "");
+		
+		label3 = new JLabel(getPageNumber(totalNumber) + "");
 		label3.setFont(new Font("宋体", Font.PLAIN, 13));
-		label3.setBounds(new Rectangle(132,3,25,16));
+		label3.setBounds(new Rectangle(130,3,length,16));
+		label3.setOpaque(false);
+		
+		label7 = new JLabel("页");
+		label7.setFont(new Font("宋体", Font.PLAIN, 13));
+		label7.setBounds(new Rectangle(130 + length,3,14,16));
+		label7.setOpaque(false);
 		
 		ImageIcon nexticon = new ImageIcon("resources/images/next.jpg");
 		nextPage = new JButton(nexticon);
@@ -86,7 +94,7 @@ public class PageToolBar<T> extends JPanel implements ActionListener{
 		nextPage.setFocusPainted(false);
 		nextPage.setContentAreaFilled(false);
 		nextPage.setCursor(new Cursor(Cursor.HAND_CURSOR));
-		nextPage.setBounds(new Rectangle(155,3,nexticon.getIconWidth(),nexticon.getIconHeight()));
+		nextPage.setBounds(new Rectangle(145 + length,3,nexticon.getIconWidth(),nexticon.getIconHeight()));
 		
 		ImageIcon lasticon = new ImageIcon("resources/images/last.jpg");
 		lastPage = new JButton(lasticon);
@@ -95,22 +103,22 @@ public class PageToolBar<T> extends JPanel implements ActionListener{
 		lastPage.setFocusPainted(false);
 		lastPage.setContentAreaFilled(false);
 		lastPage.setCursor(new Cursor(Cursor.HAND_CURSOR));
-		lastPage.setBounds(new Rectangle(175,3,lasticon.getIconWidth(),lasticon.getIconHeight()));
+		lastPage.setBounds(new Rectangle(165 + length,3,lasticon.getIconWidth(),lasticon.getIconHeight()));
 		
 		label4 = new JLabel(" |每页");
 		label4.setFont(new Font("宋体", Font.PLAIN, 13));
-		label4.setBounds(new Rectangle(190,3,45,16));
+		label4.setBounds(new Rectangle(180 + length,3,45,16));
 		
 		comboBox = new JComboBox<Integer>(str);
 		comboBox.setSelectedItem(new Integer(num_per));
-		comboBox.setBounds(new Rectangle(235,3,45,16));
+		comboBox.setBounds(new Rectangle(225 + length,3,45,16));
 		comboBox.setCursor(new Cursor(Cursor.HAND_CURSOR));
 		comboBox.getEditor().getEditorComponent().setCursor(new Cursor(Cursor.HAND_CURSOR));
 		comboBox.setBackground(new Color(247, 244, 213));
 		
 		label5 = new JLabel("条");
 		label5.setFont(new Font("宋体", Font.PLAIN, 13));
-		label5.setBounds(new Rectangle(285,3,15,16));
+		label5.setBounds(new Rectangle(275 + length,3,15,16));
 		
 		ImageIcon refreshicon = new ImageIcon("resources/images/refresh.png");
 		refresh = new JButton(refreshicon);
@@ -119,11 +127,11 @@ public class PageToolBar<T> extends JPanel implements ActionListener{
 		refresh.setFocusPainted(false);
 		refresh.setContentAreaFilled(false);
 		refresh.setCursor(new Cursor(Cursor.HAND_CURSOR));
-		refresh.setBounds(new Rectangle(305,3,refreshicon.getIconWidth()+1,refreshicon.getIconHeight()));
+		refresh.setBounds(new Rectangle(295 + length,3,refreshicon.getIconWidth()+1,refreshicon.getIconHeight()));
 		
 		label6 = new JLabel(" |共" + num + "条数据");
 		label6.setFont(new Font("宋体", Font.PLAIN, 13));
-		label6.setBounds(new Rectangle(320,3,100,16));
+		label6.setBounds(new Rectangle(310 + length,3,100,16));
 		
 		firstPage.addActionListener(this);
 		prewPage.addActionListener(this);
@@ -139,6 +147,7 @@ public class PageToolBar<T> extends JPanel implements ActionListener{
 		this.add(label1);
 		this.add(label2);
 		this.add(label3);
+		this.add(label7);
 		this.add(nextPage);
 		this.add(lastPage);
 		this.add(label4);
@@ -148,7 +157,6 @@ public class PageToolBar<T> extends JPanel implements ActionListener{
 		this.add(label6);
 	}
 	
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource() == firstPage){
@@ -156,66 +164,85 @@ public class PageToolBar<T> extends JPanel implements ActionListener{
 		}
 		if(e.getSource() == prewPage){
 			Integer page = Integer.parseInt(field.getText());
-			if(page == 1){
+			if(page.equals(1)){
 				field.setText("1");
+				field.setToolTipText("1");
 			}else{
 				field.setText(String.valueOf((page - 1)));
+				field.setToolTipText(String.valueOf(page - 1));
 			}
 		}
 		if(e.getSource() == nextPage){
-			Integer page = Integer.parseInt(field.getText());
-			Integer totalpage = (int) Math.round(1.0 * num/num_per);
-			if(page == totalpage){
-				field.setText(String.valueOf(totalpage));
-			}else{
-				field.setText(String.valueOf((page + 1)));
-			}
-			
+//			Integer page = Integer.parseInt(field.getText());
+//			Integer totalpage = (int) Math.round(1.0 * num/num_per);
+//			if(page.equals(totalpage)){
+//				field.setText(String.valueOf(totalpage));
+//				field.setToolTipText(String.valueOf(totalpage));
+//			}else{
+//				field.setText(String.valueOf((page + 1)));
+//				field.setToolTipText(String.valueOf(page + 1));
+//			}
+			label3.setText("a");
+			label3.setBounds(132, 3, m++, 22);
+			System.out.println(m + " &&  " + "a".length());
 		}
 		if(e.getSource() == lastPage){
 			Integer totalpage = (int) Math.round(1.0 * num/num_per);
 			field.setText(String.valueOf(totalpage));
-			SearchPage search = new SearchPage();
-			search.setPageNumber(Long.valueOf(String.valueOf(totalpage)));
-			search.setPageSize(Long.valueOf(String.valueOf(num_per)));
-			try {
-				for(Method m :frame.getDeclaredMethods()){
-					if(m.getName().equals("search")){
-						m.setAccessible(true);
-						m.invoke(frame.newInstance(), search);
-						break;
-					}
-				}
-			} catch (SecurityException e1) {
-				e1.printStackTrace();
-			} catch (IllegalAccessException e1) {
-				e1.printStackTrace();
-			} catch (IllegalArgumentException e1) {
-				e1.printStackTrace();
-			} catch (InvocationTargetException e1) {
-				e1.printStackTrace();
-			} catch (InstantiationException e1) {
-				e1.printStackTrace();
-			}
+			field.setToolTipText(String.valueOf(totalpage));
+//			try {
+//				for(Method m :frame.getDeclaredMethods()){
+//					if(m.getName().equals("search")){
+//						m.setAccessible(true);
+//						m.invoke(frame.newInstance(), Long.valueOf(String.valueOf(totalpage)),Long.valueOf(String.valueOf(num_per)));
+//						break;
+//					}
+//				}
+//			} catch (SecurityException e1) {
+//				e1.printStackTrace();
+//			} catch (IllegalAccessException e1) {
+//				e1.printStackTrace();
+//			} catch (IllegalArgumentException e1) {
+//				e1.printStackTrace();
+//			} catch (InvocationTargetException e1) {
+//				e1.printStackTrace();
+//			} catch (InstantiationException e1) {
+//				e1.printStackTrace();
+//			}
 		}
 		if(e.getSource() == comboBox){
 			num_per = (Integer)comboBox.getSelectedItem();
-			label3.setText(Math.round(1.0 * num/num_per) + "页");
+			label3.setText(Math.round(Math.ceil(1.0 * num/num_per)) + "页");
 		}
 		
 		if(e.getSource() == refresh){
 			field.setText("1");
 			num_per = 15;
-			label3.setText(Math.round(1.0 * num/num_per) + "页");
+			label3.setText(Math.round(Math.ceil(1.0 * num/num_per)) + "页");
 			comboBox.setSelectedItem(num_per);
 		}
+	}
+	
+	private Integer getPageNumber(Integer pages){
+		if(pages == 0){
+			return 1;
+		}else{
+			return (int) Math.round(Math.ceil(1.0 * num/num_per));
+		}
+	}
+	
+	private Integer getLabelLength(String labelText){
+		int length = labelText.length();
+		return (length * 7 + 1);
+		//如果为汉字
+//		return (length * 13 + 1)
 	}
 
 	public static void main(String[] args){
 		JFrame frame = new JFrame();
 		frame.setLayout(null);
-		JPanel toolbar = new PageToolBar<InstockFrame>(InstockFrame.class);
-		toolbar.setBounds(new Rectangle(20,20,411,22));
+		PageToolBar<InstockFrame> toolbar = new PageToolBar<InstockFrame>(InstockFrame.class,1500000000);
+		toolbar.setBounds(new Rectangle(20,20,520,22));
 		frame.add(toolbar);
 		
 		frame.setSize(600, 100);

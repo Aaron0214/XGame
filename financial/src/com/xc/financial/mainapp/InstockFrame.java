@@ -25,7 +25,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
 import com.xc.financial.beans.CodeDictBean;
-import com.xc.financial.beans.SearchPage;
 import com.xc.financial.beans.InstockBean;
 import com.xc.financial.beans.InstockSearchBean;
 import com.xc.financial.enums.CodeDictEnum;
@@ -61,7 +60,8 @@ public class InstockFrame extends JPanel implements ActionListener{
 	private InstockMapper instockMapper = new InstockMapper();
 	private CodeDictMapper codeDictMapper = new CodeDictMapper();
 	private SnMapper snMapper = new SnMapper();
-	private PageToolBar pageTool;
+	private PageToolBar<InstockFrame> pageTool;
+	private Integer totalNumber;
 	
 	public InstockFrame(){
 		this.setLayout(null);
@@ -176,7 +176,7 @@ public class InstockFrame extends JPanel implements ActionListener{
 			}
 		});
         
-        pageTool = new PageToolBar<>(null);
+        pageTool = new PageToolBar<InstockFrame>(InstockFrame.class,totalNumber);
         pageTool.setBounds(new Rectangle(255,455,411,22));
         
         button = new JButton("添加");
@@ -226,13 +226,7 @@ public class InstockFrame extends JPanel implements ActionListener{
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource() == search){
-			InstockSearchBean searchBean = new InstockSearchBean();
-			searchBean.setCode(field.getText());
-			searchBean.setStartDate(startDate.getText());
-			searchBean.setEndDate(endDate.getText());
-			searchBean.setType(StringUtils.isEmpty(type.getSelectedItemValue()) ? null : type.getSelectedItemValue().toString());
-			searchBean.setStoreType(StringUtils.isEmpty(store.getSelectedItemValue()) ? null : (Integer)store.getSelectedItemValue());
-			getDatas(searchBean);
+			search(new Long(1),new Long(15));
 		}
 		if(e.getSource() == button){
 			table.addTableRow();
@@ -287,7 +281,10 @@ public class InstockFrame extends JPanel implements ActionListener{
 				storeType.add(item);
 			}
 		}
-		getDatas(new InstockSearchBean());
+		InstockSearchBean searchBean = new InstockSearchBean();
+		searchBean.setPageNumber(new Long(1));
+		searchBean.setPageSize(new Long(15));
+		getDatas(searchBean);
 	}
 	
 	private void saveUpdateData(){
@@ -306,7 +303,10 @@ public class InstockFrame extends JPanel implements ActionListener{
 					e1.printStackTrace();
 				}
 			}
-			getDatas(new InstockSearchBean());
+			InstockSearchBean searchBean = new InstockSearchBean();
+			searchBean.setPageNumber(new Long(1));
+			searchBean.setPageSize(new Long(15));
+			getDatas(searchBean);
 		}else{
 			JOptionPane.showMessageDialog(null, "请先选择需要保存的数据！");
 		}
@@ -314,6 +314,7 @@ public class InstockFrame extends JPanel implements ActionListener{
 	
 	private void getDatas(InstockSearchBean searchBean){
 		List<InstockBean> instockBeanList = instockMapper.selectInstocksByParams(searchBean);
+		totalNumber = instockBeanList.size();
 		if(CollectionUtils.isNotEmpty(instockBeanList)){
 			rowData.clear();
 			for(InstockBean instockBean:instockBeanList){
@@ -327,14 +328,16 @@ public class InstockFrame extends JPanel implements ActionListener{
 		}
 	}
 	
-	private void search(SearchPage searchParams){
-		InstockSearchBean searchBean = (InstockSearchBean) searchParams;
+	private void search(long pageNumber,long pageSize){
+		InstockSearchBean searchBean = new InstockSearchBean();
 		searchBean.setCode(field.getText());
 		searchBean.setStartDate(startDate.getText());
 		searchBean.setEndDate(endDate.getText());
 		searchBean.setType(StringUtils.isEmpty(type.getSelectedItemValue()) ? null : type.getSelectedItemValue().toString());
 		searchBean.setStoreType(StringUtils.isEmpty(store.getSelectedItemValue()) ? null : (Integer)store.getSelectedItemValue());
-		
+		searchBean.setPageNumber(pageNumber);
+		searchBean.setPageSize(pageSize);
+		getDatas(searchBean);
 	}
 	
 	private Vector<Object> buildVectorData(InstockBean instockBean){

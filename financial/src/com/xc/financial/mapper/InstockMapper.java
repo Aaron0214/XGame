@@ -263,6 +263,7 @@ public class InstockMapper {
 			if(null != searchBean.getStoreType()){
 				sb.append(" and i.store_type = " + searchBean.getStoreType());
 			}
+			sb.append(" limit " + searchBean.getOffset() + "," + searchBean.getRows());
 			
 			connect = DriverManager.getConnection(url, username, password);
 			statement = connect.createStatement();

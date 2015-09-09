@@ -180,7 +180,7 @@ public class OutStockFrame extends JPanel implements ActionListener{
 			}
 		});
         
-        pageTool = new PageToolBar(null);
+        pageTool = new PageToolBar(null,0);
         pageTool.setBounds(new Rectangle(255,455,411,22));
         
         button = new JButton("添加");
