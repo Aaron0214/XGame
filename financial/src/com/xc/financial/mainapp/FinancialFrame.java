@@ -61,7 +61,8 @@ public class FinancialFrame extends JPanel implements ActionListener{
 	private SnMapper snMapper = new SnMapper();
 	private CodeDictMapper codeDictMapper = new CodeDictMapper();
 	private BigDecimal amount = BigDecimal.ZERO;
-	private PageToolBar pageTool;
+	private PageToolBar<FinancialFrame> pageTool;
+	private Integer totalNumber;
 	
 	public FinancialFrame(){
 		this.setLayout(null);
@@ -169,8 +170,8 @@ public class FinancialFrame extends JPanel implements ActionListener{
 			}
 		});
         
-        pageTool = new PageToolBar(null,0);
-        pageTool.setBounds(new Rectangle(255,455,411,22));
+        pageTool = new PageToolBar<FinancialFrame>(this,totalNumber);
+        pageTool.setBounds(new Rectangle(668-pageTool.getPanelLength(),455,pageTool.getPanelLength()-3,22));
         
         button = new JButton("添加");
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -225,11 +226,7 @@ public class FinancialFrame extends JPanel implements ActionListener{
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource() == search){
-			SearchBean searchBean = new SearchBean();
-			searchBean.setStartDate(startDate.getText());
-			searchBean.setEndDate(endDate.getText());
-			searchBean.setType(StringUtils.isEmpty(type.getSelectedItemValue()) ? null :type.getSelectedItemValue().toString());
-			getDatas(searchBean);
+			search(new Long(1),new Long(15));
 		}
 		if(e.getSource() == button){
 			table.addTableRow();
@@ -269,7 +266,10 @@ public class FinancialFrame extends JPanel implements ActionListener{
 			}
 		}
 		
-		getDatas(new SearchBean());
+		SearchBean searchBean = new SearchBean();
+		searchBean.setPageNumber(new Long(1));
+		searchBean.setPageSize(new Long(15));
+		getDatas(searchBean);
 	}
 	
 	private void saveUpdateData(){
@@ -288,7 +288,10 @@ public class FinancialFrame extends JPanel implements ActionListener{
 					e1.printStackTrace();
 				}
 			}
-			getDatas(new SearchBean());
+			SearchBean searchBean = new SearchBean();
+			searchBean.setPageNumber(new Long(1));
+			searchBean.setPageSize(new Long(15));
+			getDatas(searchBean);
 		}else{
 			JOptionPane.showMessageDialog(null, "请先选择需要保存的数据！");
 		}
@@ -296,6 +299,7 @@ public class FinancialFrame extends JPanel implements ActionListener{
 	
 	private void getDatas(SearchBean searchBean){
 		List<FinancialBean> finanacialBeanList = financialMapper.selectFinancialsByParams(searchBean);
+		totalNumber = finanacialBeanList.size();
 		if(CollectionUtils.isNotEmpty(finanacialBeanList)){
 			rowData.clear();
 			for(FinancialBean financialBean : finanacialBeanList){
@@ -308,6 +312,17 @@ public class FinancialFrame extends JPanel implements ActionListener{
 		if(table != null){
 			table.updateTable();
 		}
+	}
+	
+	private void search(long pageNumber,long pageSize){
+		SearchBean searchBean = new SearchBean();
+		searchBean.setCode(field.getText());
+		searchBean.setStartDate(startDate.getText());
+		searchBean.setEndDate(endDate.getText());
+		searchBean.setType(StringUtils.isEmpty(type.getSelectedItemValue()) ? null : type.getSelectedItemValue().toString());
+		searchBean.setPageNumber(pageNumber);
+		searchBean.setPageSize(pageSize);
+		getDatas(searchBean);
 	}
 	
 	private Vector<Object> buildVectorData(FinancialBean financialBean){

@@ -166,7 +166,8 @@ public class CodeDictMapper {
 			if(StringUtils.isNotEmpty(searchBean.getType())){
 				sb.append(" and c.type = " + Integer.parseInt(searchBean.getType()));
 			}
-			sb.append(" order by c.id;");
+			sb.append(" order by c.id ");
+			sb.append(" limit " + searchBean.getOffset() + "," + searchBean.getRows());
 			connect = DriverManager.getConnection(url, username, password);
 			statement = connect.createStatement();
 			result = statement.executeQuery(sb.toString());

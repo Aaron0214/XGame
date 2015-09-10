@@ -15,7 +15,7 @@ public class SearchPage implements Serializable {
 
 	private Long pageNumber = 1L; // 第..页
 
-	private Long pageSize = 10L; // 每页..个
+	private Long pageSize = 15L; // 每页..个
 
 	private String orderProperty; // 排序字段
 

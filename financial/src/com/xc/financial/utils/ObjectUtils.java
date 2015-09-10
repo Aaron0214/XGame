@@ -4,8 +4,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Vector;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.dozer.DozerBeanMapper;
 
@@ -171,7 +169,7 @@ public class ObjectUtils {
 		try {
 			Method m = obj.getClass().getDeclaredMethod(functionName);
 			m.setAccessible(true);
-			 m.invoke(a,value);
+			m.invoke(a,value);
 		} catch (IllegalAccessException e) {
 			
 		} catch (IllegalArgumentException e) {
@@ -207,15 +205,13 @@ public class ObjectUtils {
 		
 		String s = "|字符串123456哈哈441";
 		String chara = s;
-		System.out.println("汉字:" + s.replaceAll("[a-zA-Z0-9|]", ""));
+		System.out.println("汉字:" + chara.replaceAll("[a-zA-Z0-9|]", ""));
         System.out.println("数字:" + s.replaceAll("[a-zA-Z0-9]", ""));
         System.out.println("数字:" + s.replaceAll("[a-zA-Z|]", ""));
         System.out.println("字符:" + s.replaceAll("[0-9|]", ""));
         
 		int[] a = {1,3,2,4,6};
 		sort(a);
-//		for(int i :a){
-			System.out.println(Math.ceil(0.0));
-//		}
+		System.out.println(Math.ceil(0.0));
 	}
 }

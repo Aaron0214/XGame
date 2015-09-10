@@ -6,6 +6,8 @@ import java.awt.Font;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -24,14 +26,14 @@ public class PageToolBar<T> extends JPanel implements ActionListener{
 	private JLabel label,label1,label2,label3,label4,label5,label6,label7;
 	private JTextField field;
 	private JComboBox<Integer> comboBox;
-	private Integer[] str = {5,10,15,20,25};
-	private Integer num;
+	private Integer[] str = {5,10,15};
+	private Integer totalNumber;
 	private Integer num_per = 15;
-	private Class<T> frame;
-	private int m =0 ;
+	private T frame;
+	private Integer totalPanelLength = 0;
 	
-	public PageToolBar(Class<T> frame,Integer totalNumber){
-		this.num = totalNumber;
+	public PageToolBar(T frame,Integer totalNumber){
+		this.totalNumber = totalNumber;
 		this.frame = frame;
 		this.setLayout(null);
 //		this.setBackground(Color.white);
@@ -129,9 +131,12 @@ public class PageToolBar<T> extends JPanel implements ActionListener{
 		refresh.setCursor(new Cursor(Cursor.HAND_CURSOR));
 		refresh.setBounds(new Rectangle(295 + length,3,refreshicon.getIconWidth()+1,refreshicon.getIconHeight()));
 		
-		label6 = new JLabel(" |共" + num + "条数据");
+		Integer labelLength = getLabelLength(" |共" + totalNumber + "条数据");
+		label6 = new JLabel(" |共" + totalNumber + "条数据");
 		label6.setFont(new Font("宋体", Font.PLAIN, 13));
-		label6.setBounds(new Rectangle(310 + length,3,100,16));
+		label6.setBounds(new Rectangle(310 + length,3,labelLength,16));
+		
+		totalPanelLength = 310 + length + labelLength;
 		
 		firstPage.addActionListener(this);
 		prewPage.addActionListener(this);
@@ -161,6 +166,7 @@ public class PageToolBar<T> extends JPanel implements ActionListener{
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource() == firstPage){
 			field.setText("1");
+			excuteSearchMethod(new Long(1));
 		}
 		if(e.getSource() == prewPage){
 			Integer page = Integer.parseInt(field.getText());
@@ -170,56 +176,39 @@ public class PageToolBar<T> extends JPanel implements ActionListener{
 			}else{
 				field.setText(String.valueOf((page - 1)));
 				field.setToolTipText(String.valueOf(page - 1));
+				excuteSearchMethod(Long.valueOf(String.valueOf(page - 1)));
 			}
 		}
 		if(e.getSource() == nextPage){
-//			Integer page = Integer.parseInt(field.getText());
-//			Integer totalpage = (int) Math.round(1.0 * num/num_per);
-//			if(page.equals(totalpage)){
-//				field.setText(String.valueOf(totalpage));
-//				field.setToolTipText(String.valueOf(totalpage));
-//			}else{
-//				field.setText(String.valueOf((page + 1)));
-//				field.setToolTipText(String.valueOf(page + 1));
-//			}
-			label3.setText("a");
-			label3.setBounds(132, 3, m++, 22);
-			System.out.println(m + " &&  " + "a".length());
+			Integer page = Integer.parseInt(field.getText());
+			Integer totalpage = (int) Math.round(Math.ceil(1.0 * totalNumber/num_per));
+			if(page.equals(totalpage)){
+				field.setText(String.valueOf(totalpage));
+				field.setToolTipText(String.valueOf(totalpage));
+			}else{
+				field.setText(String.valueOf((page + 1)));
+				field.setToolTipText(String.valueOf(page + 1));
+				excuteSearchMethod(Long.valueOf(String.valueOf(page + 1)));
+			}
 		}
 		if(e.getSource() == lastPage){
-			Integer totalpage = (int) Math.round(1.0 * num/num_per);
+			Integer totalpage = (int) Math.round(Math.ceil(1.0 * totalNumber/num_per));
 			field.setText(String.valueOf(totalpage));
 			field.setToolTipText(String.valueOf(totalpage));
-//			try {
-//				for(Method m :frame.getDeclaredMethods()){
-//					if(m.getName().equals("search")){
-//						m.setAccessible(true);
-//						m.invoke(frame.newInstance(), Long.valueOf(String.valueOf(totalpage)),Long.valueOf(String.valueOf(num_per)));
-//						break;
-//					}
-//				}
-//			} catch (SecurityException e1) {
-//				e1.printStackTrace();
-//			} catch (IllegalAccessException e1) {
-//				e1.printStackTrace();
-//			} catch (IllegalArgumentException e1) {
-//				e1.printStackTrace();
-//			} catch (InvocationTargetException e1) {
-//				e1.printStackTrace();
-//			} catch (InstantiationException e1) {
-//				e1.printStackTrace();
-//			}
+			excuteSearchMethod(Long.valueOf(String.valueOf(totalpage)));
 		}
 		if(e.getSource() == comboBox){
 			num_per = (Integer)comboBox.getSelectedItem();
-			label3.setText(Math.round(Math.ceil(1.0 * num/num_per)) + "页");
+			label3.setText(Math.round(Math.ceil(1.0 * totalNumber/num_per)) + "");
+			excuteSearchMethod(new Long(1));
 		}
 		
 		if(e.getSource() == refresh){
 			field.setText("1");
 			num_per = 15;
-			label3.setText(Math.round(Math.ceil(1.0 * num/num_per)) + "页");
+			label3.setText(Math.round(Math.ceil(1.0 * totalNumber/num_per)) +"");
 			comboBox.setSelectedItem(num_per);
+			excuteSearchMethod(new Long(1));
 		}
 	}
 	
@@ -227,22 +216,59 @@ public class PageToolBar<T> extends JPanel implements ActionListener{
 		if(pages == 0){
 			return 1;
 		}else{
-			return (int) Math.round(Math.ceil(1.0 * num/num_per));
+			return (int) Math.round(Math.ceil(1.0 * totalNumber/num_per));
 		}
 	}
 	
+	public Integer getPanelLength(){
+		return totalPanelLength;
+	}
+	
 	private Integer getLabelLength(String labelText){
-		int length = labelText.length();
-		return (length * 7 + 1);
-		//如果为汉字
-//		return (length * 13 + 1)
+		int length = 0;
+		//计算汉字的长度
+		String str = labelText.replaceAll("[a-zA-Z0-9|]", "");
+		int charaLength = str.length();
+		if(charaLength == 0){
+			length += 0;
+		}else{
+			length += (charaLength * 13 + 1);
+		}
+		//计算数字和字符的长度
+		int charlength = labelText.length() - charaLength;
+		if(charlength == 0){
+			length += 0;
+		}else{
+			length += (charlength * 7 + 1);
+		}
+		return length;
+	}
+	
+	private void excuteSearchMethod(Long pageNumber){
+		try {
+			for(Method m :frame.getClass().getDeclaredMethods()){
+				if(m.getName().equals("search")){
+					m.setAccessible(true);
+					m.invoke(frame,pageNumber,Long.valueOf(String.valueOf(num_per)));
+					break;
+				}
+			}
+		} catch (SecurityException e1) {
+			e1.printStackTrace();
+		} catch (IllegalAccessException e1) {
+			e1.printStackTrace();
+		} catch (IllegalArgumentException e1) {
+			e1.printStackTrace();
+		} catch (InvocationTargetException e1) {
+			e1.printStackTrace();
+		}
 	}
 
 	public static void main(String[] args){
 		JFrame frame = new JFrame();
 		frame.setLayout(null);
-		PageToolBar<InstockFrame> toolbar = new PageToolBar<InstockFrame>(InstockFrame.class,1500000000);
-		toolbar.setBounds(new Rectangle(20,20,520,22));
+		PageToolBar<InstockFrame> toolbar = new PageToolBar<InstockFrame>(new InstockFrame(),5);
+		toolbar.setBounds(new Rectangle(20,20,515,22));
 		frame.add(toolbar);
 		
 		frame.setSize(600, 100);

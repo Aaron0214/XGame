@@ -48,7 +48,8 @@ public class UserFrame extends JPanel implements ActionListener{
 	private DatePicker datepicker,datepicker1;
 	private static List<Map<String,Object>> str = new ArrayList<Map<String,Object>>();
 	private UserMapper userkMapper = new UserMapper();
-	private PageToolBar pageTool;
+	private PageToolBar<UserFrame> pageTool;
+	private Integer totalNumber;
 	
 	public UserFrame(){
 		this.setLayout(null);
@@ -169,8 +170,8 @@ public class UserFrame extends JPanel implements ActionListener{
 			}
 		});
         
-        pageTool = new PageToolBar(null,0);
-        pageTool.setBounds(new Rectangle(255,455,411,22));
+        pageTool = new PageToolBar<UserFrame>(this,totalNumber);
+        pageTool.setBounds(new Rectangle(668-pageTool.getPanelLength(),455,pageTool.getPanelLength()-3,22));
         
         button = new JButton("添加");
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -209,8 +210,9 @@ public class UserFrame extends JPanel implements ActionListener{
         
         this.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
-				if(e.getSource() != datepicker){
+				if(e.getSource() != datepicker || e.getSource() != datepicker1){
 					datepicker.hidePanel();
+					datepicker1.hidePanel();
 				}
 			}
 		});
@@ -220,12 +222,7 @@ public class UserFrame extends JPanel implements ActionListener{
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource() == search){
-			UserSearchBean searchBean = new UserSearchBean();
-			searchBean.setCode(field.getText());
-			searchBean.setStartDate(startDate.getText());
-			searchBean.setEndDate(endDate.getText());
-			searchBean.setType(type.getSelectedItem().toString());
-			getDatas(searchBean);
+			search(new Long(1),new Long(15));
 		}
 		if(e.getSource() == button){
 			new ManageUserFrame(this,null,"add");
@@ -271,11 +268,15 @@ public class UserFrame extends JPanel implements ActionListener{
 		item1.put("value", "N");
 		str.add(item1);
 		
-		getDatas(new UserSearchBean());
+		UserSearchBean searchBean = new UserSearchBean();
+		searchBean.setPageNumber(new Long(1));
+		searchBean.setPageSize(new Long(15));
+		getDatas(searchBean);
 	}
 	
 	public void getDatas(UserSearchBean searchBean){
 		List<UserOperateBean> userBeanList = userkMapper.selectUsersByParams(searchBean);
+		totalNumber = userBeanList.size();
 		if(CollectionUtils.isNotEmpty(userBeanList)){
 			rowData.clear();
 			for(UserOperateBean userBean:userBeanList){
@@ -287,6 +288,17 @@ public class UserFrame extends JPanel implements ActionListener{
 		if(table != null){
 			table.updateTable();
 		}
+	}
+	
+	private void search(long pageNumber,long pageSize){
+		UserSearchBean searchBean = new UserSearchBean();
+		searchBean.setCode(field.getText());
+		searchBean.setStartDate(startDate.getText());
+		searchBean.setEndDate(endDate.getText());
+		searchBean.setType(type.getSelectedItem().toString());
+		searchBean.setPageNumber(pageNumber);
+		searchBean.setPageSize(pageSize);
+		getDatas(searchBean);
 	}
 	
 	private Vector<Object> buildVectorData(UserOperateBean userBean){

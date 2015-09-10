@@ -176,8 +176,8 @@ public class InstockFrame extends JPanel implements ActionListener{
 			}
 		});
         
-        pageTool = new PageToolBar<InstockFrame>(InstockFrame.class,totalNumber);
-        pageTool.setBounds(new Rectangle(255,455,411,22));
+        pageTool = new PageToolBar<InstockFrame>(this,totalNumber);
+        pageTool.setBounds(new Rectangle(668-pageTool.getPanelLength(),455,pageTool.getPanelLength()-3,22));
         
         button = new JButton("添加");
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -215,8 +215,9 @@ public class InstockFrame extends JPanel implements ActionListener{
         
         this.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
-				if(e.getSource() != datepicker){
+				if(e.getSource() != datepicker || e.getSource() != datepicker1){
 					datepicker.hidePanel();
+					datepicker1.hidePanel();
 				}
 			}
 		});

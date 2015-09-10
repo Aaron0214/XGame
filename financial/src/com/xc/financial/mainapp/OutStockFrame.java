@@ -60,7 +60,8 @@ public class OutStockFrame extends JPanel implements ActionListener{
 	private OutstockMapper outstockMapper = new OutstockMapper();
 	private CodeDictMapper codeDictMapper = new CodeDictMapper();
 	private SnMapper snMapper = new SnMapper();
-	private PageToolBar pageTool;
+	private PageToolBar<OutStockFrame> pageTool;
+	private Integer totalNumber;
 	
 	public OutStockFrame(){
 		this.setLayout(null);
@@ -180,8 +181,8 @@ public class OutStockFrame extends JPanel implements ActionListener{
 			}
 		});
         
-        pageTool = new PageToolBar(null,0);
-        pageTool.setBounds(new Rectangle(255,455,411,22));
+        pageTool = new PageToolBar<OutStockFrame>(this,totalNumber);
+        pageTool.setBounds(new Rectangle(668-pageTool.getPanelLength(),455,pageTool.getPanelLength()-3,22));
         
         button = new JButton("添加");
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -219,8 +220,9 @@ public class OutStockFrame extends JPanel implements ActionListener{
         
         this.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
-				if(e.getSource() != datepicker){
+				if(e.getSource() != datepicker || e.getSource() != datepicker1){
 					datepicker.hidePanel();
+					datepicker1.hidePanel();
 				}
 			}
 		});
@@ -230,13 +232,7 @@ public class OutStockFrame extends JPanel implements ActionListener{
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource() == search){
-			OutstockSearchBean searchBean = new OutstockSearchBean();
-			searchBean.setCode(field.getText());
-			searchBean.setStartDate(startDate.getText());
-			searchBean.setEndDate(endDate.getText());
-			searchBean.setType(StringUtils.isEmpty(type.getSelectedItemValue()) ? null : type.getSelectedItemValue().toString());
-			searchBean.setPurSource(StringUtils.isEmpty(store.getSelectedItemValue()) ? null : (Integer)store.getSelectedItemValue());
-			getDatas(searchBean);
+			search(new Long(1),new Long(15));
 		}
 		if(e.getSource() == button){
 			table.addTableRow();
@@ -291,7 +287,10 @@ public class OutStockFrame extends JPanel implements ActionListener{
 				purSource.add(item);
 			}
 		}
-		getDatas(new OutstockSearchBean());
+		OutstockSearchBean searchBean = new OutstockSearchBean();
+		searchBean.setPageNumber(new Long(1));
+		searchBean.setPageSize(new Long(15));
+		getDatas(searchBean);
 	}
 	
 	private void saveUpdateData(){
@@ -310,7 +309,10 @@ public class OutStockFrame extends JPanel implements ActionListener{
 					e1.printStackTrace();
 				}
 			}
-			getDatas(new OutstockSearchBean());
+			OutstockSearchBean searchBean = new OutstockSearchBean();
+			searchBean.setPageNumber(new Long(1));
+			searchBean.setPageSize(new Long(15));
+			getDatas(searchBean);
 		}else{
 			JOptionPane.showMessageDialog(null, "请先选择需要保存的数据！");
 		}
@@ -318,6 +320,7 @@ public class OutStockFrame extends JPanel implements ActionListener{
 	
 	private void getDatas(OutstockSearchBean searchBean){
 		List<OutstockBean> outstockBeanList = outstockMapper.selectOutstocksByParams(searchBean);
+		totalNumber = outstockBeanList.size();
 		if(CollectionUtils.isNotEmpty(outstockBeanList)){
 			rowData.clear();
 			for(OutstockBean outstockBean : outstockBeanList){
@@ -329,6 +332,18 @@ public class OutStockFrame extends JPanel implements ActionListener{
 		if(table != null){
 			table.updateTable();
 		}
+	}
+	
+	private void search(long pageNumber,long pageSize){
+		OutstockSearchBean searchBean = new OutstockSearchBean();
+		searchBean.setCode(field.getText());
+		searchBean.setStartDate(startDate.getText());
+		searchBean.setEndDate(endDate.getText());
+		searchBean.setType(StringUtils.isEmpty(type.getSelectedItemValue()) ? null : type.getSelectedItemValue().toString());
+		searchBean.setPurSource(StringUtils.isEmpty(store.getSelectedItemValue()) ? null : (Integer)store.getSelectedItemValue());
+		searchBean.setPageNumber(pageNumber);
+		searchBean.setPageSize(pageSize);
+		getDatas(searchBean);
 	}
 	
 	private Vector<Object> buildVectorData(OutstockBean outstockBean){

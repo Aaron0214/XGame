@@ -47,6 +47,8 @@ public class CodeDictFrame extends JPanel implements ActionListener{
 	private static List<Map<String,Object>> str = new ArrayList<Map<String,Object>>();
 	private static List<Map<String,Object>> parent = new ArrayList<Map<String,Object>>();
 	private CodeDictMapper codeDictMapper = new CodeDictMapper();
+	private PageToolBar<CodeDictFrame> pageTool;
+	private Integer totalNumber;
 	
 	public CodeDictFrame(){
 		this.setLayout(null);
@@ -111,9 +113,15 @@ public class CodeDictFrame extends JPanel implements ActionListener{
 		columns.add(2);
 		columns.add(4);
 		table.initCombox(columns);
+		table.setOpaque(false);
 		
         pane3 = new JScrollPane(table);
-        pane3.setBounds(new Rectangle(2,50,670,420));
+        pane3.setOpaque(false);
+        pane3.getViewport().setOpaque(false);
+        pane3.setBounds(new Rectangle(2,50,670,450));
+        
+        pageTool = new PageToolBar<CodeDictFrame>(this,totalNumber);
+        pageTool.setBounds(new Rectangle(668-pageTool.getPanelLength(),455,pageTool.getPanelLength()-3,22));
         
         button = new JButton("添加");
         button.setBounds(new Rectangle(240,508,60,25));
@@ -123,7 +131,6 @@ public class CodeDictFrame extends JPanel implements ActionListener{
         delete = new JButton("删除");
         delete.setCursor(new Cursor(Cursor.HAND_CURSOR));
         delete.setBounds(new Rectangle(380,508,60,25));
-		
         
         search.addActionListener(this);
         button.addActionListener(this);
@@ -137,6 +144,7 @@ public class CodeDictFrame extends JPanel implements ActionListener{
         this.add(search);
         
         this.add(pane3);
+        this.add(pageTool);
         this.add(button);
         this.add(save);
         this.add(delete);
@@ -147,10 +155,7 @@ public class CodeDictFrame extends JPanel implements ActionListener{
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource() == search){
-			SearchBean searchBean = new SearchBean();
-			searchBean.setId(StringUtils.isEmpty(field.getText()) ? null : Integer.parseInt(field.getText()));
-			searchBean.setType(type.getSelectedItemValue() == null ? null : type.getSelectedItemValue() .toString());
-			getDatas(searchBean);
+			search(new Long(1),new Long(15));
 		}
 		if(e.getSource() == button){
 			table.addTableRow(false);
@@ -193,7 +198,10 @@ public class CodeDictFrame extends JPanel implements ActionListener{
 		
 		parent.add(black);
 		
-		getDatas(new SearchBean());
+		SearchBean searchBean = new SearchBean();
+		searchBean.setPageNumber(new Long(1));
+		searchBean.setPageSize(new Long(15));
+		getDatas(searchBean);
 	}
 	
 	private void saveUpdateData(){
@@ -210,7 +218,10 @@ public class CodeDictFrame extends JPanel implements ActionListener{
 					e1.printStackTrace();
 				}
 			}
-			getDatas(new SearchBean());
+			SearchBean searchBean = new SearchBean();
+			searchBean.setPageNumber(new Long(1));
+			searchBean.setPageSize(new Long(15));
+			getDatas(searchBean);
 		}else{
 			JOptionPane.showMessageDialog(null, "请先选择需要保存的数据！");
 		}
@@ -218,6 +229,7 @@ public class CodeDictFrame extends JPanel implements ActionListener{
 	
 	private void getDatas(SearchBean searchBean){
 		List<CodeDictBean> codeDictBeanList = codeDictMapper.selectCodeDictsByParams(searchBean);
+		totalNumber = codeDictBeanList.size();
 		if(CollectionUtils.isNotEmpty(codeDictBeanList)){
 			rowData.clear();
 			parent.clear();
@@ -242,6 +254,15 @@ public class CodeDictFrame extends JPanel implements ActionListener{
 		}
 	}
 	
+	private void search(long pageNumber,long pageSize){
+		SearchBean searchBean = new SearchBean();
+		searchBean.setId(StringUtils.isEmpty(field.getText()) ? null : Integer.parseInt(field.getText()));
+		searchBean.setType(type.getSelectedItemValue() == null ? null : type.getSelectedItemValue() .toString());
+		searchBean.setPageNumber(pageNumber);
+		searchBean.setPageSize(pageSize);
+		getDatas(searchBean);
+	}
+	
 	private Vector<Object> buildVectorData(CodeDictBean codeDictBean){
 		try {
 			return ObjectUtils.createNewVecto(codeDictBean);
@@ -258,7 +279,7 @@ public class CodeDictFrame extends JPanel implements ActionListener{
 		panel.setVisible(true);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	    frame.add(panel,BorderLayout.CENTER);
-	    frame.setSize(680, 580);
+	    frame.setSize(680, 570);
 	    frame.setLocationRelativeTo(null);
 	    frame.setResizable(false);
 	    frame.setVisible(true);

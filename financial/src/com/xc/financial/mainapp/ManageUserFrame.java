@@ -493,7 +493,10 @@ public class ManageUserFrame implements ActionListener{
 		if(e.getSource() == save){
 			frame.dispose();
 			saveUpdateData(operate);
-			userFrame.getDatas(new UserSearchBean());
+			UserSearchBean searchBean = new UserSearchBean();
+			searchBean.setPageNumber(new Long(1));
+			searchBean.setPageSize(new Long(15));
+			userFrame.getDatas(searchBean);
 		}
 		
 		if(e.getSource() == cancel){
