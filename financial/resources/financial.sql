@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50623
 File Encoding         : 65001
 
-Date: 2015-09-07 17:48:07
+Date: 2015-09-11 17:04:38
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -3594,7 +3594,7 @@ DROP TABLE IF EXISTS `financial`;
 CREATE TABLE `financial` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `code` varchar(255) DEFAULT NULL,
-  `member` varchar(255) DEFAULT NULL,
+  `member` int(255) DEFAULT NULL,
   `type` int(255) DEFAULT NULL,
   `amount` decimal(20,6) DEFAULT NULL,
   `create_date` datetime DEFAULT NULL,
@@ -3607,8 +3607,8 @@ CREATE TABLE `financial` (
 -- ----------------------------
 -- Records of financial
 -- ----------------------------
-INSERT INTO `financial` VALUES ('1', 'F20150828000002', 'member', '3597', '10000.000000', '2015-08-28 17:43:04', '2015-09-07 17:21:57', '收入', null);
-INSERT INTO `financial` VALUES ('2', 'F20150902000005', 'member', '3597', '10000.000000', '2015-09-02 11:10:32', '2015-09-07 17:21:57', '收入', null);
+INSERT INTO `financial` VALUES ('1', 'F20150828000002', '0', '3597', '20000.000000', '2015-08-28 17:43:04', '2015-09-11 15:46:49', '收入', null);
+INSERT INTO `financial` VALUES ('2', 'F20150902000005', '0', '3598', '10000.000000', '2015-09-02 11:10:32', '2015-09-11 15:46:49', '收入', null);
 
 -- ----------------------------
 -- Table structure for instock
@@ -3618,23 +3618,25 @@ CREATE TABLE `instock` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `code` varchar(255) DEFAULT NULL,
   `type` varchar(255) DEFAULT NULL,
-  `member` varchar(255) DEFAULT NULL,
+  `member` int(255) DEFAULT NULL,
   `amount` decimal(20,6) DEFAULT NULL,
   `store_type` int(11) DEFAULT NULL,
   `create_date` datetime DEFAULT NULL,
   `modify_date` datetime DEFAULT NULL,
   `operate` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of instock
 -- ----------------------------
-INSERT INTO `instock` VALUES ('1', 'F20150826000001', '3585', 'A', '2.500000', '3598', '2015-08-26 15:43:48', '2015-09-07 17:19:40', null);
-INSERT INTO `instock` VALUES ('2', 'F20150828000002', '3585', 'member', '2.500000', '3598', '2015-08-28 14:34:05', '2015-08-26 15:43:48', null);
-INSERT INTO `instock` VALUES ('3', 'F20150828000003', '3585', 'member1', '2.500000', '3598', '2015-08-28 17:46:42', '2015-08-26 15:43:48', null);
-INSERT INTO `instock` VALUES ('4', 'F20150828000005', '3586', 'member', '10000.000000', '3597', '2015-08-28 17:53:40', '2015-08-28 17:53:40', null);
-INSERT INTO `instock` VALUES ('5', 'F20150828000007', '3586', 'member', '10000.000000', '3597', '2015-08-28 17:57:10', '2015-08-28 17:57:10', null);
+INSERT INTO `instock` VALUES ('1', 'F20150826000001', '3585', '0', '2.500000', '3598', '2015-08-26 15:43:48', '2015-09-07 17:19:40', null);
+INSERT INTO `instock` VALUES ('2', 'F20150828000002', '3585', '1', '2.500000', '3598', '2015-08-28 14:34:05', '2015-09-11 16:17:50', null);
+INSERT INTO `instock` VALUES ('3', 'F20150828000003', '3585', '0', '2.500000', '3598', '2015-08-28 17:46:42', '2015-08-26 15:43:48', null);
+INSERT INTO `instock` VALUES ('4', 'F20150828000005', '3586', '0', '10000.000000', '3597', '2015-08-28 17:53:40', '2015-08-28 17:53:40', null);
+INSERT INTO `instock` VALUES ('5', 'F20150828000007', '3586', '0', '10000.000000', '3597', '2015-08-28 17:57:10', '2015-08-28 17:57:10', null);
+INSERT INTO `instock` VALUES ('6', 'F20150910000008', '3586', '0', '5000.000000', '3597', '2015-09-10 11:03:41', '2015-09-10 11:03:41', null);
+INSERT INTO `instock` VALUES ('7', 'F20150911000009', '3586', '0', '10000.000000', '3597', '2015-09-11 15:47:55', '2015-09-11 15:47:55', null);
 
 -- ----------------------------
 -- Table structure for outstock
@@ -3643,7 +3645,7 @@ DROP TABLE IF EXISTS `outstock`;
 CREATE TABLE `outstock` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `code` varchar(255) DEFAULT NULL,
-  `member` varchar(255) DEFAULT NULL,
+  `member` int(255) DEFAULT NULL,
   `type` varchar(255) DEFAULT NULL,
   `amount` decimal(20,0) DEFAULT NULL,
   `pur_source` int(11) DEFAULT NULL,
@@ -3657,7 +3659,20 @@ CREATE TABLE `outstock` (
 -- ----------------------------
 -- Records of outstock
 -- ----------------------------
-INSERT INTO `outstock` VALUES ('1', 'F20150828000007', 'member', '3591', '12', '3598', '2015-08-28 16:37:49', '2015-09-07 17:22:18', '买零食', null);
+INSERT INTO `outstock` VALUES ('1', 'F20150828000007', '0', '3591', '12', '3598', '2015-08-28 16:37:49', '2015-09-07 17:22:18', '买零食', null);
+
+-- ----------------------------
+-- Table structure for relationship
+-- ----------------------------
+DROP TABLE IF EXISTS `relationship`;
+CREATE TABLE `relationship` (
+  `user_id` int(11) DEFAULT NULL,
+  `relation_user_id` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of relationship
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for sn
@@ -3674,7 +3689,7 @@ CREATE TABLE `sn` (
 -- Records of sn
 -- ----------------------------
 INSERT INTO `sn` VALUES ('1', '2', '0');
-INSERT INTO `sn` VALUES ('2', '7', '1');
+INSERT INTO `sn` VALUES ('2', '9', '1');
 INSERT INTO `sn` VALUES ('3', '7', '2');
 INSERT INTO `sn` VALUES ('4', '5', '3');
 
