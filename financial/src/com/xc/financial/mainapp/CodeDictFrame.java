@@ -143,8 +143,8 @@ public class CodeDictFrame extends JPanel implements ActionListener{
         this.add(type);
         this.add(search);
         
-        this.add(pane3);
         this.add(pageTool);
+        this.add(pane3);
         this.add(button);
         this.add(save);
         this.add(delete);
@@ -156,6 +156,7 @@ public class CodeDictFrame extends JPanel implements ActionListener{
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource() == search){
 			search(new Long(1),new Long(15));
+			pageTool.setSelectedValue(15);
 		}
 		if(e.getSource() == button){
 			table.addTableRow(false);
@@ -181,19 +182,24 @@ public class CodeDictFrame extends JPanel implements ActionListener{
 		black.put("value", null);
 		str.add(black);
 		
+		Map<String,Object> item3 = new HashMap<String,Object>();
+		item3.put("label", "区域");
+		item3.put("value", 0);
+		str.add(item3);
+		
 		Map<String,Object> item = new HashMap<String,Object>();
 		item.put("label", "收入");
-		item.put("value", 0);
+		item.put("value", 1);
 		str.add(item);
 		
 		Map<String,Object> item1 = new HashMap<String,Object>();
 		item1.put("label", "支出");
-		item1.put("value", 1);
+		item1.put("value", 2);
 		str.add(item1);
 		
 		Map<String,Object> item2 = new HashMap<String,Object>();
 		item2.put("label", "余额");
-		item2.put("value", 2);
+		item2.put("value", 3);
 		str.add(item2);
 		
 		parent.add(black);
@@ -228,8 +234,12 @@ public class CodeDictFrame extends JPanel implements ActionListener{
 	}
 	
 	private void getDatas(SearchBean searchBean){
+		totalNumber = codeDictMapper.getCount(searchBean);
+		if(null != pageTool){
+			pageTool.setTotalNumber(totalNumber);
+			pageTool.setBounds(new Rectangle(668-pageTool.getPanelLength(),455,pageTool.getPanelLength()-3,22));
+		}
 		List<CodeDictBean> codeDictBeanList = codeDictMapper.selectCodeDictsByParams(searchBean);
-		totalNumber = codeDictBeanList.size();
 		if(CollectionUtils.isNotEmpty(codeDictBeanList)){
 			rowData.clear();
 			parent.clear();

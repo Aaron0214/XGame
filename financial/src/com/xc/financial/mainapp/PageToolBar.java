@@ -200,6 +200,7 @@ public class PageToolBar<T> extends JPanel implements ActionListener{
 		if(e.getSource() == comboBox){
 			num_per = (Integer)comboBox.getSelectedItem();
 			label3.setText(Math.round(Math.ceil(1.0 * totalNumber/num_per)) + "");
+			field.setText("1");
 			excuteSearchMethod(new Long(1));
 		}
 		
@@ -210,6 +211,30 @@ public class PageToolBar<T> extends JPanel implements ActionListener{
 			comboBox.setSelectedItem(num_per);
 			excuteSearchMethod(new Long(1));
 		}
+	}
+	
+	public void setSelectedValue(Integer value){
+		num_per = value;
+		comboBox.setSelectedItem(value);
+	}
+	
+	public void setTotalNumber(Integer total){
+		totalNumber = total;
+		Integer length = getLabelLength(getPageNumber(totalNumber) + "");
+		label3.setText(getPageNumber(totalNumber) + "");
+		label3.setBounds(new Rectangle(130,3,length,16));
+		label7.setBounds(new Rectangle(130 + length,3,14,16));
+		nextPage.setBounds(new Rectangle(145 + length,3,(int)nextPage.getBounds().getWidth(),(int)nextPage.getBounds().getHeight()));
+		lastPage.setBounds(new Rectangle(165 + length,3,(int)lastPage.getBounds().getWidth(),(int)lastPage.getBounds().getHeight()));
+		label4.setBounds(new Rectangle(180 + length,3,45,16));
+		comboBox.setBounds(new Rectangle(225 + length,3,45,16));
+		label5.setBounds(new Rectangle(275 + length,3,15,16));
+		refresh.setBounds(new Rectangle(295 + length,3,(int)refresh.getBounds().getWidth(),(int)refresh.getBounds().getHeight()));
+		Integer labelLength = getLabelLength(" |共" + totalNumber + "条数据");
+		label6.setText(" |共" + totalNumber + "条数据");
+		label6.setBounds(new Rectangle(310 + length,3,labelLength,16));
+		totalPanelLength = 310 + length + labelLength;
+		this.updateUI();
 	}
 	
 	private Integer getPageNumber(Integer pages){

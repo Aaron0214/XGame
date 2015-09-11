@@ -302,4 +302,47 @@ public class CodeDictMapper {
 			}
 		}
 	}
+	
+	/**
+	 * <p>
+	 * 查询数据数量
+	 * </p>
+	 * 
+	 * @param data
+	 * @return
+	 */
+	public Integer getCount(SearchBean searchBean){
+		try{
+			StringBuffer sb = new StringBuffer();	
+			sb.append("select count(*) as count from code_dict c where 1=1 ");
+			
+			if(null != searchBean.getId()){
+				sb.append(" and c.id = '" + searchBean.getId() + "'");
+			}
+			
+			if(StringUtils.isNotEmpty(searchBean.getType())){
+				sb.append(" and c.type = " + Integer.parseInt(searchBean.getType()));
+			}
+			
+			connect = DriverManager.getConnection(url, username, password);
+			statement = connect.createStatement();
+			result = statement.executeQuery(sb.toString());
+			int count = 0;
+			while(result.next()){
+				count = Integer.parseInt(result.getString("count"));
+			}
+			return count;
+		}catch(SQLException e){
+			e.printStackTrace();
+			return -1;
+		}finally{
+			try {
+				result.close();
+				statement.close();
+				connect.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
 }

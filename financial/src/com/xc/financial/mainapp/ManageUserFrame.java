@@ -65,7 +65,7 @@ public class ManageUserFrame implements ActionListener{
 	private DatePicker datepicker;
 	private UserFrame userFrame;
 	
-	public ManageUserFrame(UserFrame userFrame,String userCode,String operate){
+	public ManageUserFrame(final UserFrame userFrame,String userCode,String operate){
 		this.operate = operate;
 		this.userFrame = userFrame;
 		frame = new JFrame();
@@ -313,9 +313,12 @@ public class ManageUserFrame implements ActionListener{
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
 		frame.addWindowListener(new WindowAdapter(){
+			@SuppressWarnings("deprecation")
 			@Override
 			public void windowClosing(WindowEvent e){
 				frame.dispose();
+				userFrame.getFrame().setEnabled(true);
+				userFrame.getFrame().show();
 			}
 		});
 	}
@@ -488,6 +491,7 @@ public class ManageUserFrame implements ActionListener{
 		zipCodeField.setText(userBean.getAddressBean().getZipCode());
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource() == save){
@@ -501,6 +505,8 @@ public class ManageUserFrame implements ActionListener{
 		
 		if(e.getSource() == cancel){
 			frame.dispose();
+			userFrame.getFrame().setEnabled(true);
+			userFrame.getFrame().show();
 		}
 		
 		if(e.getSource() == provinceField){

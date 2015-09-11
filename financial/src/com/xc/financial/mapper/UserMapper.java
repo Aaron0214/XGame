@@ -393,24 +393,24 @@ public class UserMapper {
 			sb.append("left join code_dict town on a.town_code = town.code where 1=1");
 			
 			if(StringUtils.isNotEmpty(searchBean.getName())){
-				sb.append(" and name like '%" + searchBean.getName() +"%'");
+				sb.append(" and u.name like '%" + searchBean.getName() +"%'");
 			}
 			
 			if(StringUtils.isNotEmpty(searchBean.getUsername())){
-				sb.append(" and username like '%" + searchBean.getUsername() +"%'");
+				sb.append(" and u.username like '%" + searchBean.getUsername() +"%'");
 			}
 			
 			if(StringUtils.isNotEmpty(searchBean.getCode())){
-				sb.append(" and code like '%" + searchBean.getCode() +"%'");
+				sb.append(" and u.code like '%" + searchBean.getCode() +"%'");
 			}
 			if(StringUtils.isNotEmpty(searchBean.getStartDate())){
-				sb.append(" and create_Date >= '" + DateUtils.dayBegin(DateUtils.parseSingleDate(searchBean.getStartDate())) + "'");
+				sb.append(" and u.create_Date >= '" + DateUtils.dayBegin(DateUtils.parseSingleDate(searchBean.getStartDate())) + "'");
 			}
 			if(StringUtils.isNotEmpty(searchBean.getEndDate())){
-				sb.append(" and create_Date <= '" + DateUtils.dayEnd(DateUtils.parseSingleDate(searchBean.getEndDate())) + "'");
+				sb.append(" and u.create_Date <= '" + DateUtils.dayEnd(DateUtils.parseSingleDate(searchBean.getEndDate())) + "'");
 			}
 			if(StringUtils.isNotEmpty(searchBean.getStatus())){
-				sb.append(" and status = '" + searchBean.getStatus() + "'");
+				sb.append(" and u.status = '" + searchBean.getStatus() + "'");
 			}
 			
 			connect = DriverManager.getConnection(url, username, password);
@@ -466,6 +466,62 @@ public class UserMapper {
 			}
 		}
 	}
+	
+	/**
+	 * <p>
+	 * 查询数据数量
+	 * </p>
+	 * 
+	 * @param data
+	 * @return
+	 */
+	public Integer getCount(UserSearchBean searchBean){
+		try{
+			StringBuffer sb = new StringBuffer();	
+			sb.append("select count(*) as count from user where 1=1 ");
+			
+			if(StringUtils.isNotEmpty(searchBean.getName())){
+				sb.append(" and name like '%" + searchBean.getName() +"%'");
+			}
+			
+			if(StringUtils.isNotEmpty(searchBean.getUsername())){
+				sb.append(" and username like '%" + searchBean.getUsername() +"%'");
+			}
+			
+			if(StringUtils.isNotEmpty(searchBean.getCode())){
+				sb.append(" and code like '%" + searchBean.getCode() +"%'");
+			}
+			if(StringUtils.isNotEmpty(searchBean.getStartDate())){
+				sb.append(" and create_Date >= '" + DateUtils.dayBegin(DateUtils.parseSingleDate(searchBean.getStartDate())) + "'");
+			}
+			if(StringUtils.isNotEmpty(searchBean.getEndDate())){
+				sb.append(" and create_Date <= '" + DateUtils.dayEnd(DateUtils.parseSingleDate(searchBean.getEndDate())) + "'");
+			}
+			if(StringUtils.isNotEmpty(searchBean.getStatus())){
+				sb.append(" and status = '" + searchBean.getStatus() + "'");
+			}
+			connect = DriverManager.getConnection(url, username, password);
+			statement = connect.createStatement();
+			result = statement.executeQuery(sb.toString());
+			int count = 0;
+			while(result.next()){
+				count = Integer.parseInt(result.getString("count"));
+			}
+			return count;
+		}catch(SQLException e){
+			e.printStackTrace();
+			return -1;
+		}finally{
+			try {
+				result.close();
+				statement.close();
+				connect.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
 	/**
 	 * <p>
 	 * 查询最大的id
@@ -547,6 +603,37 @@ public class UserMapper {
 		}catch(SQLException|ParseException e){
 			e.printStackTrace();
 			return userBean;
+		}finally{
+			try {
+				result.close();
+				statement.close();
+				connect.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	public List<UserBean> selectUserList(){
+		List<UserBean> userBeanList = new ArrayList<UserBean>();
+		try{
+			StringBuffer sb = new StringBuffer();	
+			sb.append("select * from user where status = 'Y' ");
+			
+			connect = DriverManager.getConnection(url, username, password);
+			statement = connect.createStatement();
+			result = statement.executeQuery(sb.toString());
+			while(result.next()){
+				UserBean userBean = new UserBean();
+				userBean.setId(Integer.parseInt(result.getString("id")));
+				userBean.setUsername(result.getString("username"));
+				userBean.setName(result.getString("name"));
+				userBeanList.add(userBean);
+			}
+			return userBeanList;
+		}catch(SQLException e){
+			e.printStackTrace();
+			return userBeanList;
 		}finally{
 			try {
 				result.close();

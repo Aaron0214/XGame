@@ -98,6 +98,7 @@ public class OutstockMapper {
 			StringBuffer sb1 = new StringBuffer();
 			sb1.append("update financial set amount = amount - " + data.get(OutstockColumnEnum.getOutstockColumnValueByKey("amount").getValue()));
 			sb1.append(" where type = " + data.get(OutstockColumnEnum.getOutstockColumnValueByKey("pur_source").getValue()));
+			sb1.append(" and member = " + data.get(OutstockColumnEnum.getOutstockColumnValueByKey("member").getValue()));
 			
 			connect = DriverManager.getConnection(url, username, password);
 			connect.setAutoCommit(false);
@@ -192,6 +193,7 @@ public class OutstockMapper {
 			StringBuffer sb1 = new StringBuffer();
 			sb1.append("update financial set amount = amount - " + ((BigDecimal)data.get(InstockColumnEnum.getInstockColumnValueByKey("amount").getValue())).subtract(o_amount));
 			sb1.append(" where type = " + data.get(OutstockColumnEnum.getOutstockColumnValueByKey("pur_source").getValue()));
+			sb1.append(" and member = " + data.get(OutstockColumnEnum.getOutstockColumnValueByKey("member").getValue()));
 			
 			connect = DriverManager.getConnection(url, username, password);
 			connect.setAutoCommit(false);
@@ -277,6 +279,7 @@ public class OutstockMapper {
 			if(null != searchBean.getPurSource()){
 				sb.append(" and o.pur_source = " + searchBean.getPurSource());
 			}
+			sb.append(" limit " + searchBean.getOffset() + "," + searchBean.getRows());
 			
 			connect = DriverManager.getConnection(url, username, password);
 			statement = connect.createStatement();
@@ -311,6 +314,57 @@ public class OutstockMapper {
 			}
 		}
 	}
+	
+	/**
+	 * <p>
+	 * 查询数据数量
+	 * </p>
+	 * 
+	 * @param data
+	 * @return
+	 */
+	public Integer getCount(OutstockSearchBean searchBean){
+		try{
+			StringBuffer sb = new StringBuffer();	
+			sb.append("select count(*) as count from outstock o where 1=1 ");
+			
+			if(StringUtils.isNotEmpty(searchBean.getCode())){
+				sb.append(" and o.code like '%" + searchBean.getCode() +"%'");
+			}
+			if(StringUtils.isNotEmpty(searchBean.getStartDate())){
+				sb.append(" and o.create_Date >= '" + DateUtils.dayBegin(DateUtils.parseSingleDate(searchBean.getStartDate())) + "'");
+			}
+			if(StringUtils.isNotEmpty(searchBean.getEndDate())){
+				sb.append(" and o.create_Date <= '" + DateUtils.dayEnd(DateUtils.parseSingleDate(searchBean.getEndDate())) + "'");
+			}
+			if(StringUtils.isNotEmpty(searchBean.getType())){
+				sb.append(" and o.type = " + Integer.parseInt(searchBean.getType()));
+			}
+			if(null != searchBean.getPurSource()){
+				sb.append(" and o.pur_source = " + searchBean.getPurSource());
+			}
+			connect = DriverManager.getConnection(url, username, password);
+			statement = connect.createStatement();
+			result = statement.executeQuery(sb.toString());
+			int count = 0;
+			while(result.next()){
+				count = Integer.parseInt(result.getString("count"));
+			}
+			return count;
+		}catch(SQLException e){
+			e.printStackTrace();
+			return -1;
+		}finally{
+			try {
+				result.close();
+				statement.close();
+				connect.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
 	/**
 	 * <p>
 	 * 查询最大的id

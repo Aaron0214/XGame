@@ -298,8 +298,12 @@ public class FinancialFrame extends JPanel implements ActionListener{
 	}
 	
 	private void getDatas(SearchBean searchBean){
+		totalNumber = financialMapper.getCount(searchBean);
+		if(null != pageTool){
+			pageTool.setTotalNumber(totalNumber);
+			pageTool.setBounds(new Rectangle(668-pageTool.getPanelLength(),455,pageTool.getPanelLength()-3,22));
+		}
 		List<FinancialBean> finanacialBeanList = financialMapper.selectFinancialsByParams(searchBean);
-		totalNumber = finanacialBeanList.size();
 		if(CollectionUtils.isNotEmpty(finanacialBeanList)){
 			rowData.clear();
 			for(FinancialBean financialBean : finanacialBeanList){

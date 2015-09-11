@@ -319,8 +319,12 @@ public class OutStockFrame extends JPanel implements ActionListener{
 	}
 	
 	private void getDatas(OutstockSearchBean searchBean){
+		totalNumber = outstockMapper.getCount(searchBean);
+		if(null != pageTool){
+			pageTool.setTotalNumber(totalNumber);
+			pageTool.setBounds(new Rectangle(668-pageTool.getPanelLength(),455,pageTool.getPanelLength()-3,22));
+		}
 		List<OutstockBean> outstockBeanList = outstockMapper.selectOutstocksByParams(searchBean);
-		totalNumber = outstockBeanList.size();
 		if(CollectionUtils.isNotEmpty(outstockBeanList)){
 			rowData.clear();
 			for(OutstockBean outstockBean : outstockBeanList){

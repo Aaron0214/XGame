@@ -29,6 +29,7 @@ import com.xc.financial.enums.column.UserColumnEnum;
 import com.xc.financial.mapper.UserMapper;
 import com.xc.financial.utils.CollectionUtils;
 import com.xc.financial.utils.ObjectUtils;
+import com.xc.financial.utils.StringUtils;
 
 public class UserFrame extends JPanel implements ActionListener{
 	
@@ -43,13 +44,14 @@ public class UserFrame extends JPanel implements ActionListener{
 	private JScrollPane pane3;
 	private JButton button,edit,delete,search;
 	private JLabel label,label1,label2,label3,label4,label5;
-	private MyComboBox type;
+	private MyComboBox status;
 	private JTextField field,field1,field2,startDate,endDate;
 	private DatePicker datepicker,datepicker1;
 	private static List<Map<String,Object>> str = new ArrayList<Map<String,Object>>();
 	private UserMapper userkMapper = new UserMapper();
 	private PageToolBar<UserFrame> pageTool;
 	private Integer totalNumber;
+	private JFrame frame;
 	
 	public UserFrame(){
 		this.setLayout(null);
@@ -80,10 +82,10 @@ public class UserFrame extends JPanel implements ActionListener{
 		label4.setFont(new Font("宋体", Font.PLAIN, 13));
 		label4.setBounds(new Rectangle(530,15,80,20));
 		
-		type = new MyComboBox(str);
-		type.setFont(new Font("宋体", Font.PLAIN, 13));
-		type.setBounds(new Rectangle(570,15,90,20));
-		type.setCursor(new Cursor(Cursor.HAND_CURSOR));
+		status = new MyComboBox(str);
+		status.setFont(new Font("宋体", Font.PLAIN, 13));
+		status.setBounds(new Rectangle(570,15,90,20));
+		status.setCursor(new Cursor(Cursor.HAND_CURSOR));
 		
 		label1 = new JLabel("开始日期：");
 		label1.setFont(new Font("宋体", Font.PLAIN, 13));
@@ -199,7 +201,7 @@ public class UserFrame extends JPanel implements ActionListener{
         this.add(startDate);
         this.add(label2);
         this.add(endDate);
-        this.add(type);
+        this.add(status);
         this.add(search);
         
         this.add(pageTool);
@@ -225,6 +227,7 @@ public class UserFrame extends JPanel implements ActionListener{
 			search(new Long(1),new Long(15));
 		}
 		if(e.getSource() == button){
+			frame.setEnabled(false);
 			new ManageUserFrame(this,null,"add");
 		}
 		if(e.getSource() == edit){
@@ -233,6 +236,7 @@ public class UserFrame extends JPanel implements ActionListener{
 				if(datas.size() > 1){
 					JOptionPane.showMessageDialog(null, "请选择一条数据进行编辑！");
 				}else{
+					frame.setEnabled(false);
 					Map<String, Object> data = datas.get(0);
 					new ManageUserFrame(this,(String)data.get(UserColumnEnum.getUserColumnValueByKey("code").getValue()),"edit");
 				}
@@ -275,8 +279,12 @@ public class UserFrame extends JPanel implements ActionListener{
 	}
 	
 	public void getDatas(UserSearchBean searchBean){
+		totalNumber = userkMapper.getCount(searchBean);
+		if(null != pageTool){
+			pageTool.setTotalNumber(totalNumber);
+			pageTool.setBounds(new Rectangle(668-pageTool.getPanelLength(),455,pageTool.getPanelLength()-3,22));
+		}
 		List<UserOperateBean> userBeanList = userkMapper.selectUsersByParams(searchBean);
-		totalNumber = userBeanList.size();
 		if(CollectionUtils.isNotEmpty(userBeanList)){
 			rowData.clear();
 			for(UserOperateBean userBean:userBeanList){
@@ -295,7 +303,7 @@ public class UserFrame extends JPanel implements ActionListener{
 		searchBean.setCode(field.getText());
 		searchBean.setStartDate(startDate.getText());
 		searchBean.setEndDate(endDate.getText());
-		searchBean.setType(type.getSelectedItem().toString());
+		searchBean.setStatus(StringUtils.isEmpty(status.getSelectedItemValue())?null:status.getSelectedItemValue().toString());
 		searchBean.setPageNumber(pageNumber);
 		searchBean.setPageSize(pageSize);
 		getDatas(searchBean);
@@ -310,15 +318,24 @@ public class UserFrame extends JPanel implements ActionListener{
 		}
 	}
 	
+	public void setFrame(JFrame frame){
+		this.frame = frame;
+	}
+	
+	public JFrame getFrame(){
+		return frame;
+	}
+	
 	public static void main(String[] args){
-		JFrame frame = new JFrame();
-		JPanel panel = new UserFrame();
+		JFrame frame1 = new JFrame();
+		UserFrame panel = new UserFrame();
 		panel.setVisible(true);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-	    frame.add(panel,BorderLayout.CENTER);
-	    frame.setSize(680, 570);
-	    frame.setLocationRelativeTo(null);
-	    frame.setResizable(false);
-	    frame.setVisible(true);
+		panel.setFrame(frame1);
+		frame1.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame1.add(panel,BorderLayout.CENTER);
+		frame1.setSize(680, 570);
+		frame1.setLocationRelativeTo(null);
+		frame1.setResizable(false);
+		frame1.setVisible(true);
 	}
 }

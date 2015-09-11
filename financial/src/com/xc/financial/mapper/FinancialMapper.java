@@ -222,6 +222,7 @@ public class FinancialMapper {
 			if(StringUtils.isNotEmpty(searchBean.getType())){
 				sb.append(" and f.type = " + Integer.parseInt(searchBean.getType()));
 			}
+			sb.append(" limit " + searchBean.getOffset() + "," + searchBean.getRows());
 			
 			connect = DriverManager.getConnection(url, username, password);
 			statement = connect.createStatement();
@@ -244,6 +245,54 @@ public class FinancialMapper {
 		}catch(SQLException|ParseException e){
 			e.printStackTrace();
 			return finanacialList;
+		}finally{
+			try {
+				result.close();
+				statement.close();
+				connect.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	/**
+	 * <p>
+	 * 查询数据数量
+	 * </p>
+	 * 
+	 * @param data
+	 * @return
+	 */
+	public Integer getCount(SearchBean searchBean){
+		try{
+			StringBuffer sb = new StringBuffer();	
+			sb.append("select count(*) as count from financial f where 1=1 ");
+			
+			if(StringUtils.isNotEmpty(searchBean.getCode())){
+				sb.append(" and f.code like '%" + searchBean.getCode() +"%'");
+			}
+			if(StringUtils.isNotEmpty(searchBean.getStartDate())){
+				sb.append(" and f.create_Date >= '" + DateUtils.dayBegin(DateUtils.parseSingleDate(searchBean.getStartDate())) + "'");
+			}
+			if(StringUtils.isNotEmpty(searchBean.getEndDate())){
+				sb.append(" and f.create_Date <= '" + DateUtils.dayEnd(DateUtils.parseSingleDate(searchBean.getEndDate())) + "'");
+			}
+			if(StringUtils.isNotEmpty(searchBean.getType())){
+				sb.append(" and f.type = " + Integer.parseInt(searchBean.getType()));
+			}
+			
+			connect = DriverManager.getConnection(url, username, password);
+			statement = connect.createStatement();
+			result = statement.executeQuery(sb.toString());
+			int count = 0;
+			while(result.next()){
+				count = Integer.parseInt(result.getString("count"));
+			}
+			return count;
+		}catch(SQLException e){
+			e.printStackTrace();
+			return -1;
 		}finally{
 			try {
 				result.close();

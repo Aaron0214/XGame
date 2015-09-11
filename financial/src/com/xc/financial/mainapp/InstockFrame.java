@@ -27,12 +27,14 @@ import javax.swing.JTextField;
 import com.xc.financial.beans.CodeDictBean;
 import com.xc.financial.beans.InstockBean;
 import com.xc.financial.beans.InstockSearchBean;
+import com.xc.financial.beans.UserBean;
 import com.xc.financial.enums.CodeDictEnum;
 import com.xc.financial.enums.SnTypeEnum;
 import com.xc.financial.enums.column.InstockColumnEnum;
 import com.xc.financial.mapper.CodeDictMapper;
 import com.xc.financial.mapper.InstockMapper;
 import com.xc.financial.mapper.SnMapper;
+import com.xc.financial.mapper.UserMapper;
 import com.xc.financial.utils.CollectionUtils;
 import com.xc.financial.utils.DateUtils;
 import com.xc.financial.utils.NumberFormatUtils;
@@ -57,9 +59,11 @@ public class InstockFrame extends JPanel implements ActionListener{
 	private DatePicker datepicker,datepicker1;
 	private List<Map<String,Object>> str = new ArrayList<Map<String,Object>>();
 	private List<Map<String,Object>> storeType = new ArrayList<Map<String,Object>>();
+	private List<Map<String,Object>> userList = new ArrayList<Map<String,Object>>();
 	private InstockMapper instockMapper = new InstockMapper();
 	private CodeDictMapper codeDictMapper = new CodeDictMapper();
 	private SnMapper snMapper = new SnMapper();
+	private UserMapper userMapper = new UserMapper();
 	private PageToolBar<InstockFrame> pageTool;
 	private Integer totalNumber;
 	
@@ -150,6 +154,8 @@ public class InstockFrame extends JPanel implements ActionListener{
 		table.changeColumnWidth(8, 150);
 		//设置第9列的宽度
 		table.changeColumnWidth(9, 100);
+		
+		table.setCellEditor(3, new ComboBoxEditor(userList));
 		
 		table.setCellEditor(4, new ComboBoxEditor(str));
 		
@@ -282,6 +288,18 @@ public class InstockFrame extends JPanel implements ActionListener{
 				storeType.add(item);
 			}
 		}
+		
+		userList.clear();
+		userList.add(black);
+		List<UserBean> userBeanList  = userMapper.selectUserList();
+		if(CollectionUtils.isNotEmpty(userBeanList)){
+			for(UserBean userBean : userBeanList){
+				Map<String,Object> item = new HashMap<String,Object>();
+				item.put("label", userBean.getUsername());
+				item.put("value", userBean.getId());
+				userList.add(item);
+			}
+		}
 		InstockSearchBean searchBean = new InstockSearchBean();
 		searchBean.setPageNumber(new Long(1));
 		searchBean.setPageSize(new Long(15));
@@ -314,8 +332,12 @@ public class InstockFrame extends JPanel implements ActionListener{
 	}
 	
 	private void getDatas(InstockSearchBean searchBean){
+		totalNumber = instockMapper.getCount(searchBean);
+		if(null != pageTool){
+			pageTool.setTotalNumber(totalNumber);
+			pageTool.setBounds(new Rectangle(668-pageTool.getPanelLength(),455,pageTool.getPanelLength()-3,22));
+		}
 		List<InstockBean> instockBeanList = instockMapper.selectInstocksByParams(searchBean);
-		totalNumber = instockBeanList.size();
 		if(CollectionUtils.isNotEmpty(instockBeanList)){
 			rowData.clear();
 			for(InstockBean instockBean:instockBeanList){
