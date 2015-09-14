@@ -21,7 +21,7 @@ public class MainFrame implements MouseListener{
 	private JFrame frame;
 	private Tree jtree;
 	private JPanel jpanel,instock,outstock,financial,user,codeDict;
-	private JLabel label,username,logout;
+	private JLabel label,username,logout,copyright;
 	
 	public MainFrame(String name){
 		frame = new JFrame();
@@ -46,27 +46,32 @@ public class MainFrame implements MouseListener{
 		jtree = new Tree();
 		jtree.setBounds(new Rectangle(15,35,110,580));
 		
-		jpanel = new JPanel();
-		jpanel.setBounds(new Rectangle(130,30,672,546));
+		jpanel = new IndexFrame();
+		jpanel.setBounds(new Rectangle(130,30,672,541));
 		
 		instock = new InstockFrame();
-		instock.setBounds(new Rectangle(125,30,672,546));
+		instock.setBounds(new Rectangle(125,30,672,541));
 		
 		outstock = new OutStockFrame();
-		outstock.setBounds(new Rectangle(125,30,672,546));
+		outstock.setBounds(new Rectangle(125,30,672,541));
 		
 		financial = new FinancialFrame();
-		financial.setBounds(new Rectangle(125,30,672,546));
+		financial.setBounds(new Rectangle(125,30,672,541));
 		
 		user = new UserFrame();
-		user.setBounds(new Rectangle(125,30,672,546));
+		user.setBounds(new Rectangle(125,30,672,541));
 		
 		codeDict = new CodeDictFrame();
-		codeDict.setBounds(new Rectangle(125,30,672,546));
+		codeDict.setBounds(new Rectangle(125,30,672,541));
+		
+		copyright = new JLabel("COPYRIGHT © 2014 XuCe ALL RIGHTS RESERVED.");
+		copyright.setFont(new Font("宋体", Font.PLAIN, 14));
+		copyright.setBounds(new Rectangle(265,550,300,80));
 		
 		jtree.addMouseListener(this);
 		logout.addMouseListener(this);
 		
+		frame.add(copyright);
 		frame.add(label);
 		frame.add(username);
 		frame.add(logout);
@@ -80,7 +85,7 @@ public class MainFrame implements MouseListener{
 		
 		doLay();
 		frame.setVisible(true);
-		frame.setSize(810, 610);
+		frame.setSize(810, 635);
 		frame.setLocationRelativeTo(null);
 		frame.setResizable(false);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

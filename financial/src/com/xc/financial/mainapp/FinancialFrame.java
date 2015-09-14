@@ -28,12 +28,14 @@ import javax.swing.JTextField;
 import com.xc.financial.beans.CodeDictBean;
 import com.xc.financial.beans.FinancialBean;
 import com.xc.financial.beans.SearchBean;
+import com.xc.financial.beans.UserBean;
 import com.xc.financial.enums.CodeDictEnum;
 import com.xc.financial.enums.SnTypeEnum;
 import com.xc.financial.enums.column.FinancialColumnEnum;
 import com.xc.financial.mapper.CodeDictMapper;
 import com.xc.financial.mapper.FinancialMapper;
 import com.xc.financial.mapper.SnMapper;
+import com.xc.financial.mapper.UserMapper;
 import com.xc.financial.utils.CollectionUtils;
 import com.xc.financial.utils.DateUtils;
 import com.xc.financial.utils.NumberFormatUtils;
@@ -57,9 +59,11 @@ public class FinancialFrame extends JPanel implements ActionListener{
 	private JTextField field,startDate,endDate;
 	private DatePicker datepicker,datepicker1;
 	private static List<Map<String,Object>> str = new ArrayList<Map<String,Object>>();
+	private List<Map<String,Object>> userList = new ArrayList<Map<String,Object>>();
 	private FinancialMapper financialMapper = new FinancialMapper();
 	private SnMapper snMapper = new SnMapper();
 	private CodeDictMapper codeDictMapper = new CodeDictMapper();
+	private UserMapper userMapper = new UserMapper();
 	private BigDecimal amount = BigDecimal.ZERO;
 	private PageToolBar<FinancialFrame> pageTool;
 	private Integer totalNumber;
@@ -147,11 +151,14 @@ public class FinancialFrame extends JPanel implements ActionListener{
 		//设置第9列的宽度
 		table.changeColumnWidth(9, 100);
 		
+		table.setCellEditor(3, new ComboBoxEditor(userList));
+		
 		table.setCellEditor(4, new ComboBoxEditor(str));
 		
 		table.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
 		
 		List<Integer> columns = new ArrayList<Integer>();
+		columns.add(3);
 		columns.add(4);
 		table.initCombox(columns);
 		table.setOpaque(false);
@@ -263,6 +270,18 @@ public class FinancialFrame extends JPanel implements ActionListener{
 				item.put("label", codeDictBean.getValue());
 				item.put("value", codeDictBean.getId());
 				str.add(item);
+			}
+		}
+		
+		userList.clear();
+		userList.add(black);
+		List<UserBean> userBeanList  = userMapper.selectUserList();
+		if(CollectionUtils.isNotEmpty(userBeanList)){
+			for(UserBean userBean : userBeanList){
+				Map<String,Object> item = new HashMap<String,Object>();
+				item.put("label", userBean.getUsername());
+				item.put("value", userBean.getId());
+				userList.add(item);
 			}
 		}
 		

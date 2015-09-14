@@ -53,7 +53,7 @@ public class OutstockMapper {
 				sb.append("'"+ data.get(OutstockColumnEnum.getOutstockColumnValueByKey("type").getValue())+"',");
 			}
 			
-			if(StringUtils.isEmpty((String)data.get(OutstockColumnEnum.getOutstockColumnValueByKey("member").getValue()))){
+			if(StringUtils.isEmpty(data.get(OutstockColumnEnum.getOutstockColumnValueByKey("member").getValue()))){
 				sb.append("null,");
 			}else{
 				sb.append("'"+ data.get(OutstockColumnEnum.getOutstockColumnValueByKey("member").getValue())+"',");
@@ -144,7 +144,7 @@ public class OutstockMapper {
 				sb.append("type = '"+ data.get(OutstockColumnEnum.getOutstockColumnValueByKey("type").getValue())+"',");
 			}
 			
-			if(StringUtils.isEmpty((String)data.get(OutstockColumnEnum.getOutstockColumnValueByKey("member").getValue()))){
+			if(StringUtils.isEmpty(data.get(OutstockColumnEnum.getOutstockColumnValueByKey("member").getValue()))){
 				sb.append("member = null,");
 			}else{
 				sb.append("member = '"+ data.get(OutstockColumnEnum.getOutstockColumnValueByKey("member").getValue())+"',");
@@ -263,7 +263,7 @@ public class OutstockMapper {
 		outstocks = new ArrayList<OutstockBean>();
 		try{
 			StringBuffer sb = new StringBuffer();	
-			sb.append("select o.*,c.value as typeValue,s.value as purSourceValue from outstock o left join code_dict c on o.type = c.id left join code_dict s on o.pur_source = s.id where 1=1");
+			sb.append("select o.*,c.value as typeValue,s.value as purSourceValue,u.username as memberValue from outstock o left join code_dict c on o.type = c.id left join code_dict s on o.pur_source = s.id left join user u on o.member = u.id where 1=1");
 			if(StringUtils.isNotEmpty(searchBean.getCode())){
 				sb.append(" and o.code like '%" + searchBean.getCode() +"%'");
 			}
@@ -289,7 +289,7 @@ public class OutstockMapper {
 				OutstockBean outstockBean = new OutstockBean();
 				outstockBean.setIndex(index++);
 				outstockBean.setCode(result.getString("code"));
-				outstockBean.setMember(result.getString("member"));
+				outstockBean.setMember(result.getString("memberValue"));
 				outstockBean.setCreateDate(DateUtils.parseLongDate(DateUtils.parseDate(result.getString("create_date"))));
 				outstockBean.setModifyDate(DateUtils.parseLongDate(DateUtils.parseDate(result.getString("modify_date"))));
 				outstockBean.setAmount(BigDecimal.valueOf(Double.valueOf(result.getString("amount"))));

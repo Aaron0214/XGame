@@ -164,6 +164,7 @@ public class InstockFrame extends JPanel implements ActionListener{
 		table.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
 		
 		List<Integer> columns = new ArrayList<Integer>();
+		columns.add(3);
 		columns.add(4);
 		columns.add(6);
 		table.initCombox(columns);
@@ -176,8 +177,9 @@ public class InstockFrame extends JPanel implements ActionListener{
         
         pane3.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
-				if(e.getSource() != datepicker){
+				if(e.getSource() != datepicker || e.getSource() != datepicker1){
 					datepicker.hidePanel();
+					datepicker1.hidePanel();
 				}
 			}
 		});

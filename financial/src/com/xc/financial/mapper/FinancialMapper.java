@@ -52,7 +52,7 @@ public class FinancialMapper {
 				sb.append("'"+ data.get(FinancialColumnEnum.getFinancialColumnValueByKey("type").getValue())+"',");
 			}
 			
-			if(StringUtils.isEmpty((String)data.get(FinancialColumnEnum.getFinancialColumnValueByKey("member").getValue()))){
+			if(StringUtils.isEmpty(data.get(FinancialColumnEnum.getFinancialColumnValueByKey("member").getValue()))){
 				sb.append("null,");
 			}else{
 				sb.append("'"+ data.get(FinancialColumnEnum.getFinancialColumnValueByKey("member").getValue())+"',");
@@ -121,7 +121,7 @@ public class FinancialMapper {
 				sb.append("type = '"+ data.get(FinancialColumnEnum.getFinancialColumnValueByKey("type").getValue())+"',");
 			}
 			
-			if(StringUtils.isEmpty((String)data.get(FinancialColumnEnum.getFinancialColumnValueByKey("member").getValue()))){
+			if(StringUtils.isEmpty(data.get(FinancialColumnEnum.getFinancialColumnValueByKey("member").getValue()))){
 				sb.append("member = null,");
 			}else{
 				sb.append("member = '"+ data.get(FinancialColumnEnum.getFinancialColumnValueByKey("member").getValue())+"',");
@@ -209,7 +209,7 @@ public class FinancialMapper {
 		List<FinancialBean> finanacialList = new ArrayList<FinancialBean>();
 		try{
 			StringBuffer sb = new StringBuffer();	
-			sb.append("select f.*,c.value as typeValue from financial f left join code_dict c on f.type = c.id where 1=1");
+			sb.append("select f.*,c.value as typeValue,u.username as memberValue from financial f left join code_dict c on f.type = c.id left join user u on f.member = u.id where 1=1");
 			if(StringUtils.isNotEmpty(searchBean.getCode())){
 				sb.append(" and f.code like '%" + searchBean.getCode() +"%'");
 			}
@@ -232,7 +232,7 @@ public class FinancialMapper {
 				FinancialBean financialBean = new FinancialBean();
 				financialBean.setIndex(index++);
 				financialBean.setCode(result.getString("code"));
-				financialBean.setMember(result.getString("member"));
+				financialBean.setMember(result.getString("memberValue"));
 				financialBean.setCreateDate(DateUtils.parseLongDate(DateUtils.parseDate(result.getString("create_date"))));
 				financialBean.setModifyDate(DateUtils.parseLongDate(DateUtils.parseDate(result.getString("modify_date"))));
 				financialBean.setAmount(BigDecimal.valueOf(Double.valueOf(result.getString("amount"))));
