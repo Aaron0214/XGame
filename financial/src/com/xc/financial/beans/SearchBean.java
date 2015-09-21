@@ -17,6 +17,8 @@ public class SearchBean extends SearchPage{
 	private String endDate;
 	
 	private String type;
+	
+	private String status;
 
 	public Integer getId() {
 		return id;
@@ -56,6 +58,14 @@ public class SearchBean extends SearchPage{
 
 	public void setType(String type) {
 		this.type = type;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
 	}
 	
 }

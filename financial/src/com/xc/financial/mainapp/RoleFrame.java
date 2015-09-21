@@ -1,6 +1,5 @@
 package com.xc.financial.mainapp;
 
-import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -23,96 +22,88 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
-import com.xc.financial.beans.UserOperateBean;
-import com.xc.financial.beans.UserSearchBean;
-import com.xc.financial.enums.column.UserColumnEnum;
-import com.xc.financial.mapper.UserMapper;
+import com.xc.financial.beans.RoleOperateBean;
+import com.xc.financial.beans.SearchBean;
+import com.xc.financial.enums.column.RoleColumnEnum;
+import com.xc.financial.mapper.RoleMapper;
 import com.xc.financial.utils.CollectionUtils;
 import com.xc.financial.utils.ObjectUtils;
 import com.xc.financial.utils.StringUtils;
 import com.xc.financial.tools.*;
 
-public class UserFrame extends JPanel implements ActionListener{
-	
+public class RoleFrame extends JPanel implements ActionListener{
+
+	/**
+	 * 
+	 */
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 	private Table table;
 	private Vector<Object> columns = new Vector<Object>();
-	private String[] columnNames= {"","序号","用户编码","姓名","性别","出生日期","状态","地址 ","用户名","邮箱","电话号码","创建时间","修改时间","备注","操作员"}; 
+	private String[] columnNames= {"","编号","角色名称","状态","创建时间","修改时间","备注","操作员"}; 
 	private Vector<Object> rowData = new Vector<Object>();
 	private JScrollPane pane3;
 	private JButton button,edit,delete,search;
-	private JLabel label,label1,label2,label3,label4,label5;
-	private MyComboBox status;
-	private JTextField field,field1,field2,startDate,endDate;
+	private JLabel label,label1,label2,label3;
+	private MyComboBox type;
+	private JTextField field,startDate,endDate;
 	private DatePicker datepicker,datepicker1;
 	private static List<Map<String,Object>> str = new ArrayList<Map<String,Object>>();
-	private UserMapper userkMapper = new UserMapper();
-	private PageToolBar<UserFrame> pageTool;
+	private RoleMapper roleMapper = new RoleMapper();
+	private PageToolBar<RoleFrame> pageTool;
 	private Integer totalNumber;
-	private JFrame frame;
+	private MainFrame frame;
 	
-	public UserFrame(){
+	public RoleFrame(){
 		this.setLayout(null);
 		init();
 		
-		label = new JLabel("编码：");
+		label = new JLabel("编号：");
 		label.setFont(new Font("宋体", Font.PLAIN, 13));
 		label.setBounds(new Rectangle(5,15,50,20));
 		
 		field = new JTextField();
-		field.setBounds(new Rectangle(45,15,120,20));
+		field.setBounds(new Rectangle(45,15,100,20));
 		
-		label3 = new JLabel("用户名：");
+		label3 = new JLabel("状态：");
 		label3.setFont(new Font("宋体", Font.PLAIN, 13));
-		label3.setBounds(new Rectangle(175,15,80,20));
+		label3.setBounds(new Rectangle(180,15,80,20));
 		
-		field1 = new JTextField();
-		field1.setBounds(new Rectangle(230,15,120,20));
-		
-		label5 = new JLabel("姓名：");
-		label5.setFont(new Font("宋体", Font.PLAIN, 13));
-		label5.setBounds(new Rectangle(360,15,80,20));
-		
-		field2 = new JTextField();
-		field2.setBounds(new Rectangle(400,15,120,20));
-		
-		label4 = new JLabel("状态：");
-		label4.setFont(new Font("宋体", Font.PLAIN, 13));
-		label4.setBounds(new Rectangle(530,15,80,20));
-		
-		status = new MyComboBox(str);
-		status.setFont(new Font("宋体", Font.PLAIN, 13));
-		status.setBounds(new Rectangle(570,15,90,20));
-		status.setCursor(new Cursor(Cursor.HAND_CURSOR));
+		type = new MyComboBox(str);
+		type.setFont(new Font("宋体", Font.PLAIN, 13));
+		type.setBounds(new Rectangle(220,15,80,20));
+		type.setCursor(new Cursor(Cursor.HAND_CURSOR));
 		
 		label1 = new JLabel("开始日期：");
 		label1.setFont(new Font("宋体", Font.PLAIN, 13));
-		label1.setBounds(new Rectangle(5,45,80,20));
+		label1.setBounds(new Rectangle(330,15,80,20));
 		
 		startDate = new JTextField();
-		startDate.setBounds(new Rectangle(75,45,175,20));
+		startDate.setBounds(new Rectangle(395,15,175,20));
 		datepicker = DatePicker.getInstance("yyyy-MM-dd");
 		datepicker.register(startDate);
 		
+		
 		label2 = new JLabel("结束日期：");
 		label2.setFont(new Font("宋体", Font.PLAIN, 13));
-		label2.setBounds(new Rectangle(265,45,80,20));
+		label2.setBounds(new Rectangle(5,45,80,20));
 		
 		endDate = new JTextField();
-		endDate.setBounds(new Rectangle(335,45,175,20));
+		endDate.setBounds(new Rectangle(70,45,175,20));
 		datepicker1 = DatePicker.getInstance("yyyy-MM-dd");
 		datepicker1.register(endDate);
 		
 		search = new JButton("搜索");
-		search.setBounds(new Rectangle(530,45,60,20));
+		search.setBounds(new Rectangle(270,45,60,20));
 		search.setCursor(new Cursor(Cursor.HAND_CURSOR));
 		
 		
 		table = new Table(rowData, columns){
-			
+			/**
+			 * 
+			 */
 			private static final long serialVersionUID = 1L;
 
 			public boolean isCellEditable(int row, int column) {
@@ -125,6 +116,7 @@ public class UserFrame extends JPanel implements ActionListener{
 		};
 		table.setPreferredScrollableViewportSize(new Dimension(670, 420));
 		
+		
 		table.isCellEditable(0,2);
 		//设置第一列的宽度
 		table.changeColumnWidth(0, 20);
@@ -135,29 +127,16 @@ public class UserFrame extends JPanel implements ActionListener{
 		//设置第4列的宽度
 		table.changeColumnWidth(3, 100);
 		//设置第5列的宽度
-		table.changeColumnWidth(4, 80);
+		table.changeColumnWidth(4, 150);
 		//设置第6列的宽度
-		table.changeColumnWidth(5, 100);
-		//设置第6列的宽度
-		table.changeColumnWidth(6, 80);
+		table.changeColumnWidth(5, 150);
 		//设置第7列的宽度
-		table.changeColumnWidth(7, 200);
+		table.changeColumnWidth(6, 150);
 		//设置第8列的宽度
-		table.changeColumnWidth(8, 100);
-		//设置第9列的宽度
-		table.changeColumnWidth(9, 150);
-		//设置第9列的宽度
-		table.changeColumnWidth(10, 100);
-		//设置第10列的宽度
-		table.changeColumnWidth(11, 150);
-		//设置第11列的宽度
-		table.changeColumnWidth(12, 150);
-		//设置第12列的宽度
-		table.changeColumnWidth(13, 150);
-		//设置第13列的宽度
-		table.changeColumnWidth(14, 100);
+		table.changeColumnWidth(7, 100);
 		
 		table.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
+		
 		table.setOpaque(false);
 		
         pane3 = new JScrollPane(table);
@@ -167,21 +146,24 @@ public class UserFrame extends JPanel implements ActionListener{
         
         pane3.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
-				if(e.getSource() != datepicker){
+				if(e.getSource() != datepicker || e.getSource() != datepicker1){
 					datepicker.hidePanel();
+					datepicker1.hidePanel();
 				}
 			}
 		});
         
-        pageTool = new PageToolBar<UserFrame>(this,totalNumber);
+        pageTool = new PageToolBar<RoleFrame>(this,totalNumber);
         pageTool.setBounds(new Rectangle(668-pageTool.getPanelLength(),455,pageTool.getPanelLength()-3,22));
         
         button = new JButton("添加");
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
         button.setBounds(new Rectangle(240,508,60,25));
+        
         edit = new JButton("编辑");
         edit.setCursor(new Cursor(Cursor.HAND_CURSOR));
         edit.setBounds(new Rectangle(310,508,60,25));
+        
         delete = new JButton("删除");
         delete.setCursor(new Cursor(Cursor.HAND_CURSOR));
         delete.setBounds(new Rectangle(380,508,60,25));
@@ -194,15 +176,11 @@ public class UserFrame extends JPanel implements ActionListener{
         this.add(label);
         this.add(field);
         this.add(label3);
-        this.add(field1);
-        this.add(label5);
-        this.add(field2);
-        this.add(label4);
+        this.add(type);
         this.add(label1);
         this.add(startDate);
         this.add(label2);
         this.add(endDate);
-        this.add(status);
         this.add(search);
         
         this.add(pageTool);
@@ -219,7 +197,6 @@ public class UserFrame extends JPanel implements ActionListener{
 				}
 			}
 		});
-		this.setVisible(false);
 	}
 	
 	@Override
@@ -228,8 +205,9 @@ public class UserFrame extends JPanel implements ActionListener{
 			search(new Long(1),new Long(15));
 		}
 		if(e.getSource() == button){
-			frame.setEnabled(false);
-			new ManageUserFrame(this,null,"add");
+			ManageRoleFrame manageRole = new ManageRoleFrame(null);
+			manageRole.setFrame(frame);
+			frame.changeFrame(manageRole);
 		}
 		if(e.getSource() == edit){
 			List<Map<String, Object>> datas = table.getSelectRowValue();
@@ -237,9 +215,10 @@ public class UserFrame extends JPanel implements ActionListener{
 				if(datas.size() > 1){
 					JOptionPane.showMessageDialog(null, "请选择一条数据进行编辑！");
 				}else{
-					frame.setEnabled(false);
 					Map<String, Object> data = datas.get(0);
-					new ManageUserFrame(this,(String)data.get(UserColumnEnum.getUserColumnValueByKey("code").getValue()),"edit");
+					ManageRoleFrame manageRole = new  ManageRoleFrame((Integer)data.get(RoleColumnEnum.getRoleColumnValueByKey("id").getValue()));
+					manageRole.setFrame(frame);
+					frame.changeFrame(manageRole);
 				}
 			}else{
 				JOptionPane.showMessageDialog(null, "请先选择一行需要编辑的数据！");
@@ -273,23 +252,24 @@ public class UserFrame extends JPanel implements ActionListener{
 		item1.put("value", "N");
 		str.add(item1);
 		
-		UserSearchBean searchBean = new UserSearchBean();
+		SearchBean searchBean = new SearchBean();
 		searchBean.setPageNumber(new Long(1));
 		searchBean.setPageSize(new Long(15));
 		getDatas(searchBean);
 	}
 	
-	public void getDatas(UserSearchBean searchBean){
-		totalNumber = userkMapper.getCount(searchBean);
+	
+	private void getDatas(SearchBean searchBean){
+		totalNumber = roleMapper.getCount(searchBean);
 		if(null != pageTool){
 			pageTool.setTotalNumber(totalNumber);
 			pageTool.setBounds(new Rectangle(668-pageTool.getPanelLength(),455,pageTool.getPanelLength()-3,22));
 		}
-		List<UserOperateBean> userBeanList = userkMapper.selectUsersByParams(searchBean);
-		if(CollectionUtils.isNotEmpty(userBeanList)){
+		List<RoleOperateBean> roleBeanList = roleMapper.selectRolesByParams(searchBean);
+		if(CollectionUtils.isNotEmpty(roleBeanList)){
 			rowData.clear();
-			for(UserOperateBean userBean:userBeanList){
-				rowData.add(buildVectorData(userBean));
+			for(RoleOperateBean roleBean : roleBeanList){
+				rowData.add(buildVectorData(roleBean));
 			}
 		}else{
 			rowData.clear();
@@ -300,43 +280,42 @@ public class UserFrame extends JPanel implements ActionListener{
 	}
 	
 	private void search(long pageNumber,long pageSize){
-		UserSearchBean searchBean = new UserSearchBean();
-		searchBean.setCode(field.getText());
+		SearchBean searchBean = new SearchBean();
+		searchBean.setId(StringUtils.isEmpty(field.getText())?null:Integer.parseInt(field.getText()));
 		searchBean.setStartDate(startDate.getText());
 		searchBean.setEndDate(endDate.getText());
-		searchBean.setStatus(StringUtils.isEmpty(status.getSelectedItemValue())?null:status.getSelectedItemValue().toString());
+		searchBean.setStatus(StringUtils.isEmpty(type.getSelectedItemValue()) ? null : type.getSelectedItemValue().toString());
 		searchBean.setPageNumber(pageNumber);
 		searchBean.setPageSize(pageSize);
 		getDatas(searchBean);
 	}
 	
-	private Vector<Object> buildVectorData(UserOperateBean userBean){
+	private Vector<Object> buildVectorData(RoleOperateBean roleBean){
 		try {
-			return ObjectUtils.createNewVecto(userBean);
+			return ObjectUtils.createNewVecto(roleBean);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
 		}
 	}
 	
-	public void setFrame(JFrame frame){
+	public void setFrame(MainFrame frame){
 		this.frame = frame;
 	}
 	
-	public JFrame getFrame(){
+	public MainFrame getFrame(){
 		return frame;
 	}
 	
-	public static void main(String[] args){
-		JFrame frame1 = new JFrame();
-		UserFrame panel = new UserFrame();
-		panel.setVisible(true);
-		panel.setFrame(frame1);
-		frame1.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame1.add(panel,BorderLayout.CENTER);
-		frame1.setSize(680, 570);
-		frame1.setLocationRelativeTo(null);
-		frame1.setResizable(false);
-		frame1.setVisible(true);
+	public static void main(String[] arg0){
+		JFrame frame = new JFrame();
+		RoleFrame panel = new RoleFrame();
+		frame.add(panel);
+		frame.setSize(680, 570);
+		frame.setLocationRelativeTo(null);
+		frame.setResizable(false);
+		frame.setVisible(true);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
+
 }

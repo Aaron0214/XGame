@@ -13,23 +13,35 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
+import com.xc.financial.tools.*;
 
 import com.xc.financial.login.LoginFrame;
 
-public class MainFrame implements MouseListener{
+public class MainFrame extends JFrame implements MouseListener{
 	
-	private JFrame frame;
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private Tree jtree;
-	private JPanel jpanel,instock,outstock,financial,user,codeDict;
-	private JLabel label,username,logout,copyright;
+	private JPanel jpanel,instock,outstock,financial,codeDict,back;
+	private UserFrame user;
+	private RoleFrame role;
+	private JLabel label,label1,username,logout,copyright;
+	private JPanel lastFrame;
 	
 	public MainFrame(String name){
-		frame = new JFrame();
-		frame.setLayout(null);
+		this.setLayout(null);
+		
+		back = (JPanel) this.getContentPane();
 		
 		label = new JLabel("欢迎,");
 		label.setFont(new Font("宋体", Font.PLAIN, 13));
 		label.setBounds(new Rectangle(675,5,40,20));
+		
+		label1 = new JLabel("欢迎登陆财务管理系统");
+		label1.setFont(new Font("宋体", Font.PLAIN, 13));
+		label1.setBounds(new Rectangle(20,5,150,20));
 		
 		username = new JLabel(name);
 		username.setFont(new Font("宋体", Font.PLAIN, 13));
@@ -44,10 +56,10 @@ public class MainFrame implements MouseListener{
 		logout.setCursor(new Cursor(Cursor.HAND_CURSOR));
 		
 		jtree = new Tree();
-		jtree.setBounds(new Rectangle(15,35,110,580));
+		jtree.setBounds(new Rectangle(15,10,110,580));
 		
 		jpanel = new IndexFrame();
-		jpanel.setBounds(new Rectangle(130,30,672,541));
+		jpanel.setBounds(new Rectangle(125,30,672,541));
 		
 		instock = new InstockFrame();
 		instock.setBounds(new Rectangle(125,30,672,541));
@@ -64,6 +76,9 @@ public class MainFrame implements MouseListener{
 		codeDict = new CodeDictFrame();
 		codeDict.setBounds(new Rectangle(125,30,672,541));
 		
+		role = new RoleFrame();
+		role.setBounds(new Rectangle(125,30,672,541));
+		
 		copyright = new JLabel("COPYRIGHT © 2014 XuCe ALL RIGHTS RESERVED.");
 		copyright.setFont(new Font("宋体", Font.PLAIN, 14));
 		copyright.setBounds(new Rectangle(265,550,300,80));
@@ -71,30 +86,26 @@ public class MainFrame implements MouseListener{
 		jtree.addMouseListener(this);
 		logout.addMouseListener(this);
 		
-		frame.add(copyright);
-		frame.add(label);
-		frame.add(username);
-		frame.add(logout);
-		frame.add(jtree);
-		frame.add(jpanel);
-		frame.add(instock);
-		frame.add(outstock);
-		frame.add(financial);
-		frame.add(user);
-		frame.add(codeDict);
+		back.add(copyright);
+		back.add(label1);
+		back.add(label);
+		back.add(username);
+		back.add(logout);
+		back.add(jtree);
+		back.add(jpanel);
 		
 		doLay();
-		frame.setVisible(true);
-		frame.setSize(810, 635);
-		frame.setLocationRelativeTo(null);
-		frame.setResizable(false);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		this.setVisible(true);
+		this.setSize(810, 635);
+		this.setLocationRelativeTo(null);
+		this.setResizable(false);
+		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
 	
 	private void doLay() {
-        Container container = frame.getContentPane();
+        Container container = this.getContentPane();
         container.setBackground(new Color(167, 201, 219));
-        frame.pack();
+        this.pack();
     } 
 	
 	public static void main(String[] args){
@@ -104,69 +115,98 @@ public class MainFrame implements MouseListener{
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		if(e.getSource() == jtree){
+			back.remove(jpanel);
+			back.remove(instock);
+			back.remove(outstock);
+			back.remove(financial);
+			back.remove(user);
+			back.remove(codeDict);
+			back.remove(role);
+			if(null != lastFrame){
+				back.remove(lastFrame);
+			}
 			if(SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 1){
 				DefaultMutableTreeNode node = (DefaultMutableTreeNode) jtree.getLastSelectedPathComponent();
 				if(node != null && node.getChildCount() == 0){
 					if(node.getUserObject().equals("首页")){
+						jpanel = new IndexFrame();
+						jpanel.setBounds(new Rectangle(125,30,672,541));
+						back.add(jpanel);
+						back.updateUI();
 						jpanel.setVisible(true);
-						instock.setVisible(false);
-						outstock.setVisible(false);
-						financial.setVisible(false);
-						user.setVisible(false);
-						codeDict.setVisible(false);
 					}
 					if(node.getUserObject().equals("收入管理")){
-						jpanel.setVisible(false);
-						outstock.setVisible(false);
-						financial.setVisible(false);
-						user.setVisible(false);
-						codeDict.setVisible(false);
+						instock = new InstockFrame();
+						instock.setBounds(new Rectangle(125,30,672,541));
+						back.add(instock);
+						back.updateUI();
 						instock.setVisible(true);
 					}
 					
 					if(node.getUserObject().equals("消费管理")){
-						jpanel.setVisible(false);
-						instock.setVisible(false);
-						financial.setVisible(false);
-						user.setVisible(false);
-						codeDict.setVisible(false);
+						outstock = new OutStockFrame();
+						outstock.setBounds(new Rectangle(125,30,672,541));
+						back.add(outstock);
+						back.updateUI();
 						outstock.setVisible(true);
 					}
 					
 					if(node.getUserObject().equals("余额管理")){
-						jpanel.setVisible(false);
-						instock.setVisible(false);
-						outstock.setVisible(false);
-						user.setVisible(false);
-						codeDict.setVisible(false);
+						financial = new FinancialFrame();
+						financial.setBounds(new Rectangle(125,30,672,541));
+						back.add(financial);
+						back.updateUI();
 						financial.setVisible(true);
 					}
 					
 					if(node.getUserObject().equals("用户列表")){
-						jpanel.setVisible(false);
-						instock.setVisible(false);
-						outstock.setVisible(false);
-						financial.setVisible(false);
-						codeDict.setVisible(false);
+						user = new UserFrame();
+						user.setBounds(new Rectangle(125,30,672,541));
+						user.setFrame(this);
+						back.add(user);
+						back.updateUI();
 						user.setVisible(true);
 					}
 					if(node.getUserObject().equals("配置项管理")){
-						jpanel.setVisible(false);
-						instock.setVisible(false);
-						outstock.setVisible(false);
-						financial.setVisible(false);
-						user.setVisible(false);
+						codeDict = new CodeDictFrame();
+						codeDict.setBounds(new Rectangle(125,30,672,541));
+						back.add(codeDict);
+						back.updateUI();
 						codeDict.setVisible(true);
+					}
+					if(node.getUserObject().equals("角色管理")){
+						role = new RoleFrame();
+						role.setBounds(new Rectangle(125,30,672,541));
+						role.setFrame(this);
+						back.add(role);
+						back.updateUI();
 					}
 				}
 			}
 		}
 		
 		if(e.getSource() == logout){
-			frame.dispose();
+			this.dispose();
 			new LoginFrame();
 		}
 		
+	}
+	
+	public void changeFrame(JPanel panel){
+		back.remove(jpanel);
+		back.remove(instock);
+		back.remove(outstock);
+		back.remove(financial);
+		back.remove(user);
+		back.remove(codeDict);
+		back.remove(role);
+		if(null != lastFrame){
+			back.remove(lastFrame);
+		}
+		panel.setBounds(new Rectangle(125,30,672,541));
+		back.add(panel);
+		back.updateUI();
+		lastFrame = panel;
 	}
 
 	@Override

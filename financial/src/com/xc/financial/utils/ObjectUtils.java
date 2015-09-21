@@ -1,8 +1,10 @@
 package com.xc.financial.utils;
 
+import java.util.List;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Collection;
 import java.util.Vector;
 
 import org.dozer.DozerBeanMapper;
@@ -48,8 +50,17 @@ public class ObjectUtils {
 	    	    	 if(null == f.get(obj)){
 	 	    	    	flag = true;
 	 	    	    }else{
-	 	    	    	flag = false;
-	 	    	    	break;
+	 	    	    	if(f.getType().equals(List.class)){
+	 	    	    		if(CollectionUtils.isEmpty((Collection<?>) f.get(obj))){
+	 	    	    			flag = true;
+	 	    	    		}else{
+	 	    	    			flag = false;
+	 	    	    			break;
+	 	    	    		}
+	 	    	    	}else{
+	 	    	    		flag = false;
+	 	    	    		break;
+	 	    	    	}
 	 	    	    }
 	    	    }
 	    	}

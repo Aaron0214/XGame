@@ -42,6 +42,7 @@ import com.xc.financial.utils.DateUtils;
 import com.xc.financial.utils.NumberFormatUtils;
 import com.xc.financial.utils.ObjectUtils;
 import com.xc.financial.utils.StringUtils;
+import com.xc.financial.tools.*;
 
 public class ManageUserFrame implements ActionListener{
 	
@@ -501,6 +502,8 @@ public class ManageUserFrame implements ActionListener{
 			searchBean.setPageNumber(new Long(1));
 			searchBean.setPageSize(new Long(15));
 			userFrame.getDatas(searchBean);
+			userFrame.getFrame().setEnabled(true);
+			userFrame.getFrame().show();
 		}
 		
 		if(e.getSource() == cancel){

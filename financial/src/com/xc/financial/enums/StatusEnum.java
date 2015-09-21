@@ -2,7 +2,7 @@ package com.xc.financial.enums;
 
 public enum StatusEnum {
 
-	NORMAL("Y","正常"),un_normal("N","异常");
+	NORMAL("Y","正常"),UN_NORMAL("N","异常");
 	
 	private String key;
 	
