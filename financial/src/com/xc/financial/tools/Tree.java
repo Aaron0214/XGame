@@ -2,6 +2,7 @@ package com.xc.financial.tools;
 
 import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.Font;
 
 import javax.swing.ImageIcon;
 import javax.swing.JTree;
@@ -45,10 +46,13 @@ public class Tree extends JTree{
 		render.setLeafIcon(new ImageIcon(""));
 		render.setClosedIcon(new ImageIcon(""));//把前面的图标去掉
 		render.setBackgroundNonSelectionColor(new Color(0, 0, 0, 0));//设置节点透明
+		render.setBackgroundSelectionColor(new Color(204, 204, 204));
+		render.setTextSelectionColor(Color.BLUE);
 		BasicTreeUI ui=(BasicTreeUI)(this.getUI());
 		ui.setCollapsedIcon(new ImageIcon("resources/images/tree.png"));//自定义打开的图标
 		ui.setExpandedIcon(new ImageIcon("resources/images/tree1.png"));//自定义打开的图标
 		this.putClientProperty("JTree.lineStyle","None");//隐藏连接线
+		this.setFont(new Font("宋体", Font.PLAIN, 13));
 		this.setOpaque(false);
 		this.setCellRenderer(render);
 		this.setCursor(new Cursor(Cursor.HAND_CURSOR));

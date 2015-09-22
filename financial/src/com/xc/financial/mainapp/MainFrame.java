@@ -24,7 +24,7 @@ public class MainFrame extends JFrame implements MouseListener{
 	 */
 	private static final long serialVersionUID = 1L;
 	private Tree jtree;
-	private JPanel jpanel,instock,outstock,financial,codeDict,back;
+	private JPanel jpanel,instock,outstock,financial,codeDict,back,authority;
 	private UserFrame user;
 	private RoleFrame role;
 	private JLabel label,label1,username,logout,copyright;
@@ -56,7 +56,7 @@ public class MainFrame extends JFrame implements MouseListener{
 		logout.setCursor(new Cursor(Cursor.HAND_CURSOR));
 		
 		jtree = new Tree();
-		jtree.setBounds(new Rectangle(15,10,110,580));
+		jtree.setBounds(new Rectangle(15,30,110,580));
 		
 		jpanel = new IndexFrame();
 		jpanel.setBounds(new Rectangle(125,30,672,541));
@@ -78,6 +78,9 @@ public class MainFrame extends JFrame implements MouseListener{
 		
 		role = new RoleFrame();
 		role.setBounds(new Rectangle(125,30,672,541));
+		
+		authority = new AuthorityFrame();
+		authority.setBounds(new Rectangle(125,30,672,541));
 		
 		copyright = new JLabel("COPYRIGHT © 2014 XuCe ALL RIGHTS RESERVED.");
 		copyright.setFont(new Font("宋体", Font.PLAIN, 14));
@@ -104,7 +107,8 @@ public class MainFrame extends JFrame implements MouseListener{
 	
 	private void doLay() {
         Container container = this.getContentPane();
-        container.setBackground(new Color(167, 201, 219));
+//        container.setBackground(new Color(167, 201, 219));
+        container.setBackground(new Color(172, 213, 242));
         this.pack();
     } 
 	
@@ -122,6 +126,7 @@ public class MainFrame extends JFrame implements MouseListener{
 			back.remove(user);
 			back.remove(codeDict);
 			back.remove(role);
+			back.remove(authority);
 			if(null != lastFrame){
 				back.remove(lastFrame);
 			}
@@ -179,6 +184,18 @@ public class MainFrame extends JFrame implements MouseListener{
 						role.setBounds(new Rectangle(125,30,672,541));
 						role.setFrame(this);
 						back.add(role);
+						back.updateUI();
+					}
+					if(node.getUserObject().equals("权限管理")){
+						authority = new AuthorityFrame();
+						authority.setBounds(new Rectangle(125,30,672,541));
+						back.add(authority);
+						back.updateUI();
+					}
+					if(node.getUserObject().equals("更改密码")){
+						authority = new AuthorityFrame();
+						authority.setBounds(new Rectangle(125,30,672,541));
+						back.add(authority);
 						back.updateUI();
 					}
 				}

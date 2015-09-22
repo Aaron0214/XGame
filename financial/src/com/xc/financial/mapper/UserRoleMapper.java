@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.xc.financial.beans.UserRoleBean;
+import com.xc.financial.utils.CollectionUtils;
 import com.xc.financial.utils.StringUtils;
 
 public class UserRoleMapper {
@@ -79,6 +80,58 @@ public class UserRoleMapper {
 			return statement.execute(sb.toString()) == true ? 1 : -1;
 		}catch(SQLException e){
 			e.printStackTrace();
+			return -1;
+		}finally{
+			try {
+				statement.close();
+				connect.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	
+	public int updateUserRole(List<UserRoleBean> userRoleList){
+		try{
+			connect = DriverManager.getConnection(url, username, password);
+			connect.setAutoCommit(false);
+			statement = connect.createStatement();
+			if(CollectionUtils.isNotEmpty(userRoleList)){
+				Integer userId = userRoleList.get(0).getUserId();
+				StringBuffer sb1 = new StringBuffer();
+				sb1.append("delete from user_role where user_id = ");
+				sb1.append(userId);
+				statement.addBatch(sb1.toString());
+				
+				for(UserRoleBean userRoleBean:userRoleList){
+					StringBuffer sb = new StringBuffer();
+					sb.append("insert into user_role(user_id,role_id) values(");
+					
+					if(null == userRoleBean.getUserId()){
+						sb.append("null,");
+					}else{
+						sb.append("'"+ userRoleBean.getUserId()+"',");
+					}
+					
+					if(StringUtils.isEmpty(userRoleBean.getRoleId())){
+						sb.append("null)");
+					}else{
+						sb.append("'"+ userRoleBean.getRoleId() +"')");
+					}
+					statement.addBatch(sb.toString());
+				}
+			}
+			statement.executeBatch();
+			connect.commit();
+			return 1;
+		}catch(SQLException e){
+			e.printStackTrace();
+			try {
+				connect.rollback();
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
 			return -1;
 		}finally{
 			try {

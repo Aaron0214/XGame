@@ -15,7 +15,7 @@ public class MyLabel extends JLabel{
 	
 	public MyLabel(Map<String,Object> data){
 		this.data = data;
-		this.setText("     " + (String)data.get("label"));
+		this.setText("    " + (String)data.get("label"));
 	}
 	
 	public Object getValue(){
